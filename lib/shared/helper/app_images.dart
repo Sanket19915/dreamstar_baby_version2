@@ -1,0 +1,36 @@
+class AppImages {
+  static const logo = "assets/images/logo.webp";
+  static const logoN = "assets/images/logon.webp";
+  static const splash1 = "assets/images/splash1.webp";
+  static const splash2 = "assets/images/splash2.webp";
+  static const splash3 = "assets/images/splash3.webp";
+  static const hand = "assets/images/hand.gif";
+  static const bg = "assets/images/bg.png";
+  static const bg1 = "assets/images/bg.png";
+  static const bell = "assets/images/charm_bell.png";
+  static const share = "assets/images/share-2.png";
+  static const baby = "assets/images/baby.png";
+  static const bellPepper = "assets/images/bellpepper.png";
+  static const book = "assets/images/book.webp";
+  static const know = "assets/images/know.webp";
+  static const exist = "assets/images/exist.png";
+  static const kine = "assets/images/kine.png";
+  static const inter = "assets/images/inter.png";
+  static const intra = "assets/images/intra.png";
+  static const natu = "assets/images/natu.png";
+  static const musi = "assets/images/musi.png";
+  static const ling = "assets/images/ling.png";
+  static const spat = "assets/images/spat.png";
+  static const logi = "assets/images/logi.png";
+  static const homenew = "assets/images/homenew.png";
+  static const testi = "assets/images/testi.png";
+  static const about = "assets/images/about.png";
+  static const follow = "assets/images/follow.png";
+  static const people = "assets/images/people.png";
+  static const kn1 = "assets/images/kn1.webp";
+  static const kn2 = "assets/images/kn2.webp";
+  static const kn3 = "assets/images/kn3.webp";
+  static const kn4 = "assets/images/kn4.webp";
+  static const kn5 = "assets/images/kn5.webp";
+  static const kn6 = "assets/images/kn6.webp";
+}
