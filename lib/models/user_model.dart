@@ -7,7 +7,7 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       phoneNo: json['phone_no'] as String? ?? '',
-      token: json['token'] as String? ?? '',
+      token: json['access_token'] as String? ?? '',
     );
   }
 }

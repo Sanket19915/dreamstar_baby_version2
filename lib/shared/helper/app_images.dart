@@ -1,5 +1,6 @@
 class AppImages {
   static const logo = "assets/images/logo.webp";
+  static const logoNew = "assets/images/logonew.png";
   static const logoN = "assets/images/logon.webp";
   static const splash1 = "assets/images/splash1.webp";
   static const splash2 = "assets/images/splash2.webp";
@@ -33,4 +34,12 @@ class AppImages {
   static const kn4 = "assets/images/kn4.webp";
   static const kn5 = "assets/images/kn5.webp";
   static const kn6 = "assets/images/kn6.webp";
+  static const login_bg = "assets/images/login_bg.jpeg";
+  static const loginbg = "assets/images/loginbg.jpeg";
+  static const propic = "assets/images/propic.png";
+  static const profile = "assets/images/profile.png";
+  static const facebook = "assets/images/facebook.png";
+  static const instagram = "assets/images/propic.png";
+  static const youtube = "assets/images/youtube.png";
+  static const whatsapp = "assets/images/whatsapp.png";
 }

@@ -6,4 +6,7 @@ class Routes {
   static const home = '/home';
   static const knowEntry = '/knowEntry';
   static const notification = '/NotificationScreen';
+  static const settingsScreen = '/SettingsScreen';
+  static const EditProfileScreen = '/EditProfileScreen';
+  static const BottoNavbarScreen = '/botto_navbar_screen';
 }

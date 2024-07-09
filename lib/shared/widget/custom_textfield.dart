@@ -181,7 +181,7 @@ class CustomTextField extends StatelessWidget {
 
     return BlocBuilder<TextFieldValidationBloc, TextFieldState>(
         builder: (context, state) {
-      double heightMultiplier = 0.06;
+      double heightMultiplier = 0.07;
       if (state is TextFieldInValidState) {
         heightMultiplier = 0.11;
       }

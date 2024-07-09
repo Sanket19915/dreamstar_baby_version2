@@ -1,8 +1,14 @@
+import 'dart:io';
+
+import 'package:dream_baby/features/konwledge_hub/affirmation.dart';
+import 'package:dream_baby/features/konwledge_hub/pdf_reader.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 
 class KnowEntry extends StatefulWidget {
   const KnowEntry({super.key});
@@ -62,7 +68,17 @@ class _KnowEntryState extends State<KnowEntry> {
                 height: 15,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () async {
+                  String pdfPath = await _loadPdfFromAssets();
+
+                  // Navigate to the PDFViewerScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PDFViewerScreen(pdfPath: pdfPath),
+                    ),
+                  );
+                },
                 child: Container(
                   height: height * 0.13,
                   width: width,
@@ -115,7 +131,18 @@ class _KnowEntryState extends State<KnowEntry> {
                 height: 15,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () async {
+                  String pdfPath1 = await _affirmationloadPdfFromAssets();
+
+                  // Navigate to the PDFViewerScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AffirmationScreen(pdfPath1: pdfPath1),
+                    ),
+                  );
+                },
                 child: Container(
                   height: height * 0.13,
                   width: width,
@@ -150,5 +177,23 @@ class _KnowEntryState extends State<KnowEntry> {
         ),
       ),
     );
+  }
+
+  Future<String> _loadPdfFromAssets() async {
+    final ByteData data = await rootBundle.load(
+        'assets/pdf/TheNineMonthJourney.pdf'); // Replace with your PDF asset path
+    final Directory tempDir = await getTemporaryDirectory();
+    final File tempFile = File('${tempDir.path}/sample.pdf');
+    await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
+    return tempFile.path;
+  }
+
+  Future<String> _affirmationloadPdfFromAssets() async {
+    final ByteData data = await rootBundle.load(
+        'assets/pdf/Affirmations.pdf'); // Replace with your PDF asset path
+    final Directory tempDir = await getTemporaryDirectory();
+    final File tempFile = File('${tempDir.path}/sample.pdf');
+    await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
+    return tempFile.path;
   }
 }

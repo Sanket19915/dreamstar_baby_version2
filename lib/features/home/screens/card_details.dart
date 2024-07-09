@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dream_baby/router/routes.dart';
+import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'dart:math' as math;
+import 'package:http/http.dart' as http;
 
 class BabyCard extends StatefulWidget {
   const BabyCard({super.key});
@@ -14,30 +20,67 @@ class BabyCard extends StatefulWidget {
 }
 
 class _BabyCardState extends State<BabyCard> {
+  String firstName = '';
+  String profilePicture = '';
+
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      var token = await AuthService.getToken(); // Retrieve token from storage
+      var url = Uri.parse('http://dreambaby.pro/api/profile');
+      var response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        setState(() {
+          firstName = data['first_name'] ?? '';
+          profilePicture = data['profile_picture'] ?? '';
+        });
+      } else {
+        print('Failed to fetch user profile: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error fetching user profile: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return Column(
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage('https://picsum.photos/200/300'),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Text(
-              'Hi, Samiksha',
-              style: GoogleFonts.lobsterTwo(
-                  color: AppColors.blackColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500),
-            )
-          ],
+        InkWell(
+          onTap: () => GoRouter.of(context).push(Routes.settingsScreen),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage('https://picsum.photos/200/300'),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Text(
+                'Hi, ${firstName}',
+                style: GoogleFonts.lobsterTwo(
+                    color: AppColors.blackColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500),
+              )
+            ],
+          ),
         ),
         const SizedBox(
           height: 15,

@@ -1,3 +1,5 @@
+import 'package:dream_baby/features/auth/screens/sign_up1.dart';
+import 'package:dream_baby/firebase_options.dart';
 import 'package:dream_baby/router/app_router.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
@@ -13,17 +15,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-  await Hive.openBox('myBox');
-  await Firebase.initializeApp();
-
-  // Check if a token exists
+  await Hive.openBox('userBox');
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   final token = await TokenService.getToken();
   if (token != null) {
     // Attempt to login using the token
     final user = await AuthService.loginWithToken(token);
     if (user != null) {
       // If login succeeds, navigate to the home screen
-      runApp(MyApp());
+      runApp(MyApp(initialRoute: Routes.home));
       return;
     } else {
       // If login fails, continue with the regular login flow
@@ -33,23 +35,26 @@ void main() async {
   }
 
   // If no token or login with token fails, start the app normally
-  runApp(MyApp());
+  runApp(MyApp(initialRoute: Routes.splash));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.initialRoute});
+
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
+        ChangeNotifierProvider(create: (_) => SignUpViewModel()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: GoRouter(
           routes: appRoutes,
-          initialLocation: Routes.splash,
+          initialLocation: initialRoute,
         ),
         title: 'Dream Baby',
         theme: ThemeData(
