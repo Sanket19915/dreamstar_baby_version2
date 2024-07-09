@@ -22,15 +22,22 @@ class BabyCard extends StatefulWidget {
 class _BabyCardState extends State<BabyCard> {
   String firstName = '';
   String profilePicture = '';
+  var weight = '0.9 KG';
+  var height = '22 CM';
+  var weeks = '20';
+  var days = '13';
+  var sizes = 'Bell Pepper';
 
+  @override
   void initState() {
     super.initState();
     _fetchUserProfile();
+    fetchBabyData(1, 1);
   }
 
   Future<void> _fetchUserProfile() async {
     try {
-      var token = await AuthService.getToken(); // Retrieve token from storage
+      var token = await AuthService.getToken();
       var url = Uri.parse('http://dreambaby.pro/api/profile');
       var response = await http.get(
         url,
@@ -54,9 +61,49 @@ class _BabyCardState extends State<BabyCard> {
     }
   }
 
+  Future<void> fetchBabyData(int week, int day) async {
+    var token = await AuthService.getToken();
+    var url =
+        Uri.parse('http://dreambaby.pro/api/baby_data?week=$week&day=$day');
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'Cookie': 'XSRF-TOKEN=your-token; laravel_session=your-session'
+    };
+
+    try {
+      var response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        var contentType = response.headers['content-type'];
+        if (contentType != null && contentType.contains('application/json')) {
+          var data = json.decode(response.body);
+
+          setState(() {
+            weight = data[0]['weight']?.toString() ?? '0.0 KG';
+            height = data[0]['height']?.toString() ?? '0 CM';
+            weeks = data[0]['week']?.toString() ?? '0';
+            days = data[0]['day']?.toString() ?? '0';
+            sizes = data[0]['size']?.toString() ?? '';
+          });
+
+          print(
+              'Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
+        } else {
+          throw Exception('Unexpected response format');
+        }
+      } else {
+        throw Exception('Failed to fetch baby data: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error fetching baby data: $e');
+      throw Exception('Error fetching baby data: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
+    double deviceHeight = MediaQuery.of(context).size.height;
     return Column(
       children: [
         InkWell(
@@ -65,15 +112,17 @@ class _BabyCardState extends State<BabyCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage('https://picsum.photos/200/300'),
+                backgroundImage: NetworkImage(profilePicture.isNotEmpty
+                    ? profilePicture
+                    : 'https://picsum.photos/200/300'),
               ),
               const SizedBox(
                 width: 10,
               ),
               Text(
-                'Hi, ${firstName}',
+                'Hi $firstName,',
                 style: GoogleFonts.lobsterTwo(
                     color: AppColors.blackColor,
                     fontSize: 20,
@@ -87,9 +136,9 @@ class _BabyCardState extends State<BabyCard> {
         ),
         ConstrainedBox(
           constraints: BoxConstraints(
-              maxHeight: math.max(height * .059, 170), minHeight: 170),
+              maxHeight: math.max(deviceHeight * .059, 170), minHeight: 170),
           child: Container(
-            height: height * 0.201,
+            height: deviceHeight * 0.201,
             decoration: BoxDecoration(
               color: AppColors.cardColor.withOpacity(.3),
               borderRadius: const BorderRadius.all(
@@ -135,7 +184,7 @@ class _BabyCardState extends State<BabyCard> {
                                           fontWeight: FontWeight.w500,
                                           color: AppColors.greyTextColor)),
                                   TextSpan(
-                                    text: '  0.5 KG',
+                                    text: '  $weight',
                                     style: GoogleFonts.poppins(
                                         fontSize: 11,
                                         height: 1,
@@ -168,7 +217,7 @@ class _BabyCardState extends State<BabyCard> {
                                           fontWeight: FontWeight.w500,
                                           color: AppColors.greyTextColor)),
                                   TextSpan(
-                                    text: '   22 CM',
+                                    text: '   $height',
                                     style: GoogleFonts.poppins(
                                         fontSize: 11,
                                         height: 1,
@@ -202,7 +251,7 @@ class _BabyCardState extends State<BabyCard> {
                                           color: AppColors.greyTextColor)),
                                   TextSpan(
                                     text:
-                                        '        20 Weeks \n               13 Days',
+                                        '        $weeks Weeks \n               $days Days',
                                     style: GoogleFonts.poppins(
                                         fontSize: 11,
                                         height: 1.5,
@@ -276,10 +325,9 @@ class _BabyCardState extends State<BabyCard> {
                               height: 10,
                             ),
                             Container(
-                              alignment: Alignment.centerLeft,
-                              padding: const EdgeInsets.only(left: 25),
+                              alignment: Alignment.center,
                               child: AutoSizeText(
-                                'Bell Pepper',
+                                sizes,
                                 textAlign: TextAlign.end,
                                 minFontSize: 14,
                                 maxLines: 2,

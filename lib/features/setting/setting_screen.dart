@@ -27,6 +27,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, dynamic> userProfile = {}; // Holds fetched user profile data
   int? userId; // Stores the user ID for delete API
+  bool isLoading = true; // Loading state flag
 
   @override
   void initState() {
@@ -36,12 +37,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> fetchUserProfile() async {
     try {
-      var token = await AuthService.getToken(); // Retrieve token from storage
+      var token = await AuthService.getToken();
 
       // Check if the token is empty
       if (token == null || token.isEmpty) {
-        print('Token is blank or not fetched correctly');
         // Handle the case where token is blank
+        setState(() {
+          isLoading = false;
+        });
         return;
       }
 
@@ -56,9 +59,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       // Print response for debugging
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         var contentType = response.headers['content-type'];
         if (contentType != null && contentType.contains('application/json')) {
@@ -66,20 +66,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
           setState(() {
             userProfile = data;
             userId = data['id']; // Store user ID for delete API
-            print('Response id: ${userId}');
+            isLoading =
+                false; // Set loading state to false after data is fetched
           });
         } else {
-          print('Unexpected content type: $contentType');
           // Handle non-JSON response
+          setState(() {
+            isLoading = false; // Set loading state to false
+          });
         }
       } else {
-        print('Failed to fetch user profile: ${response.reasonPhrase}');
-        print('Response body: ${response.body}');
         // Handle error
+        setState(() {
+          isLoading = false; // Set loading state to false
+        });
       }
     } catch (e) {
-      print('Error fetching user profile: $e');
       // Handle error
+      setState(() {
+        isLoading = false; // Set loading state to false
+      });
     }
   }
 
@@ -113,101 +119,104 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-      body: Container(
-        height: height,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppImages.bg),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 110),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  height: height * 0.2,
-                  width: width * 0.5,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(AppImages.propic),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
+      body: Stack(
+        children: [
+          Container(
+            height: height,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(AppImages.bg),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 110),
+                  InkWell(
+                    onTap: () {},
                     child: Container(
+                      height: height * 0.2,
+                      width: width * 0.5,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        image: DecorationImage(
+                          image: AssetImage(AppImages.propic),
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      child: IconButton(
-                        icon:
-                            const Icon(Icons.edit, color: AppColors.mainColor),
-                        onPressed: () {
-                          context.push(
-                            Routes.EditProfileScreen,
-                            extra: userProfile, // Pass userProfile data
-                          );
-                        },
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.edit,
+                                color: AppColors.mainColor),
+                            onPressed: () {
+                              context.push(
+                                Routes.EditProfileScreen,
+                                extra: userProfile, // Pass userProfile data
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 30),
+                  _buildSettingOption('FAQ', Icons.question_answer, () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => FAQScreen(),
+                      ),
+                    );
+                  }),
+                  _buildSettingOption('Privacy Policy', Icons.privacy_tip, () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PrivacyPolicyScreen(),
+                      ),
+                    );
+                  }),
+                  _buildSettingOption('Terms & Conditions', Icons.description,
+                      () async {
+                    String pdfPath = await _loadPdfFromAsset();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TermsAndConditionsScreen(
+                          pdfPath: pdfPath,
+                        ),
+                      ),
+                    );
+                  }),
+                  _buildSettingOption('Delete my account', Icons.delete, () {
+                    _showDeleteConfirmationDialog();
+                  }),
+                  _buildSettingOption('Logout', Icons.logout, () async {
+                    try {
+                      await FirebaseAuth.instance.signOut();
+                      SessionManager().clearSession(); // Clear session data
+                      context.go(Routes.login);
+                    } catch (e) {
+                      // Handle error as needed
+                    }
+                  }),
+                ],
               ),
-              const SizedBox(height: 30),
-              // Inside _SettingsScreenState
-              _buildSettingOption('FAQ', Icons.question_answer, () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => FAQScreen(),
-                  ),
-                );
-              }),
-
-              // Inside _SettingsScreenState
-              _buildSettingOption('Privacy Policy', Icons.privacy_tip, () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => PrivacyPolicyScreen(),
-                  ),
-                );
-              }),
-
-              _buildSettingOption('Terms & Conditions', Icons.description,
-                  () async {
-                String pdfPath = await _loadPdfFromAsset();
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => TermsAndConditionsScreen(
-                      pdfPath: pdfPath,
-                    ),
-                  ),
-                );
-              }),
-
-              _buildSettingOption('Delete my account', Icons.delete, () {
-                _showDeleteConfirmationDialog();
-              }),
-              _buildSettingOption('Logout', Icons.logout, () async {
-                try {
-                  await FirebaseAuth.instance.signOut();
-                  SessionManager().clearSession(); // Clear session data
-                  context.go(Routes.login);
-                } catch (e) {
-                  print('Error signing out: $e');
-                  // Handle error as needed
-                }
-              }),
-            ],
+            ),
           ),
-        ),
+          if (isLoading)
+            Padding(
+              padding: const EdgeInsets.only(top: 100),
+              child: const LinearProgressIndicator(),
+            ), // Show LinearProgressIndicator while loading
+        ],
       ),
     );
   }
@@ -307,13 +316,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       // Check if the token is empty
       if (token == null || token.isEmpty) {
-        print('Token is blank or not fetched correctly');
         // Handle the case where token is blank
         return;
       }
 
       if (userId == null) {
-        print('User ID not available');
         // Handle the case where user ID is not available
         return;
       }
@@ -329,19 +336,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
 
       // Print response for debugging
-      print('Response ID: ${userId}');
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         // Account deleted successfully
         // Handle any UI changes or navigations as needed
-        print('Account deleted successfully');
         // Example: Navigate to login screen after deletion
         context.go(Routes.login);
       } else {
-        print('Failed to delete account: ${response.reasonPhrase}');
-        print('Response body: ${response.body}');
         // Handle error
         // Example: Show error message to the user
         ScaffoldMessenger.of(context).showSnackBar(
@@ -352,7 +353,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     } catch (e) {
-      print('Error deleting account: $e');
       // Handle error
       // Example: Show error message to the user
       ScaffoldMessenger.of(context).showSnackBar(

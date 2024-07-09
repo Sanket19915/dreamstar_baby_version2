@@ -1,5 +1,4 @@
 // lib/otp_screen.dart
-import 'package:dream_baby/features/auth/screens/more_details.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';

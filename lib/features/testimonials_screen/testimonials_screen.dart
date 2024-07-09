@@ -12,6 +12,7 @@ class TestimonialScreen extends StatefulWidget {
 
 class _TestimonialScreenState extends State<TestimonialScreen> {
   List<Map<String, dynamic>> testimonials = [];
+  bool isLoading = true; // Add this flag
 
   @override
   void initState() {
@@ -46,95 +47,123 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
           ),
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.only(top: 90),
-        height: height,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/bg.png'), // Your background image
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: testimonials.isEmpty
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 40.0),
-                itemCount: testimonials.length,
-                itemBuilder: (context, index) {
-                  final testimonial = testimonials[index];
-                  final int stars = testimonial['rating'] is int
-                      ? testimonial['rating']
-                      : int.tryParse(testimonial['rating'].toString()) ?? 0;
-                  final String? userImage = testimonial['user_image'];
-
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: userImage != null &&
-                                        userImage.isNotEmpty
-                                    ? NetworkImage(userImage) as ImageProvider<
-                                        Object> // Explicit cast to ImageProvider<Object>
-                                    : const AssetImage(
-                                        'assets/images/default_avatar.png'),
-                                radius: 30,
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    testimonial['user_name'] ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: List.generate(5, (starIndex) {
-                                      return Icon(
-                                        starIndex < stars
-                                            ? Icons.star
-                                            : Icons.star_border,
-                                        color: Colors.amber,
-                                      );
-                                    }),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            testimonial['review'] ?? '',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            testimonial['created_at'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
+      body: Column(
+        children: [
+          if (isLoading)
+            Padding(
+              padding: const EdgeInsets.only(top: 100),
+              child: LinearProgressIndicator(),
+            ), // Show the LinearProgressIndicator when loading
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.only(top: 90),
+              height: height,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'assets/images/bg.png'), // Your background image
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : testimonials.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No Reviews yet',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 40.0),
+                          itemCount: testimonials.length,
+                          itemBuilder: (context, index) {
+                            final testimonial = testimonials[index];
+                            final double stars = testimonial['rating'] is double
+                                ? testimonial['rating']
+                                : double.tryParse(
+                                        testimonial['rating'].toString()) ??
+                                    0;
+                            final String? userImage = testimonial['user_image'];
+
+                            return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              elevation: 5,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: userImage != null &&
+                                                  userImage.isNotEmpty
+                                              ? NetworkImage(userImage)
+                                                  as ImageProvider<
+                                                      Object> // Explicit cast to ImageProvider<Object>
+                                              : const AssetImage(
+                                                  'assets/images/logon.webp'),
+                                          radius: 30,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              testimonial['user_name'] ?? '',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Row(
+                                              children:
+                                                  List.generate(5, (starIndex) {
+                                                return Icon(
+                                                  starIndex < stars
+                                                      ? Icons.star
+                                                      : Icons.star_border,
+                                                  color: Colors.amber,
+                                                );
+                                              }),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      testimonial['review'] ?? '',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      testimonial['created_at'] ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -155,12 +184,19 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
         var responseData = json.decode(response.body);
         setState(() {
           testimonials = List<Map<String, dynamic>>.from(responseData['data']);
+          isLoading = false; // Set isLoading to false after data is loaded
         });
       } else {
         print('Failed to fetch testimonials: ${response.statusCode}');
+        setState(() {
+          isLoading = false; // Set isLoading to false even if there is an error
+        });
       }
     } catch (e) {
       print('Error fetching testimonials: $e');
+      setState(() {
+        isLoading = false; // Set isLoading to false even if there is an error
+      });
     }
   }
 
@@ -180,7 +216,7 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               RatingBar.builder(
-                initialRating: 4,
+                initialRating: 0,
                 minRating: 1,
                 direction: Axis.horizontal,
                 allowHalfRating: true,
@@ -245,11 +281,13 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
         body: body,
       );
 
-      if (response.statusCode == 200) {
+      print('Unexpected response body: $body');
+
+      if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Review submitted successfully')),
         );
-        fetchTestimonials(); // Refresh testimonials after submission
+        fetchTestimonials();
       } else {
         var responseBody = response.body;
         var errorMessage = 'Failed to submit review';

@@ -234,7 +234,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 70),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     Hero(
                       tag: 'Logo',
                       child: Image.asset(
@@ -242,10 +242,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         height: MediaQuery.of(context).size.height * .06,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
                           color: AppColors.whiteColor,
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Column(
@@ -282,7 +282,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ? FileImage(_profileImage!)
                                   : null,
                               child: _profileImage == null
-                                  ? Icon(Icons.add_a_photo,
+                                  ? const Icon(Icons.add_a_photo,
                                       color: Colors.white, size: 50)
                                   : null,
                             ),
