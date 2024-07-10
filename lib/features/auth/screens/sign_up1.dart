@@ -246,8 +246,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: const BoxDecoration(
-                          color: AppColors.whiteColor,
-                          borderRadius: BorderRadius.all(Radius.circular(12))),
+                        color: AppColors.whiteColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                      ),
                       child: Column(
                         children: [
                           Row(

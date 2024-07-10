@@ -4,17 +4,25 @@ import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactUsScreen extends StatelessWidget {
+  Future<bool> launchUrl(Uri uri) async {
+    if (await canLaunch(uri.toString())) {
+      await launch(uri.toString());
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Contact Us',
           style: TextStyle(
               fontWeight: FontWeight.w600, color: AppColors.mainColor),
@@ -24,10 +32,10 @@ class ContactUsScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Container(
-        padding: EdgeInsets.only(top: 110),
+        padding: const EdgeInsets.only(top: 110),
         height: height,
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/bg.png'), // Your background image
             fit: BoxFit.cover,
@@ -43,7 +51,7 @@ class ContactUsScreen extends StatelessWidget {
                 height: 250,
                 fit: BoxFit.scaleDown,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Contact Information
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -60,61 +68,64 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.chat,
                           text: 'Chat with Us',
                           onTap: () async {
-                            final whatsappUrl = 'https://wa.me/918446164585';
-                            if (await canLaunch(whatsappUrl)) {
-                              await launch(whatsappUrl);
+                            final whatsappUrl =
+                                Uri.parse('https://wa.me/917030962300');
+                            if (await canLaunchUrl(whatsappUrl)) {
+                              await launchUrl(whatsappUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Could not open WhatsApp')),
                               );
                             }
                           },
                         ),
-                        Divider(),
+                        const Divider(),
                         ContactItem(
                           icon: Icons.phone,
-                          text: '+918446164585',
+                          text: '+917030962300',
                           onTap: () async {
-                            final phoneUrl = 'tel:+918446164585';
-                            if (await canLaunch(phoneUrl)) {
-                              await launch(phoneUrl);
+                            final phoneUrl = Uri.parse('tel:+917030962300');
+                            if (await launchUrl(phoneUrl)) {
+                              await launchUrl(phoneUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Could not make the call')),
                               );
                             }
                           },
                         ),
-                        Divider(),
+                        const Divider(),
                         ContactItem(
                           icon: Icons.web,
-                          text: 'www.dreambaby.in',
+                          text: 'www.dreamstarbaby.in',
                           onTap: () async {
-                            final websiteUrl = 'https://www.dreambaby.in';
-                            if (await canLaunch(websiteUrl)) {
-                              await launch(websiteUrl);
+                            final websiteUrl =
+                                Uri.parse('https://www.dreamstarbaby.in');
+                            if (await canLaunchUrl(websiteUrl)) {
+                              await launchUrl(websiteUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content:
                                         Text('Could not open the website')),
                               );
                             }
                           },
                         ),
-                        Divider(),
+                        const Divider(),
                         ContactItem(
                           icon: Icons.email,
-                          text: 'nehal@yopmail.com',
+                          text: 'contact@sonalijainjayaswal.com',
                           onTap: () async {
-                            final emailUrl = 'mailto:nehal@yopmail.com';
-                            if (await canLaunch(emailUrl)) {
-                              await launch(emailUrl);
+                            final emailUrl = Uri.parse(
+                                'mailto:contact@sonalijainjayaswal.com');
+                            if (await canLaunchUrl(emailUrl)) {
+                              await launchUrl(emailUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                     content: Text('Could not send the email')),
                               );
                             }
@@ -153,11 +164,11 @@ class ContactItem extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, size: 30, color: Colors.black),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Expanded(
               child: Text(
                 text,
-                style: TextStyle(fontSize: 18, color: Colors.black),
+                style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
           ],

@@ -24,7 +24,7 @@ class AboutUsScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xffF7F3FD),
         elevation: 0,
         centerTitle: true,
       ),
@@ -38,6 +38,7 @@ class AboutUsScreen extends StatelessWidget {
           ),
         ),
         child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -93,14 +94,14 @@ class AboutUsScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                             image: DecorationImage(
                               image: AssetImage(
-                                  'assets/images/profile.jpg'), // Your creator's image
+                                  'assets/images/profile.webp'), // Your creator's image
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         const Text(
-                          'DR Sonal Jaiswal',
+                          'Dr. Sonal Jain Jayaswal',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
@@ -111,31 +112,18 @@ class AboutUsScreen extends StatelessWidget {
                     const SizedBox(height: 5),
                     const Divider(color: AppColors.greyTextColor),
                     // Our Mission
-                    const Text(
-                      'Our Mission',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    const Divider(color: AppColors.greyTextColor),
+
                     // Our Vision
-                    const Text(
-                      'Our Vision',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    // const Text(
+                    //   'Our Vision',
+                    //   style: TextStyle(
+                    //     fontSize: 20,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                     const SizedBox(height: 10),
                     const Text(
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
+                      "Driven by her desire for motherhood, Dr. Sonal Jain Jayaswal, armed with formal degrees in Engineering as well as Management, embarked on an extraordinary journey to master Garbhasanskar. As an accomplished mother of two and a doctorate in prenatal education, she has positively impacted and empowered lives of countless aspiring mothers with her transformative approach. Her groundbreaking book and online app on GarbhaSanskar holistically blends ancient wisdom with modern science, igniting a revolution in nurturing divinity in the womb —a vital cornerstone for the achievement of empowered future.",
                       style: TextStyle(fontSize: 16),
                     ),
                   ],
@@ -157,25 +145,26 @@ class AboutUsScreen extends StatelessWidget {
                   IconButton(
                     icon: SvgPicture.asset('assets/images/facebook.svg'),
                     onPressed: () {
-                      _launchURL('https://facebook.com');
+                      _launchURL('https://www.facebook.com/sonaljainjayaswal/');
                     },
                   ),
                   IconButton(
                     icon: SvgPicture.asset('assets/images/instagram.svg'),
                     onPressed: () {
-                      _launchURL('https://instagram.com');
+                      _launchURL(
+                          'https://www.instagram.com/drsonaljainjayaswal/');
                     },
                   ),
                   IconButton(
                     icon: SvgPicture.asset('assets/images/youtube.svg'),
                     onPressed: () {
-                      _launchURL('https://youtube.com');
+                      _launchURL('https://www.youtube.com/@SonalJainJayaswal');
                     },
                   ),
                   IconButton(
                     icon: SvgPicture.asset('assets/images/whatsapp.svg'),
                     onPressed: () {
-                      _launchURL('https://wa.me/yourphonenumber');
+                      _launchURL('https://wa.me/917030962300');
                     },
                   ),
                 ],

@@ -67,5 +67,20 @@
     <key>ClientId</key>
     <string>1:432287109522:ios:4e20d812e024874a72b14b</string> <!-- CLIENT_ID -->
   </dict>
+
+  <!-- Add the following keys and values for URL schemes and security configurations -->
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>tel</string>
+    <string>mailto</string>
+    <string>https</string>
+    <string>http</string>
+    <string>whatsapp</string>
+  </array>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+  </dict>
 </dict>
 </plist>
