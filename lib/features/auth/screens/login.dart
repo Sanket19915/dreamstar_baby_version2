@@ -1,12 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:dream_baby/features/auth/bloc/form_validate.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
@@ -16,6 +7,14 @@ import 'package:dream_baby/shared/utils/validator.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
 import 'package:dream_baby/viewmodels/login_viewmodel.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,25 +34,25 @@ class _LoginScreenState extends State<LoginScreen> {
     final viewModel = Provider.of<LoginViewModel>(context);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppImages.loginbg),
-            fit: BoxFit.fitHeight,
-            opacity: 1,
-          ),
-        ),
-        height: double.infinity,
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: BlocProvider(
-            create: (_) => IsFormValidBloc(),
-            child: BlocBuilder<IsFormValidBloc, bool>(
-              builder: (context, isValid) {
-                return Stack(
-                  children: [
-                    Container(
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(AppImages.loginbg),
+                fit: BoxFit.fitHeight,
+                opacity: 1,
+              ),
+            ),
+            height: double.infinity,
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: BlocProvider(
+                create: (_) => IsFormValidBloc(),
+                child: BlocBuilder<IsFormValidBloc, bool>(
+                  builder: (context, isValid) {
+                    return Container(
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Column(
@@ -86,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           //     ],
                           //   ),
                           // ),
-                          SizedBox(
+                          const SizedBox(
                             height: 0,
                           ),
                           Hero(
@@ -96,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: MediaQuery.of(context).size.height * .06,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Row(
@@ -291,25 +290,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                    ),
-                    if (isLoading)
-                      Positioned.fill(
-                        child: Container(
-                          color: Colors.black.withOpacity(0.5),
-                          child: const Center(
-                            child: SpinKitCircle(
-                              color: AppColors.primaryColor,
-                              size: 50.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              },
+                    );
+                  },
+                ),
+              ),
             ),
           ),
-        ),
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                height: MediaQuery.of(context).size.height,
+                child: const Center(
+                  child: SpinKitCircle(
+                    color: AppColors.primaryColor,
+                    size: 50.0,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
