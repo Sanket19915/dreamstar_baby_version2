@@ -9,4 +9,5 @@ class Routes {
   static const settingsScreen = '/SettingsScreen';
   static const EditProfileScreen = '/EditProfileScreen';
   static const BottoNavbarScreen = '/botto_navbar_screen';
+  static const ExistentialScreenScreen = '/ExistentialScreen';
 }

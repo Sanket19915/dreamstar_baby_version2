@@ -1,6 +1,8 @@
+import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FourQuotients extends StatefulWidget {
@@ -73,14 +75,18 @@ class _FourQuotientsState extends State<FourQuotients> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        // color: Colors.green,
-                        image: DecorationImage(
-                            image: AssetImage(AppImages.exist),
-                            fit: BoxFit.cover),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(12),
+                    child: InkWell(
+                      onTap: () => GoRouter.of(context)
+                          .push(Routes.ExistentialScreenScreen),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          //color: Colors.green,
+                          image: DecorationImage(
+                              image: AssetImage(AppImages.exist),
+                              fit: BoxFit.cover),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
                         ),
                       ),
                     ),

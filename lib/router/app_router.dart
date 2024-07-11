@@ -7,6 +7,7 @@ import 'package:dream_baby/features/auth/screens/splash1.dart';
 import 'package:dream_baby/features/home/screens/home_screen.dart';
 import 'package:dream_baby/features/konwledge_hub/know_entry.dart';
 import 'package:dream_baby/features/notifications/screen/notification_screen.dart';
+import 'package:dream_baby/features/questions/sq/existential.dart';
 import 'package:dream_baby/features/setting/edit_profile_screen.dart';
 import 'package:dream_baby/features/setting/setting_screen.dart';
 import 'package:dream_baby/router/routes.dart';
@@ -46,6 +47,10 @@ final appRoutes = <RouteBase>[
   GoRoute(
     path: Routes.BottoNavbarScreen,
     builder: (context, state) => BottoNavbarScreen(),
+  ),
+  GoRoute(
+    path: Routes.ExistentialScreenScreen,
+    builder: (context, state) => ExistentialScreen(),
   ),
   GoRoute(
     path: Routes.notification,

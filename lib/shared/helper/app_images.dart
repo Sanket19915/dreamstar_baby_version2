@@ -42,4 +42,6 @@ class AppImages {
   static const instagram = "assets/images/propic.png";
   static const youtube = "assets/images/youtube.png";
   static const whatsapp = "assets/images/whatsapp.png";
+  static const sq = "assets/images/sq.webp";
+  static const existential = "assets/images/existential.png";
 }
