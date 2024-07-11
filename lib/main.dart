@@ -11,6 +11,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
+import 'shared/helper/app_color.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -58,6 +60,12 @@ class MyApp extends StatelessWidget {
         ),
         title: 'Dream Baby',
         theme: ThemeData(
+          radioTheme: const RadioThemeData(
+              fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
+          checkboxTheme: const CheckboxThemeData(
+              side: BorderSide(color: AppColors.mainColor),
+              checkColor: WidgetStatePropertyAll(AppColors.whiteColor),
+              fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
           primarySwatch: Colors.pink,
         ),
       ),

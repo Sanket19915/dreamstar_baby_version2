@@ -46,7 +46,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
     if (isLoggedIn) {
       context.go(Routes.home);
     } else {
-      context.go(Routes.moreDetails); // Navigate to login if not logged in
+      context.go(Routes.login); // Navigate to login if not logged in
     }
   }
 

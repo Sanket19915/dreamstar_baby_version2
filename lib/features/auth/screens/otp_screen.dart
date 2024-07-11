@@ -1,18 +1,21 @@
 // lib/otp_screen.dart
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class OTPScreen extends StatefulWidget {
   final String phoneNumber;
   final String verificationId;
   final VoidCallback onVerified;
 
-  OTPScreen({
+  const OTPScreen({
+    super.key,
     required this.phoneNumber,
     required this.verificationId,
     required this.onVerified,
@@ -25,9 +28,13 @@ class OTPScreen extends StatefulWidget {
 class _OTPScreenState extends State<OTPScreen> {
   final TextEditingController otpController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  bool isLoading = false;
   void signInWithOTP() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
+
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: widget.verificationId,
         smsCode: otpController.text,
@@ -36,9 +43,16 @@ class _OTPScreenState extends State<OTPScreen> {
       await _auth
           .signInWithCredential(credential)
           .then((value) => print('User Login In Successful'));
-      ;
-      widget.onVerified(); // Call the callback to sign up
+   
+      widget.onVerified();
+     setState(() {
+        isLoading = false;
+      });    // Call the callback to sign up
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: e.toString());
       print('Failed to sign in with OTP: $e');
     }
   }
@@ -67,7 +81,7 @@ class _OTPScreenState extends State<OTPScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 70),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     Hero(
                       tag: 'Logo',
                       child: Image.asset(
@@ -75,10 +89,10 @@ class _OTPScreenState extends State<OTPScreen> {
                         height: MediaQuery.of(context).size.height * .06,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
+                      padding: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
                           color: AppColors.whiteColor,
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Column(
@@ -130,6 +144,18 @@ class _OTPScreenState extends State<OTPScreen> {
                   ],
                 ),
               ),
+              if (isLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: const Center(
+                      child: SpinKitThreeInOut(
+                        color: AppColors.primaryColor,
+                        size: 40.0,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

@@ -207,11 +207,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       isLoading = false;
     });
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MoreDetailsScreen()),
-    );
-    // context.go(Routes.home);
+  
+    context.go(Routes.moreDetails);
   }
 
   @override
