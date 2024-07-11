@@ -90,13 +90,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _motionTabBarController.index = value;
           });
         },
-        images: [
-          AppImages.testi,
-          AppImages.about,
-          AppImages.homenew,
-          AppImages.people,
-          AppImages.follow
-        ],
+        // images: [
+        //   AppImages.testi,
+        //   AppImages.about,
+        //   AppImages.homenew,
+        //   AppImages.people,
+        //   AppImages.follow
+        // ],
       ),
     );
   }
