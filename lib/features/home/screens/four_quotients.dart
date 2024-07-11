@@ -1,3 +1,4 @@
+import 'package:dream_baby/features/questions/sq/existential.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
@@ -73,14 +74,24 @@ class _FourQuotientsState extends State<FourQuotients> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        // color: Colors.green,
-                        image: DecorationImage(
-                            image: AssetImage(AppImages.exist),
-                            fit: BoxFit.cover),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(12),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) =>
+                                const ExistentialScreen(from: "Existential"),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          //color: Colors.green,
+                          image: DecorationImage(
+                              image: AssetImage(AppImages.exist),
+                              fit: BoxFit.cover),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
                         ),
                       ),
                     ),
@@ -89,14 +100,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                     width: 10,
                   ),
                   Expanded(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        // color: Colors.green,
-                        image: DecorationImage(
-                            image: AssetImage(AppImages.kine),
-                            fit: BoxFit.cover),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(12),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) =>
+                                const ExistentialScreen(from: "Kinesthetic"),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          // color: Colors.green,
+                          image: DecorationImage(
+                              image: AssetImage(AppImages.kine),
+                              fit: BoxFit.cover),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
                         ),
                       ),
                     ),
@@ -127,14 +148,25 @@ class _FourQuotientsState extends State<FourQuotients> {
                                   children: [
                                     Expanded(
                                       flex: 1,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            image: DecorationImage(
-                                                image:
-                                                    AssetImage(AppImages.inter),
-                                                fit: BoxFit.cover)),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ExistentialScreen(
+                                                      from: "Interpersonal"),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.inter),
+                                                  fit: BoxFit.cover)),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
@@ -142,14 +174,25 @@ class _FourQuotientsState extends State<FourQuotients> {
                                     ),
                                     Expanded(
                                       flex: 1,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            image: DecorationImage(
-                                                image:
-                                                    AssetImage(AppImages.intra),
-                                                fit: BoxFit.cover)),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ExistentialScreen(
+                                                      from: "Intrapersonal"),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.intra),
+                                                  fit: BoxFit.cover)),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -160,13 +203,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                               ),
                               Expanded(
                                   flex: 1,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                        image: DecorationImage(
-                                            image: AssetImage(AppImages.natu),
-                                            fit: BoxFit.cover)),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (ctx) =>
+                                              const ExistentialScreen(
+                                                  from: "Naturalistic"),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10)),
+                                          image: DecorationImage(
+                                              image: AssetImage(AppImages.natu),
+                                              fit: BoxFit.cover)),
+                                    ),
                                   )),
                             ],
                           ),
@@ -208,14 +262,25 @@ class _FourQuotientsState extends State<FourQuotients> {
                                   children: [
                                     Expanded(
                                       flex: 1,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            image: DecorationImage(
-                                                image:
-                                                    AssetImage(AppImages.ling),
-                                                fit: BoxFit.cover)),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ExistentialScreen(
+                                                      from: "Linguistic"),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.ling),
+                                                  fit: BoxFit.cover)),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
@@ -223,14 +288,25 @@ class _FourQuotientsState extends State<FourQuotients> {
                                     ),
                                     Expanded(
                                       flex: 1,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            image: DecorationImage(
-                                                image:
-                                                    AssetImage(AppImages.spat),
-                                                fit: BoxFit.cover)),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ExistentialScreen(
+                                                      from: "Spatial Visual"),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.spat),
+                                                  fit: BoxFit.cover)),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -245,14 +321,25 @@ class _FourQuotientsState extends State<FourQuotients> {
                                   children: [
                                     Expanded(
                                       flex: 1,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            image: DecorationImage(
-                                                image:
-                                                    AssetImage(AppImages.logi),
-                                                fit: BoxFit.cover)),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ExistentialScreen(
+                                                      from: "Logical"),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.logi),
+                                                  fit: BoxFit.cover)),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
@@ -260,14 +347,25 @@ class _FourQuotientsState extends State<FourQuotients> {
                                     ),
                                     Expanded(
                                       flex: 1,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            image: DecorationImage(
-                                                image:
-                                                    AssetImage(AppImages.musi),
-                                                fit: BoxFit.cover)),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) =>
+                                                  const ExistentialScreen(
+                                                      from: "Musical"),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.musi),
+                                                  fit: BoxFit.cover)),
+                                        ),
                                       ),
                                     ),
                                   ],

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dream_baby/router/routes.dart';
@@ -8,9 +9,8 @@ import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'dart:math' as math;
 import 'package:http/http.dart' as http;
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class BabyCard extends StatefulWidget {
   const BabyCard({super.key});
@@ -27,6 +27,7 @@ class _BabyCardState extends State<BabyCard> {
   var weeks = '20';
   var days = '13';
   var sizes = 'Bell Pepper';
+  var images = '';
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _BabyCardState extends State<BabyCard> {
         var data = json.decode(response.body);
         setState(() {
           firstName = data['first_name'] ?? '';
-          profilePicture = data['profile_picture'] ?? '';
+          profilePicture = data['profile_pic'] ?? '';
         });
       } else {
         print('Failed to fetch user profile: ${response.reasonPhrase}');
@@ -85,6 +86,7 @@ class _BabyCardState extends State<BabyCard> {
             weeks = data[0]['week']?.toString() ?? '0';
             days = data[0]['day']?.toString() ?? '0';
             sizes = data[0]['size']?.toString() ?? '';
+            images = data[0]['image']?.toString() ?? '';
           });
 
           print(
@@ -115,7 +117,7 @@ class _BabyCardState extends State<BabyCard> {
               CircleAvatar(
                 radius: 20,
                 backgroundImage: NetworkImage(profilePicture.isNotEmpty
-                    ? profilePicture
+                    ? "http://dreambaby.pro/storage/$profilePicture"
                     : 'https://picsum.photos/200/300'),
               ),
               const SizedBox(
@@ -316,10 +318,15 @@ class _BabyCardState extends State<BabyCard> {
                             Container(
                               alignment: Alignment.center,
                               padding: const EdgeInsets.only(left: 20),
-                              child: Image.asset(
-                                AppImages.bellPepper,
-                                height: 40,
-                              ),
+                              child: images.isEmpty
+                                  ? Image.asset(
+                                      AppImages.bellPepper,
+                                      height: 40,
+                                    )
+                                  : Image.network(
+                                      "http://dreambaby.pro/storage/$images",
+                                      height: 40,
+                                    ),
                             ),
                             const SizedBox(
                               height: 10,
