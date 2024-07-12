@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
           routes: appRoutes,
           initialLocation: initialRoute,
         ),
-        title: 'Dream Baby',
+        title: 'Dream Star Baby',
         theme: ThemeData(
           radioTheme: const RadioThemeData(
               fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
