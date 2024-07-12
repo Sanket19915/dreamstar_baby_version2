@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,8 @@ import '../../../shared/widget/custom_button.dart';
 enum DetailType { EDD, LMP }
 
 class MoreDetailsScreen extends StatefulWidget {
-  const MoreDetailsScreen({super.key});
+ final String ?userId;
+  const MoreDetailsScreen({super.key ,this.userId});
 
   @override
   State<MoreDetailsScreen> createState() => _MoreDetailsScreenState();
@@ -272,7 +275,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             onPressed: () {
                               submitAdditionalDetails(
                                   dob: dobController.text,
-                                  userId: "28",
+                                  userId: widget.userId??"",
                                   eed: selectType == DetailType.EDD
                                       ? eddController.text
                                       : "",
@@ -290,9 +293,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               fontSize: 14,
                               color: AppColors.greyTextColor,
                             ),
-                            onPressed: () {
-                              context.go(Routes.home);
-                            },
+                            onPressed: () => skipInformation(widget.userId ?? ""),
                           ),
                         ],
                       ),
@@ -320,6 +321,27 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     );
   }
 
+  Future<void> skipInformation(String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://dreambaby.pro/api/auth/register/skip'),
+        body: {
+          'user_id': userId,
+        },
+      );
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data =
+            jsonDecode(response.body) as Map<String, dynamic>;
+        Fluttertoast.showToast(msg: data["message"]);
+        context.go(Routes.home);
+      } else {
+        Fluttertoast.showToast(msg: "skip faild");
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "something went wrong");
+    }
+  }
+
   Future<void> submitAdditionalDetails({
     required String dob,
     required String userId,
@@ -343,12 +365,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         Fluttertoast.showToast(msg: "Registration completed successfully");
         context.go(Routes.home);
       } else {
-        Fluttertoast.showToast(msg: "Registration faild");
-        context.go(Routes.home);
+        Fluttertoast.showToast(msg: "Something went wrong");
       }
       setState(() {
         isLoading = false;
       });
-    } catch (e) {}
+    } catch (e) {
+        Fluttertoast.showToast(msg: e.toString());
+    }
   }
 }

@@ -38,10 +38,6 @@ final appRoutes = <RouteBase>[
     path: Routes.home,
     builder: (context, state) => HomeScreen(),
   ),
-    GoRoute(
-    path: Routes.moreDetails,
-    builder: (context, state) => MoreDetailsScreen(),
-  ),
   GoRoute(
     path: Routes.knowEntry,
     builder: (context, state) => KnowEntry(),
@@ -56,7 +52,9 @@ final appRoutes = <RouteBase>[
   ),
   GoRoute(
     path: Routes.ExistentialScreenScreen,
-    builder: (context, state) => ExistentialScreen(from: "",),
+    builder: (context, state) => ExistentialScreen(
+      from: "",
+    ),
   ),
   GoRoute(
     path: Routes.notification,
@@ -64,6 +62,13 @@ final appRoutes = <RouteBase>[
       return CustomSlideTransitionPage(
         child: NotificationScreen(),
       );
+    },
+  ),
+  GoRoute(
+    path: Routes.moreDetails,
+    builder: (context, state) {
+        final userId = state.extra as String;
+    return  MoreDetailsScreen(userId: userId ,);
     },
   ),
   GoRoute(

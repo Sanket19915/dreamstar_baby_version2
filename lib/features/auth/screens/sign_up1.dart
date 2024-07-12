@@ -133,7 +133,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  void _sendOTP() async {
+  void _sendOTP({String ?userId}) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     String phoneNumber = phoneController.text.trim();
 
@@ -175,11 +175,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => OTPScreen(
-                resendToken:resendToken,
+                resendToken: resendToken,
                 phoneNumber: phoneNumber,
                 verificationId: verificationId,
                 onVerified: () {
-                  context.go(Routes.moreDetails);
+                  context.go(Routes.moreDetails,extra: userId);
                 }, // Callback to sign up after verification
               ),
             ),
@@ -213,8 +213,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               profileImage: _profileImage?.path ?? "")
           .then(
         (value) {
-          if (!value) {
-            _sendOTP();
+          if (!value.containsKey("errors")) {
+            _sendOTP(userId: value["user_id"]);
           }
         },
       );
@@ -225,7 +225,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setState(() {
         isLoading = false;
       });
-      Fluttertoast.showToast(msg:"Please upload profile picture");
+      Fluttertoast.showToast(msg: "Please upload profile picture");
     }
   }
 
@@ -448,7 +448,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class SignUpViewModel with ChangeNotifier {
-  Future<bool> signUp({
+  Future<Map<String, dynamic>> signUp({
     required String firstName,
     required String lastName,
     required String phone,
@@ -482,7 +482,9 @@ class SignUpViewModel with ChangeNotifier {
     finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
 
     Fluttertoast.showToast(msg: finalResponse["message"]);
-    return finalResponse.containsKey("errors");
+    // String userId =  finalResponse["user_id"];
+    // return finalResponse.containsKey("errors");
+    return finalResponse;
     // Handle successful response
     // } else {
     //   Fluttertoast.showToast(msg: response.reasonPhrase ?? "");

@@ -206,6 +206,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         isLoading = false;
       });
     } catch (e) {
+       Fluttertoast.showToast(msg: "Please upload profile pic");
       setState(() {
         isLoading = false;
       });
