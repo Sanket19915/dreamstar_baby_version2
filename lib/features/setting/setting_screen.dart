@@ -11,6 +11,7 @@ import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,6 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 false; // Set loading state to false after data is fetched
           });
         } else {
+          Fluttertoast.showToast(msg: "Something went wrong");
           // Handle non-JSON response
           setState(() {
             isLoading = false; // Set loading state to false

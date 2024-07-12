@@ -1,19 +1,14 @@
-import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dream_baby/features/home/screens/card_details.dart';
 import 'package:dream_baby/features/home/screens/four_quotients.dart';
 import 'package:dream_baby/features/rough.dart';
 import 'package:dream_baby/router/routes.dart';
-import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
-import 'package:dream_baby/shared/widget/bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeContentScreen extends StatefulWidget {
   const HomeContentScreen({super.key});

@@ -6,8 +6,9 @@ import 'dart:io';
 
 class PDFViewerScreen extends StatefulWidget {
   final String pdfPath;
+  final String? week;
 
-  PDFViewerScreen({required this.pdfPath});
+  PDFViewerScreen({required this.pdfPath ,this.week});
 
   @override
   _PDFViewerScreenState createState() => _PDFViewerScreenState();
@@ -19,6 +20,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   bool pdfReady = false;
   late PDFViewController _pdfViewController;
   TextEditingController _pageController = TextEditingController();
+  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,10 +53,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 setState(() {
                   _totalPages = _pages!;
                   pdfReady = true;
+                _pdfViewController.setPage(int.parse(widget.week ?? "1")-1);
                 });
               },
               onViewCreated: (PDFViewController vc) {
                 _pdfViewController = vc;
+            
               },
               onPageChanged: (int? page, int? total) {
                 setState(() {

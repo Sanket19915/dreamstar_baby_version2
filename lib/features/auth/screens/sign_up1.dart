@@ -1,8 +1,8 @@
 // lib/sign_up_screen.dart
 
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:dream_baby/features/auth/screens/more_details.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -157,6 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           setState(() {
             isLoading = false;
           });
+          Fluttertoast.showToast(msg: e.code);
           if (e.code == 'invalid-phone-number') {
             print('The provided phone number is not valid.');
           } else {
@@ -173,9 +175,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => OTPScreen(
+                resendToken:resendToken,
                 phoneNumber: phoneNumber,
                 verificationId: verificationId,
-                onVerified: _signUp, // Callback to sign up after verification
+                onVerified: () {
+                  context.go(Routes.moreDetails);
+                }, // Callback to sign up after verification
               ),
             ),
           );
@@ -193,22 +198,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _signUp() async {
-    setState(() {
-      isLoading = true;
-    });
-    await Provider.of<SignUpViewModel>(context, listen: false).signUp(
-      firstName: firstNameController.text,
-      lastName: lastNameController.text,
-      phone: phoneController.text,
-      email: emailController.text,
-      password: passwordController.text,
-      confirmPassword: confirmPasswordController.text,
-    );
-    setState(() {
-      isLoading = false;
-    });
-  
-    context.go(Routes.moreDetails);
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await Provider.of<SignUpViewModel>(context, listen: false)
+          .signUp(
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              phone: phoneController.text,
+              email: emailController.text,
+              password: passwordController.text,
+              confirmPassword: confirmPasswordController.text,
+              profileImage: _profileImage?.path ?? "")
+          .then(
+        (value) {
+          if (!value) {
+            _sendOTP();
+          }
+        },
+      );
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg:"Please upload profile picture");
+    }
   }
 
   @override
@@ -381,7 +399,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontSize: 16,
                               color: AppColors.whiteColor,
                             ),
-                            onPressed: isFormValid ? _sendOTP : null,
+                            onPressed: isFormValid ? _signUp : null,
                           ),
                         ],
                       ),
@@ -430,31 +448,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class SignUpViewModel with ChangeNotifier {
-  Future<void> signUp({
+  Future<bool> signUp({
     required String firstName,
     required String lastName,
     required String phone,
     required String email,
     required String password,
     required String confirmPassword,
+    required String profileImage,
   }) async {
-    final response = await http.post(
+    final request = http.MultipartRequest(
+      'POST',
       Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
-      body: {
+    )
+      ..fields.addAll({
         'first_name': firstName,
         'last_name': lastName,
         'phone_no': phone,
         'email': email,
         'password': password,
         'confirm_password': confirmPassword,
-        'profile_pic': '',
-      },
-    );
+      })
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      })
+      ..files
+          .add(await http.MultipartFile.fromPath('profile_pic', profileImage));
+    var response = await request.send();
+    var jsonData = await http.Response.fromStream(response);
+    Map<String, dynamic>? finalResponse;
+    // if (response.statusCode == 200) {
+    finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
 
-    if (response.statusCode == 200) {
-      // Handle successful response
-    } else {
-      // Handle error response
-    }
+    Fluttertoast.showToast(msg: finalResponse["message"]);
+    return finalResponse.containsKey("errors");
+    // Handle successful response
+    // } else {
+    //   Fluttertoast.showToast(msg: response.reasonPhrase ?? "");
+    //   return true;
+    // }
   }
 }

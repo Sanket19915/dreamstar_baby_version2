@@ -1,5 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
 import 'package:dream_baby/features/konwledge_hub/affirmation.dart';
 import 'package:dream_baby/features/konwledge_hub/pdf_reader.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
@@ -10,6 +11,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../services/auth_services.dart';
+
 class KnowEntry extends StatefulWidget {
   const KnowEntry({super.key});
 
@@ -18,6 +21,7 @@ class KnowEntry extends StatefulWidget {
 }
 
 class _KnowEntryState extends State<KnowEntry> {
+  String ?week;
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -69,13 +73,47 @@ class _KnowEntryState extends State<KnowEntry> {
               ),
               InkWell(
                 onTap: () async {
+                  var token = await AuthService.getToken();
+                  var url = Uri.parse(
+                      'http://dreambaby.pro/api/baby_data?week=1&day=1');
+                  var headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer $token',
+                    'Cookie':
+                        'XSRF-TOKEN=your-token; laravel_session=your-session'
+                  };
+
+                  try {
+                    var response = await http.get(url, headers: headers);
+
+                    if (response.statusCode == 200) {
+                      var contentType = response.headers['content-type'];
+                      if (contentType != null &&
+                          contentType.contains('application/json')) {
+                        var data = json.decode(response.body);
+
+                        setState(() {
+                          week = data[0]['week']?.toString() ?? '0';
+                        });
+                      } else {
+                        throw Exception('Unexpected response format');
+                      }
+                    } else {
+                      throw Exception(
+                          'Failed to fetch baby data: ${response.reasonPhrase}');
+                    }
+                  } catch (e) {
+                    print('Error fetching baby data: $e');
+                    throw Exception('Error fetching baby data: $e');
+                  }
+
                   String pdfPath = await _loadPdfFromAssets();
 
                   // Navigate to the PDFViewerScreen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PDFViewerScreen(pdfPath: pdfPath),
+                      builder: (context) => PDFViewerScreen(pdfPath: pdfPath ,week:  week),
                     ),
                   );
                 },

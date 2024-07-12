@@ -5,6 +5,7 @@ import 'package:dream_baby/shared/helper/app_label.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -12,14 +13,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 class OTPScreen extends StatefulWidget {
   final String phoneNumber;
   final String verificationId;
+  final int? resendToken;
   final VoidCallback onVerified;
 
-  const OTPScreen({
-    super.key,
-    required this.phoneNumber,
-    required this.verificationId,
-    required this.onVerified,
-  });
+  const OTPScreen(
+      {super.key,
+      required this.phoneNumber,
+      required this.verificationId,
+      required this.onVerified,
+      this.resendToken});
 
   @override
   _OTPScreenState createState() => _OTPScreenState();
@@ -29,6 +31,7 @@ class _OTPScreenState extends State<OTPScreen> {
   final TextEditingController otpController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading = false;
+  String verificationId = "";
   void signInWithOTP() async {
     try {
       setState(() {
@@ -36,18 +39,19 @@ class _OTPScreenState extends State<OTPScreen> {
       });
 
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: widget.verificationId,
+        verificationId:
+            verificationId.isEmpty ? widget.verificationId : verificationId,
         smsCode: otpController.text,
       );
 
       await _auth
           .signInWithCredential(credential)
           .then((value) => print('User Login In Successful'));
-   
+
       widget.onVerified();
-     setState(() {
+      setState(() {
         isLoading = false;
-      });    // Call the callback to sign up
+      }); // Call the callback to sign up
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -141,6 +145,33 @@ class _OTPScreenState extends State<OTPScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
+                    Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            // Get language using key
+                            const TextSpan(
+                              text: "Did't receive the OTP? ",
+                              style: TextStyle(color: Colors.black45),
+                            ),
+
+                            TextSpan(
+                              text: "Resend ",
+                              style: const TextStyle(
+                                color: AppColors.primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  resendCode();
+                                },
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -161,5 +192,49 @@ class _OTPScreenState extends State<OTPScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> resendCode() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final FirebaseAuth auth = FirebaseAuth.instance;
+      await auth.verifyPhoneNumber(
+        phoneNumber: widget.phoneNumber,
+        forceResendingToken: widget.resendToken,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await auth.signInWithCredential(credential).then(
+            (value) async {
+              print('Logged In Successfully');
+              // Call the callback
+            },
+          );
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          setState(() {
+            isLoading = false;
+          });
+          Fluttertoast.showToast(msg: e.code);
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          setState(() {
+            isLoading = false;
+          });
+          setState(() {
+            verificationId = verificationId;
+          });
+          // Log the verification ID
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          print('Code auto-retrieval timeout');
+        },
+      );
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }

@@ -1,5 +1,5 @@
 class AppImages {
-  static const logo = "assets/images/logo.webp";
+  // static const logo = "assets/images/logo.webp";
   static const logoNew = "assets/images/logonew.png";
   static const logoN = "assets/images/logon.webp";
   static const splash1 = "assets/images/splash1.webp";

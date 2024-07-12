@@ -3,8 +3,8 @@
 
     <application
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon"
-        android:label="Dream Baby">
+        android:icon="@mipmap/ic_launcher"
+        android:label="Dream Star Baby">
 
         <activity
             android:name=".MainActivity"

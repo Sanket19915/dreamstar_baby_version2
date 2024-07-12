@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -116,9 +117,7 @@ class _BabyCardState extends State<BabyCard> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(profilePicture.isNotEmpty
-                    ? "http://dreambaby.pro/storage/$profilePicture"
-                    : 'https://picsum.photos/200/300'),
+                backgroundImage: NetworkImage("http://dreambaby.pro/storage/$profilePicture"),
               ),
               const SizedBox(
                 width: 10,
