@@ -1,8 +1,6 @@
 import 'package:dream_baby/features/auth/screens/login.dart';
 import 'package:dream_baby/features/auth/screens/onboarding.dart';
-import 'package:dream_baby/features/auth/screens/registration.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
-import 'package:dream_baby/features/auth/screens/splash.dart';
 import 'package:dream_baby/features/auth/screens/splash1.dart';
 import 'package:dream_baby/features/home/screens/home_screen.dart';
 import 'package:dream_baby/features/konwledge_hub/know_entry.dart';

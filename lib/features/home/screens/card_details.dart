@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+
 import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -211,7 +211,7 @@ class _BabyCardState extends State<BabyCard> {
                               text: TextSpan(
                                 children: <TextSpan>[
                                   TextSpan(
-                                      text: 'Height:',
+                                      text: 'Size:',
                                       style: GoogleFonts.poppins(
                                           fontSize: 11,
                                           height: 1,

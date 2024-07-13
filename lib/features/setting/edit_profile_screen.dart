@@ -50,7 +50,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool isConfirmPasswordValid = false;
 
   bool get isFormValid {
-    return isFirstNameValid && isLastNameValid && isPhoneValid && isEmailValid
+    return isFirstNameValid &&
+            isLastNameValid &&
+            isPhoneValid &&
+            isEmailValid &&
+            ((_profileImage?.path.isNotEmpty ?? false) ||
+                widget.userProfile['profile_pic'] != null)
         //  &&
         // isPasswordValid &&
         // isConfirmPasswordValid
@@ -160,6 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // }
 
   Future<void> _pickImage() async {
+    widget.userProfile["profile_pic"] = null;
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
@@ -168,6 +174,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _profileImage = File(pickedFile.path);
       }
     });
+  }
+
+  Future<void> _saveProfileWithoutImage() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      var token = await AuthService.getToken();
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://dreambaby.pro/api/update-profile'))
+        ..fields.addAll({
+          'first_name': firstNameController.text,
+          'last_name': lastNameController.text,
+          'phone_no': phoneController.text,
+          'email': emailController.text,
+        })
+        ..headers.addAll({
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        });
+
+      var response = await request.send();
+      var jsonData = await http.Response.fromStream(response);
+      Map<String, dynamic>? finalResponse;
+      if (response.statusCode == 200) {
+        finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
+
+        Fluttertoast.showToast(msg: finalResponse["message"]);
+        context.go(Routes.home);
+      } else {
+        Fluttertoast.showToast(msg: "Something went wrong");
+      }
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Please upload profile pic");
+      setState(() {
+        isLoading = false;
+      });
+    }
+    // Handle save profile logic
+    print('Profile saved');
   }
 
   Future<void> _saveProfile() async {
@@ -206,7 +256,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         isLoading = false;
       });
     } catch (e) {
-       Fluttertoast.showToast(msg: "Please upload profile pic");
+      Fluttertoast.showToast(msg: "Please upload profile pic");
       setState(() {
         isLoading = false;
       });
@@ -263,19 +313,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     const SizedBox(height: 110),
                     GestureDetector(
-                      onTap: _pickImage,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: AppColors.secondaryTextColor,
-                        backgroundImage: _profileImage != null
-                            ? FileImage(_profileImage!)
-                            : null,
-                        child: _profileImage == null
-                            ? const Icon(Icons.add_a_photo,
-                                color: Colors.white, size: 50)
-                            : null,
-                      ),
-                    ),
+                        onTap: _pickImage,
+                        child: widget.userProfile["profile_pic"] == null
+                            ? CircleAvatar(
+                                radius: 50,
+                                backgroundColor: AppColors.secondaryTextColor,
+                                backgroundImage: _profileImage != null
+                                    ? FileImage(_profileImage!)
+                                    : null,
+                                child: _profileImage == null
+                                    ? const Icon(Icons.add_a_photo,
+                                        color: Colors.white, size: 50)
+                                    : null,
+                              )
+                            : CircleAvatar(
+                                radius: 50,
+                                backgroundColor: AppColors.secondaryTextColor,
+                                backgroundImage: NetworkImage(
+                                    "http://dreambaby.pro/storage/${widget.userProfile["profile_pic"]}"),
+                              )),
                     const SizedBox(height: 20),
                     CustomTextField(
                       autoValidate: AutovalidateMode.onUserInteraction,
@@ -371,7 +427,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         fontSize: 16,
                         color: AppColors.whiteColor,
                       ),
-                      onPressed: isFormValid ? _saveProfile : null,
+                      onPressed: isFormValid
+                          ? _profileImage == null
+                              ? _saveProfileWithoutImage
+                              : _saveProfile
+                          : null,
                     ),
                   ],
                 ),
