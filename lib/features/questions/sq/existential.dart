@@ -666,9 +666,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         ? "Intellectual"
                                         : "Spirutal",
         "intelligence_type": "",
-        "question_type": "",
-        "week": 1,
-        "day": 1
+        "question_type": ""
       });
       request.headers.addAll(headers);
 

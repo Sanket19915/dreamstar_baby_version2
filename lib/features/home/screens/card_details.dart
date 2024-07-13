@@ -66,7 +66,7 @@ class _BabyCardState extends State<BabyCard> {
   Future<void> fetchBabyData(int week, int day) async {
     var token = await AuthService.getToken();
     var url =
-        Uri.parse('http://dreambaby.pro/api/baby_data?week=$week&day=$day');
+        Uri.parse('http://dreambaby.pro/api/baby_data');
     var headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
