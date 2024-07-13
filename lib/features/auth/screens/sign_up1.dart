@@ -133,7 +133,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  void _sendOTP({String ?userId}) async {
+  void _sendOTP() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     String phoneNumber = phoneController.text.trim();
 
@@ -179,8 +179,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 phoneNumber: phoneNumber,
                 verificationId: verificationId,
                 onVerified: () {
-                  context.go(Routes.moreDetails,extra: userId);
-                }, // Callback to sign up after verification
+                  _signUp(); // Callback to sign up after verification
+                 }, 
               ),
             ),
           );
@@ -214,7 +214,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           .then(
         (value) {
           if (!value.containsKey("errors")) {
-            _sendOTP(userId: value["user_id"]);
+            context.go(Routes.moreDetails,extra: value["user_id"].toString());
+          } else {
+            Fluttertoast.showToast(msg: value["message"]);
           }
         },
       );
@@ -399,7 +401,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontSize: 16,
                               color: AppColors.whiteColor,
                             ),
-                            onPressed: isFormValid ? _signUp : null,
+                            onPressed: isFormValid ? _sendOTP : null,
                           ),
                         ],
                       ),

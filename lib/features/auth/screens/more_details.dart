@@ -286,7 +286,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                           ),
                           CustomButton(
                             text: 'Skip',
-                            isEnabled: false,
+                            isEnabled: true,
                             borderColor: AppColors.whiteColor,
                             backgroundColor: AppColors.whiteColor,
                             textStyle: CustomLabels.body3GreyTextStyle(
