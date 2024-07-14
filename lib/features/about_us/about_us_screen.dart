@@ -38,7 +38,7 @@ class AboutUsScreen extends StatelessWidget {
           ),
         ),
         child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,

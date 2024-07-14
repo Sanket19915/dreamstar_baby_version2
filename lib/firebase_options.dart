@@ -50,11 +50,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAdjWdFcYkSROt0hs65Zw3Y6bmX7-8k7uk',
-    appId: '1:432287109522:android:7c235b51d8e5d33472b14b',
-    messagingSenderId: '432287109522',
-    projectId: 'dream-baby-3f01e',
-    storageBucket: 'dream-baby-3f01e.appspot.com',
+    apiKey: 'AIzaSyDKd6ItHbpJwCWgNOgAnVMdf61UkKU52Xo',
+    appId: '1:304693604721:android:b21437e89a663f9c6906d0',
+    messagingSenderId: '304693604721',
+    projectId: 'dreamstarbaby-e5f83',
+    storageBucket: 'dreamstarbaby-e5f83.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -63,7 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '432287109522',
     projectId: 'dream-baby-3f01e',
     storageBucket: 'dream-baby-3f01e.appspot.com',
-    iosBundleId: 'com.example.dreamBaby',
+    iosBundleId: 'com.example.dreamstarbaby',
   );
-
 }

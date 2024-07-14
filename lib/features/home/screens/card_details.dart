@@ -23,12 +23,13 @@ class BabyCard extends StatefulWidget {
 class _BabyCardState extends State<BabyCard> {
   String firstName = '';
   String profilePicture = '';
-  var weight = '0.9 KG';
-  var height = '22 CM';
-  var weeks = '20';
-  var days = '13';
-  var sizes = 'Bell Pepper';
+  var weight = ' KG';
+  var height = ' CM';
+  var weeks = '';
+  var days = '';
+  var sizes = '';
   var images = '';
+  var total_day = '';
 
   @override
   void initState() {
@@ -65,12 +66,10 @@ class _BabyCardState extends State<BabyCard> {
 
   Future<void> fetchBabyData(int week, int day) async {
     var token = await AuthService.getToken();
-    var url =
-        Uri.parse('http://dreambaby.pro/api/baby_data');
+    var url = Uri.parse('http://dreambaby.pro/api/baby_data');
     var headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
-      'Cookie': 'XSRF-TOKEN=your-token; laravel_session=your-session'
     };
 
     try {
@@ -81,17 +80,20 @@ class _BabyCardState extends State<BabyCard> {
         if (contentType != null && contentType.contains('application/json')) {
           var data = json.decode(response.body);
 
+          print(data);
           setState(() {
-            weight = data[0]['weight']?.toString() ?? '0.0 KG';
-            height = data[0]['height']?.toString() ?? '0 CM';
-            weeks = data[0]['week']?.toString() ?? '0';
-            days = data[0]['day']?.toString() ?? '0';
-            sizes = data[0]['size']?.toString() ?? '';
-            images = data[0]['image']?.toString() ?? '';
+            total_day = data['total_days']?.toString() ?? '0';
+            var babyData = data['data'][0];
+            weight = babyData['weight']?.toString() ?? '0.0 KG';
+            height = babyData['height']?.toString() ?? '0 CM';
+            weeks = babyData['week']?.toString() ?? '0';
+            days = babyData['day']?.toString() ?? '0';
+            sizes = babyData['size']?.toString() ?? '';
+            images = babyData['image']?.toString() ?? '';
           });
 
           print(
-              'Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
+              'total_days: $total_day, Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
         } else {
           throw Exception('Unexpected response format');
         }
@@ -107,6 +109,10 @@ class _BabyCardState extends State<BabyCard> {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
+    print(total_day);
+    double percent =
+        (double.tryParse(total_day) ?? 0) / 280; // Compute the percentage here
+    print('Percent: $percent'); // Debug print to check the value of percent
     return Column(
       children: [
         InkWell(
@@ -117,7 +123,8 @@ class _BabyCardState extends State<BabyCard> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage("http://dreambaby.pro/storage/$profilePicture"),
+                backgroundImage: NetworkImage(
+                    "http://dreambaby.pro/storage/$profilePicture"),
               ),
               const SizedBox(
                 width: 10,
@@ -218,7 +225,7 @@ class _BabyCardState extends State<BabyCard> {
                                           fontWeight: FontWeight.w500,
                                           color: AppColors.greyTextColor)),
                                   TextSpan(
-                                    text: '   $height',
+                                    text: '        $sizes',
                                     style: GoogleFonts.poppins(
                                         fontSize: 11,
                                         height: 1,
@@ -333,7 +340,7 @@ class _BabyCardState extends State<BabyCard> {
                             Container(
                               alignment: Alignment.center,
                               child: AutoSizeText(
-                                sizes,
+                                height,
                                 textAlign: TextAlign.end,
                                 minFontSize: 14,
                                 maxLines: 2,
@@ -350,10 +357,10 @@ class _BabyCardState extends State<BabyCard> {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.only(left: 25),
+                  padding: EdgeInsets.only(left: 25),
                   alignment: Alignment.center,
                   child: CircularPercentIndicator(
-                    center: const SizedBox(
+                    center: SizedBox(
                       height: 134,
                       child: Image(
                         image: AssetImage(AppImages.baby),
@@ -363,7 +370,7 @@ class _BabyCardState extends State<BabyCard> {
                     radius: 74.0,
                     lineWidth: 8.0,
                     animation: true,
-                    percent: 0.65,
+                    percent: percent,
                     circularStrokeCap: CircularStrokeCap.round,
                     backgroundColor: AppColors.whiteColor.withOpacity(.85),
                     progressColor: AppColors.mainColor,

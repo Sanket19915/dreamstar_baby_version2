@@ -1,4 +1,4 @@
-package com.example.dream_baby
+package com.example.dreamstarbaby
 
 import io.flutter.embedding.android.FlutterActivity
 

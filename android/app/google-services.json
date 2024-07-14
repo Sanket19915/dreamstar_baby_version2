@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "432287109522",
-    "project_id": "dream-baby-3f01e",
-    "storage_bucket": "dream-baby-3f01e.appspot.com"
+    "project_number": "304693604721",
+    "project_id": "dreamstarbaby-e5f83",
+    "storage_bucket": "dreamstarbaby-e5f83.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:432287109522:android:7c235b51d8e5d33472b14b",
+        "mobilesdk_app_id": "1:304693604721:android:b21437e89a663f9c6906d0",
         "android_client_info": {
-          "package_name": "com.example.dream_baby"
+          "package_name": "com.example.dreamstarbaby"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAdjWdFcYkSROt0hs65Zw3Y6bmX7-8k7uk"
+          "current_key": "AIzaSyDKd6ItHbpJwCWgNOgAnVMdf61UkKU52Xo"
         }
       ],
       "services": {
