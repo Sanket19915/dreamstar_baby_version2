@@ -2,6 +2,7 @@ import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -67,7 +68,15 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                 ),
               ),
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Container(
+                      height: height,
+                      child: Center(
+                        child: SpinKitCircle(
+                          color: AppColors.primaryColor,
+                          size: 50.0,
+                        ),
+                      ),
+                    )
                   : testimonials.isEmpty
                       ? const Center(
                           child: Text(
@@ -219,7 +228,7 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                 initialRating: 0,
                 minRating: 1,
                 direction: Axis.horizontal,
-                allowHalfRating: true,
+                allowHalfRating: false,
                 itemCount: 5,
                 itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
                 itemBuilder: (context, _) => const Icon(

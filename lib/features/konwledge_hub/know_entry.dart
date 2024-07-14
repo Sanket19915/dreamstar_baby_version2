@@ -60,274 +60,281 @@ class _KnowEntryState extends State<KnowEntry> {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: isLoading
-                ? const Center(
-                    child: SpinKitCircle(
-                      color: AppColors.primaryColor,
-                      size: 50.0,
-                    ),
-                  )
-                : Column(
-                    children: List.generate(
-                      knowEntry.length,
-                      (index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: InkWell(
-                            onTap: () async {
-                              // if (knowEntry[index].filePath?.contains(".pdf") ??
-                              //     false) {
-                              //   var token = await AuthService.getToken();
-                              //   var url = Uri.parse(
-                              //       'http://dreambaby.pro/api/baby_data?week=1&day=1');
-                              //   var headers = {
-                              //     'Content-Type': 'application/json',
-                              //     'Authorization': 'Bearer $token',
-                              //     'Cookie':
-                              //         'XSRF-TOKEN=your-token; laravel_session=your-session'
-                              //   };
+        child: Center(
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: isLoading
+                  ? Container(
+                      height: height,
+                      child: Center(
+                        child: SpinKitCircle(
+                          color: AppColors.primaryColor,
+                          size: 50.0,
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: List.generate(
+                        knowEntry.length,
+                        (index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: InkWell(
+                              onTap: () async {
+                                // if (knowEntry[index].filePath?.contains(".pdf") ??
+                                //     false) {
+                                //   var token = await AuthService.getToken();
+                                //   var url = Uri.parse(
+                                //       'http://dreambaby.pro/api/baby_data?week=1&day=1');
+                                //   var headers = {
+                                //     'Content-Type': 'application/json',
+                                //     'Authorization': 'Bearer $token',
+                                //     'Cookie':
+                                //         'XSRF-TOKEN=your-token; laravel_session=your-session'
+                                //   };
 
-                              //   try {
-                              //     var response =
-                              //         await http.get(url, headers: headers);
+                                //   try {
+                                //     var response =
+                                //         await http.get(url, headers: headers);
 
-                              //     if (response.statusCode == 200) {
-                              //       var contentType =
-                              //           response.headers['content-type'];
-                              //       if (contentType != null &&
-                              //           contentType
-                              //               .contains('application/json')) {
-                              //         var data = json.decode(response.body);
+                                //     if (response.statusCode == 200) {
+                                //       var contentType =
+                                //           response.headers['content-type'];
+                                //       if (contentType != null &&
+                                //           contentType
+                                //               .contains('application/json')) {
+                                //         var data = json.decode(response.body);
 
-                              //         setState(() {
-                              //           week = data[0]['week']?.toString() ?? '0';
-                              //         });
-                              //       } else {
-                              //          setState(() {
-                              //           isLoading = false;
-                              //         });
-                              //         throw Exception(
-                              //             'Unexpected response format');
-                              //       }
-                              //     } else {
-                              //         setState(() {
-                              //         isLoading = false;
-                              //       });
-                              //       throw Exception(
-                              //           'Failed to fetch baby data: ${response.reasonPhrase}');
-                              //     }
-                              //   } catch (e) {
-                              //       setState(() {
-                              //       isLoading = false;
-                              //     });
-                              //     print('Error fetching baby data: $e');
-                              //     throw Exception('Error fetching baby data: $e');
-                              //   }
-                              if (knowEntry[index].filePath?.contains(".pdf") ??
-                                  false) {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                String pdfPath = await _loadPdfFromNetwork(
-                                    knowEntry[index].filePath);
+                                //         setState(() {
+                                //           week = data[0]['week']?.toString() ?? '0';
+                                //         });
+                                //       } else {
+                                //          setState(() {
+                                //           isLoading = false;
+                                //         });
+                                //         throw Exception(
+                                //             'Unexpected response format');
+                                //       }
+                                //     } else {
+                                //         setState(() {
+                                //         isLoading = false;
+                                //       });
+                                //       throw Exception(
+                                //           'Failed to fetch baby data: ${response.reasonPhrase}');
+                                //     }
+                                //   } catch (e) {
+                                //       setState(() {
+                                //       isLoading = false;
+                                //     });
+                                //     print('Error fetching baby data: $e');
+                                //     throw Exception('Error fetching baby data: $e');
+                                //   }
+                                if (knowEntry[index]
+                                        .filePath
+                                        ?.contains(".pdf") ??
+                                    false) {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  String pdfPath = await _loadPdfFromNetwork(
+                                      knowEntry[index].filePath);
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PDFViewerScreen(
-                                        pdfPath: pdfPath, week: week),
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PDFViewerScreen(
+                                          pdfPath: pdfPath, week: week),
+                                    ),
+                                  );
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
+
+                                // }
+                              },
+                              child: Container(
+                                height: height * 0.13,
+                                width: width,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: NetworkImage(
+                                          "http://dreambaby.pro/storage/${knowEntry[index].backgroundImage}"),
+                                      fit: BoxFit.cover),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(15),
                                   ),
-                                );
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-
-                              // }
-                            },
-                            child: Container(
-                              height: height * 0.13,
-                              width: width,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                        "http://dreambaby.pro/storage/${knowEntry[index].backgroundImage}"),
-                                    fit: BoxFit.cover),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(15),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  )
+                          );
+                        },
+                      ),
+                    )
 
-            // Column(
-            //   children: [
-            //     InkWell(
-            //       onTap: () {},
-            //       child: Container(
-            //         height: height * 0.13,
-            //         width: width,
-            //         decoration: const BoxDecoration(
-            //           image: DecorationImage(
-            //               image: AssetImage(AppImages.kn1), fit: BoxFit.cover),
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(15),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     const SizedBox(
-            //       height: 15,
-            //     ),
-            //     InkWell(
-            //       onTap: () async {
-            //         var token = await AuthService.getToken();
-            //         var url = Uri.parse(
-            //             'http://dreambaby.pro/api/baby_data?week=1&day=1');
-            //         var headers = {
-            //           'Content-Type': 'application/json',
-            //           'Authorization': 'Bearer $token',
-            //           'Cookie':
-            //               'XSRF-TOKEN=your-token; laravel_session=your-session'
-            //         };
+              // Column(
+              //   children: [
+              //     InkWell(
+              //       onTap: () {},
+              //       child: Container(
+              //         height: height * 0.13,
+              //         width: width,
+              //         decoration: const BoxDecoration(
+              //           image: DecorationImage(
+              //               image: AssetImage(AppImages.kn1), fit: BoxFit.cover),
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(15),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       height: 15,
+              //     ),
+              //     InkWell(
+              //       onTap: () async {
+              //         var token = await AuthService.getToken();
+              //         var url = Uri.parse(
+              //             'http://dreambaby.pro/api/baby_data?week=1&day=1');
+              //         var headers = {
+              //           'Content-Type': 'application/json',
+              //           'Authorization': 'Bearer $token',
+              //           'Cookie':
+              //               'XSRF-TOKEN=your-token; laravel_session=your-session'
+              //         };
 
-            //         try {
-            //           var response = await http.get(url, headers: headers);
+              //         try {
+              //           var response = await http.get(url, headers: headers);
 
-            //           if (response.statusCode == 200) {
-            //             var contentType = response.headers['content-type'];
-            //             if (contentType != null &&
-            //                 contentType.contains('application/json')) {
-            //               var data = json.decode(response.body);
+              //           if (response.statusCode == 200) {
+              //             var contentType = response.headers['content-type'];
+              //             if (contentType != null &&
+              //                 contentType.contains('application/json')) {
+              //               var data = json.decode(response.body);
 
-            //               setState(() {
-            //                 week = data[0]['week']?.toString() ?? '0';
-            //               });
-            //             } else {
-            //               throw Exception('Unexpected response format');
-            //             }
-            //           } else {
-            //             throw Exception(
-            //                 'Failed to fetch baby data: ${response.reasonPhrase}');
-            //           }
-            //         } catch (e) {
-            //           print('Error fetching baby data: $e');
-            //           throw Exception('Error fetching baby data: $e');
-            //         }
+              //               setState(() {
+              //                 week = data[0]['week']?.toString() ?? '0';
+              //               });
+              //             } else {
+              //               throw Exception('Unexpected response format');
+              //             }
+              //           } else {
+              //             throw Exception(
+              //                 'Failed to fetch baby data: ${response.reasonPhrase}');
+              //           }
+              //         } catch (e) {
+              //           print('Error fetching baby data: $e');
+              //           throw Exception('Error fetching baby data: $e');
+              //         }
 
-            //         String pdfPath = await _loadPdfFromAssets();
+              //         String pdfPath = await _loadPdfFromAssets();
 
-            //         // Navigate to the PDFViewerScreen
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) => PDFViewerScreen(pdfPath: pdfPath ,week:  week),
-            //           ),
-            //         );
-            //       },
-            //       child: Container(
-            //         height: height * 0.13,
-            //         width: width,
-            //         decoration: const BoxDecoration(
-            //           image: DecorationImage(
-            //               image: AssetImage(AppImages.kn2),
-            //               fit: BoxFit.cover,
-            //               alignment: Alignment.center),
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(15),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     const SizedBox(
-            //       height: 15,
-            //     ),
-            //     InkWell(
-            //       onTap: () {},
-            //       child: Container(
-            //         height: height * 0.13,
-            //         width: width,
-            //         decoration: const BoxDecoration(
-            //           image: DecorationImage(
-            //               image: AssetImage(AppImages.kn3), fit: BoxFit.cover),
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(15),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     const SizedBox(
-            //       height: 15,
-            //     ),
-            //     InkWell(
-            //       onTap: () {},
-            //       child: Container(
-            //         height: height * 0.13,
-            //         width: width,
-            //         decoration: const BoxDecoration(
-            //           image: DecorationImage(
-            //               image: AssetImage(AppImages.kn4), fit: BoxFit.cover),
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(15),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     const SizedBox(
-            //       height: 15,
-            //     ),
-            //     InkWell(
-            //       onTap: () async {
-            //         String pdfPath1 = await _affirmationloadPdfFromAssets();
+              //         // Navigate to the PDFViewerScreen
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) => PDFViewerScreen(pdfPath: pdfPath ,week:  week),
+              //           ),
+              //         );
+              //       },
+              //       child: Container(
+              //         height: height * 0.13,
+              //         width: width,
+              //         decoration: const BoxDecoration(
+              //           image: DecorationImage(
+              //               image: AssetImage(AppImages.kn2),
+              //               fit: BoxFit.cover,
+              //               alignment: Alignment.center),
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(15),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       height: 15,
+              //     ),
+              //     InkWell(
+              //       onTap: () {},
+              //       child: Container(
+              //         height: height * 0.13,
+              //         width: width,
+              //         decoration: const BoxDecoration(
+              //           image: DecorationImage(
+              //               image: AssetImage(AppImages.kn3), fit: BoxFit.cover),
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(15),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       height: 15,
+              //     ),
+              //     InkWell(
+              //       onTap: () {},
+              //       child: Container(
+              //         height: height * 0.13,
+              //         width: width,
+              //         decoration: const BoxDecoration(
+              //           image: DecorationImage(
+              //               image: AssetImage(AppImages.kn4), fit: BoxFit.cover),
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(15),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       height: 15,
+              //     ),
+              //     InkWell(
+              //       onTap: () async {
+              //         String pdfPath1 = await _affirmationloadPdfFromAssets();
 
-            //         // Navigate to the PDFViewerScreen
-            //         Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //             builder: (context) =>
-            //                 AffirmationScreen(pdfPath1: pdfPath1),
-            //           ),
-            //         );
-            //       },
-            //       child: Container(
-            //         height: height * 0.13,
-            //         width: width,
-            //         decoration: const BoxDecoration(
-            //           image: DecorationImage(
-            //               image: AssetImage(AppImages.kn5), fit: BoxFit.cover),
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(15),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //     const SizedBox(
-            //       height: 15,
-            //     ),
-            //     InkWell(
-            //       onTap: () {},
-            //       child: Container(
-            //         height: height * 0.13,
-            //         width: width,
-            //         decoration: const BoxDecoration(
-            //           image: DecorationImage(
-            //               image: AssetImage(AppImages.kn6), fit: BoxFit.cover),
-            //           borderRadius: BorderRadius.all(
-            //             Radius.circular(15),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
+              //         // Navigate to the PDFViewerScreen
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (context) =>
+              //                 AffirmationScreen(pdfPath1: pdfPath1),
+              //           ),
+              //         );
+              //       },
+              //       child: Container(
+              //         height: height * 0.13,
+              //         width: width,
+              //         decoration: const BoxDecoration(
+              //           image: DecorationImage(
+              //               image: AssetImage(AppImages.kn5), fit: BoxFit.cover),
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(15),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(
+              //       height: 15,
+              //     ),
+              //     InkWell(
+              //       onTap: () {},
+              //       child: Container(
+              //         height: height * 0.13,
+              //         width: width,
+              //         decoration: const BoxDecoration(
+              //           image: DecorationImage(
+              //               image: AssetImage(AppImages.kn6), fit: BoxFit.cover),
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(15),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
 
-            //   ],
-            // ),
-            ),
+              //   ],
+              // ),
+              ),
+        ),
       ),
     );
   }

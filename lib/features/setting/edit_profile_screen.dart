@@ -356,7 +356,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     CustomTextField(
                       autoValidate: AutovalidateMode.onUserInteraction,
                       hintText: 'Phone Number',
+                      //enabled: false,
                       controller: phoneController,
+                      readOnly: true,
+                      backGroundColor: AppColors.greyTextColor,
                       textInputAction: TextInputAction.next,
                       borderColor: AppColors.secondaryTextColor,
                       inputType: CustomTextInputType.number,
