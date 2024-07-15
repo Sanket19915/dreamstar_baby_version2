@@ -171,11 +171,13 @@ class Datum {
         mainVideo2: json["main_video2"],
         mainAudio: json["main_audio"],
         mainAudio2: json["main_audio2"],
-
         youtubeLink: json["youtube_link"] ?? "",
         options: (json["options"] == null && json["options"] == [])
             ? []
-            : optionsModelFromJson(json["options"]),
+            : (optionsModelFromJson(json["options"])
+                    .where((element) => element.text.isNotEmpty)
+                    .toList() ??
+                []),
         correctAnswer: json["correct_answer"] ?? "",
         feedback: json["feedback"] ?? false,
         answerKeyInput: json["answer_key_input"] ?? "",

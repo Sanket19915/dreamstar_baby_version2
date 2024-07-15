@@ -100,11 +100,12 @@ class AboutUsScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                        Text(
                           'Dr. Sonal Jain Jayaswal',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
+                          style: GoogleFonts.poppins(
+                            color: AppColors.blackColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -122,9 +123,14 @@ class AboutUsScreen extends StatelessWidget {
                     //   ),
                     // ),
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       "Driven by her desire for motherhood, Dr. Sonal Jain Jayaswal, armed with formal degrees in Engineering as well as Management, embarked on an extraordinary journey to master Garbhasanskar. As an accomplished mother of two and a doctorate in prenatal education, she has positively impacted and empowered lives of countless aspiring mothers with her transformative approach. Her groundbreaking book and online app on GarbhaSanskar holistically blends ancient wisdom with modern science, igniting a revolution in nurturing divinity in the womb —a vital cornerstone for the achievement of empowered future.",
-                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.poppins(
+                        color: AppColors.blackColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),

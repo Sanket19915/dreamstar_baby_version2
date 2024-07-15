@@ -10,7 +10,7 @@ class FAQScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xffF7F3FD),
         elevation: 0,
         leading: InkWell(
           onTap: () {
@@ -42,8 +42,8 @@ class FAQScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: ListView(
           children: [
-            _buildFAQItem('What makes Dream Star Baby™ unique?',
-                "Dream Baby™ is a scientifically designed app based on a step by step ,structured process using 'Sonal’s Intelligence Model for HolisticDevelopment© ' Through this model the expectant mother can systematically achieve the PQ, IQ, EQ and SQ of her baby which makes it absolutely result oriented."),
+            _buildFAQItem('What makes DreamStar Baby™ unique?',
+                "DreamStar Baby™ is a scientifically designed app based on a step by step ,structured process using 'Sonal’s Intelligence Model for HolisticDevelopment© ' Through this model the expectant mother can systematically achieve the PQ, IQ, EQ and SQ of her baby which makes it absolutely result oriented."),
             _buildFAQItem('What is the best time to start the course?',
                 'Since the brain development of the baby starts from 16th day of conception, even before the planning mother gets to know that she is pregnant, so the best time to start the course is from the planning stage itself.'),
             _buildFAQItem('What is the investment required?',

@@ -8,7 +8,7 @@ class PDFViewerScreen extends StatefulWidget {
   final String pdfPath;
   final String? week;
 
-  PDFViewerScreen({required this.pdfPath ,this.week});
+  PDFViewerScreen({required this.pdfPath, this.week});
 
   @override
   _PDFViewerScreenState createState() => _PDFViewerScreenState();
@@ -21,7 +21,6 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   late PDFViewController _pdfViewController;
   TextEditingController _pageController = TextEditingController();
   @override
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,22 +42,21 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           Container(
             child: PDFView(
               fitEachPage: true,
-              fitPolicy: FitPolicy.BOTH,
+              fitPolicy: FitPolicy.WIDTH,
               filePath: widget.pdfPath,
               autoSpacing: false,
-              enableSwipe: false,
+              enableSwipe: true,
               pageSnap: false,
               swipeHorizontal: true,
               onRender: (_pages) {
                 setState(() {
                   _totalPages = _pages!;
                   pdfReady = true;
-                _pdfViewController.setPage(int.parse(widget.week ?? "1")-1);
+                  _pdfViewController.setPage(int.parse(widget.week ?? "1") - 1);
                 });
               },
               onViewCreated: (PDFViewController vc) {
                 _pdfViewController = vc;
-            
               },
               onPageChanged: (int? page, int? total) {
                 setState(() {

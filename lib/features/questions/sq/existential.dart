@@ -81,7 +81,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor:
-            _isAppBarTransparent ? Colors.transparent : AppColors.whiteColor,
+            _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
         leading: InkWell(
           onTap: () {
             context.pop();
@@ -175,7 +175,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         ),
                         const SizedBox(height: 20),
                         const Center(
-                          child: Text("Opps, No Activity Found"),
+                          child: Text(
+                              "Congratulations! You have completed all activities for today for this Quotient"),
                         )
                       ],
                     )
@@ -665,7 +666,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     : widget.from == "Musical"
                                         ? "Intellectual"
                                         : "Spirutal",
-        "intelligence_type": "",
+        "intelligence_type": widget.from,
         "question_type": ""
       });
       request.headers.addAll(headers);
@@ -942,7 +943,6 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
 //   }
 
   String extractYouTubeVideoId(String iframe) {
-    // Regular expression to find the src attribute and extract the video ID
     final idRegExp =
         RegExp(r'src="https:\/\/www\.youtube\.com\/embed\/([^"?]+)');
     final match = idRegExp.firstMatch(iframe);
