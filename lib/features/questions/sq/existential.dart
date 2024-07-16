@@ -328,13 +328,21 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "",
-                                        questionsModel
-                                                ?.questions
-                                                ?.data[_selectedIndex]
-                                                .options[
-                                                    selectedOptionIndex ?? 0]
-                                                .text ??
-                                            "");
+                                        (questionsModel
+                                                    ?.questions
+                                                    ?.data[_selectedIndex]
+                                                    .options
+                                                    .isEmpty ??
+                                                true)
+                                            ? ""
+                                            : questionsModel
+                                                    ?.questions
+                                                    ?.data[_selectedIndex]
+                                                    .options[
+                                                        selectedOptionIndex ??
+                                                            0]
+                                                    .text ??
+                                                "");
                                     if (questionsModel
                                             ?.questions?.data.length ==
                                         (_selectedIndex + 1)) {
