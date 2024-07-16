@@ -179,8 +179,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 phoneNumber: phoneNumber,
                 verificationId: verificationId,
                 onVerified: () {
+               (  _profileImage?.path.isEmpty ??  true)?_signUpWithoutImage():
                   _signUp(); // Callback to sign up after verification
-                 }, 
+                },
               ),
             ),
           );
@@ -197,13 +198,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+
+  void _signUpWithoutImage() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      await Provider.of<SignUpViewModel>(context, listen: false)
+          .signUpWithotProfile(
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              phone: phoneController.text,
+              email: emailController.text,
+              password: passwordController.text,
+              confirmPassword: confirmPasswordController.text,
+             )
+          .then(
+        (value) {
+          if (!value.containsKey("errors")) {
+            context.go(Routes.moreDetails, extra: value["user_id"].toString());
+          } else {
+            Fluttertoast.showToast(msg: value["message"]);
+          }
+        },
+      );
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
   void _signUp() async {
     try {
       setState(() {
         isLoading = true;
       });
+
       await Provider.of<SignUpViewModel>(context, listen: false)
-          .signUp(
+          .signUpWithProfile(
               firstName: firstNameController.text,
               lastName: lastNameController.text,
               phone: phoneController.text,
@@ -214,7 +252,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           .then(
         (value) {
           if (!value.containsKey("errors")) {
-            context.go(Routes.moreDetails,extra: value["user_id"].toString());
+            context.go(Routes.moreDetails, extra: value["user_id"].toString());
           } else {
             Fluttertoast.showToast(msg: value["message"]);
           }
@@ -450,7 +488,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class SignUpViewModel with ChangeNotifier {
-  Future<Map<String, dynamic>> signUp({
+  Future<Map<String, dynamic>> signUpWithProfile({
     required String firstName,
     required String lastName,
     required String phone,
@@ -482,6 +520,42 @@ class SignUpViewModel with ChangeNotifier {
     Map<String, dynamic>? finalResponse;
     // if (response.statusCode == 200) {
     finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
+
+    Fluttertoast.showToast(msg: finalResponse["message"]);
+    // String userId =  finalResponse["user_id"];
+    // return finalResponse.containsKey("errors");
+    return finalResponse;
+    // Handle successful response
+    // } else {
+    //   Fluttertoast.showToast(msg: response.reasonPhrase ?? "");
+    //   return true;
+    // }
+  }
+
+  Future<Map<String, dynamic>> signUpWithotProfile({
+    required String firstName,
+    required String lastName,
+    required String phone,
+    required String email,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    final response = await http.post(
+        Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
+        body: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'phone_no': phone,
+          'email': email,
+          'password': password,
+          'confirm_password': confirmPassword,
+        });
+
+   
+  
+    Map<String, dynamic>? finalResponse;
+    // if (response.statusCode == 200) {
+    finalResponse = jsonDecode(response.body) as Map<String, dynamic>;
 
     Fluttertoast.showToast(msg: finalResponse["message"]);
     // String userId =  finalResponse["user_id"];
