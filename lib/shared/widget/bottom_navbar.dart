@@ -1,5 +1,4 @@
 import 'package:dream_baby/shared/helper/app_color.dart';
-import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-badge.widget.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
@@ -111,13 +110,13 @@ class _BottoNavbarScreenState extends State<BottoNavbarScreen>
           _motionTabBarController!.index = value;
         });
       },
-      images: [
-        AppImages.testi,
-        AppImages.about,
-        AppImages.homenew,
-        AppImages.people,
-        AppImages.follow
-      ],
+      // images: [
+      //   AppImages.testi,
+      //   AppImages.about,
+      //   AppImages.homenew,
+      //   AppImages.people,
+      //   AppImages.follow
+      // ],
     );
   }
 }

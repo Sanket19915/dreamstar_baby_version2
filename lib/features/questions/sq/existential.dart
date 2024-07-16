@@ -355,26 +355,60 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    elevation: const WidgetStatePropertyAll(0),
-                                    backgroundColor: WidgetStatePropertyAll(
-                                        const Color(0xFFC4C8D0)
-                                            .withOpacity(0.5)),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text(
-                                    'Answer key',
-                                    style: TextStyle(
-                                        color: Color(0xFF200F31),
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                              ),
+                              (questionsModel?.questions?.data[position]
+                                          .answerKeyInput.isNotEmpty ??
+                                      false)
+                                  ? SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                          elevation:
+                                              const WidgetStatePropertyAll(0),
+                                          backgroundColor:
+                                              WidgetStatePropertyAll(
+                                                  const Color(0xFFC4C8D0)
+                                                      .withOpacity(0.5)),
+                                        ),
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                  'Answer key : ${questionsModel?.questions?.data[position].answerKeyInput}',
+                                                  style: const TextStyle(
+                                                      color: Color(0xFF200F31),
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                      child: const Text(
+                                                        'Okay',
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xFF200F31),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ))
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Answer key',
+                                          style: TextStyle(
+                                              color: Color(0xFF200F31),
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox(),
                               const SizedBox(height: 20),
                             ],
                           ),
@@ -458,21 +492,23 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 ),
                 (data?.questionDescription.isEmpty ?? true)
                     ? Container()
-                    : InkWell(
-                        onTap: () {
-                          setState(() {
-                            isQuestionExpanded = !isQuestionExpanded;
-                          });
-                        },
-                        child: Text(
-                          isQuestionExpanded ? 'Read less' : 'Read more',
-                          style: const TextStyle(
-                            color: Color(0xffE71C65),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                    : ((data?.questionDescription.length ?? 0) < 100)
+                        ? Container()
+                        : InkWell(
+                            onTap: () {
+                              setState(() {
+                                isQuestionExpanded = !isQuestionExpanded;
+                              });
+                            },
+                            child: Text(
+                              isQuestionExpanded ? 'Read less' : 'Read more',
+                              style: const TextStyle(
+                                color: Color(0xffE71C65),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
                 const SizedBox(height: 20),
                 (data?.mainImage.isEmpty ?? true)
                     ? Container()
