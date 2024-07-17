@@ -179,8 +179,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 phoneNumber: phoneNumber,
                 verificationId: verificationId,
                 onVerified: () {
-               (  _profileImage?.path.isEmpty ??  true)?_signUpWithoutImage():
-                  _signUp(); // Callback to sign up after verification
+                  print(_profileImage?.path.isEmpty);
+                  (_profileImage?.path.isEmpty ?? true)
+                      ? _signUpWithoutImage()
+                      : _signUp(); // Callback to sign up after verification
                 },
               ),
             ),
@@ -198,7 +200,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-
   void _signUpWithoutImage() async {
     try {
       setState(() {
@@ -207,18 +208,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       await Provider.of<SignUpViewModel>(context, listen: false)
           .signUpWithotProfile(
-              firstName: firstNameController.text,
-              lastName: lastNameController.text,
-              phone: phoneController.text,
-              email: emailController.text,
-              password: passwordController.text,
-              confirmPassword: confirmPasswordController.text,
-             )
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
+        phone: phoneController.text,
+        email: emailController.text,
+        password: passwordController.text,
+        confirmPassword: confirmPasswordController.text,
+      )
           .then(
         (value) {
           if (!value.containsKey("errors")) {
+            print(value["user_id"]);
             context.go(Routes.moreDetails, extra: value["user_id"].toString());
           } else {
+            print(value["message"]);
             Fluttertoast.showToast(msg: value["message"]);
           }
         },
@@ -252,8 +255,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           .then(
         (value) {
           if (!value.containsKey("errors")) {
+            print("error");
             context.go(Routes.moreDetails, extra: value["user_id"].toString());
           } else {
+            print("success");
             Fluttertoast.showToast(msg: value["message"]);
           }
         },
@@ -551,15 +556,15 @@ class SignUpViewModel with ChangeNotifier {
           'confirm_password': confirmPassword,
         });
 
-   
-  
     Map<String, dynamic>? finalResponse;
     // if (response.statusCode == 200) {
+    print("body===${response.body}");
     finalResponse = jsonDecode(response.body) as Map<String, dynamic>;
-
+    print(finalResponse);
     Fluttertoast.showToast(msg: finalResponse["message"]);
     // String userId =  finalResponse["user_id"];
     // return finalResponse.containsKey("errors");
+    print(finalResponse);
     return finalResponse;
     // Handle successful response
     // } else {
