@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:304693604721:android:f4b3e180a7c257f36906d0",
+        "android_client_info": {
+          "package_name": "com.dreamstar.baby"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKd6ItHbpJwCWgNOgAnVMdf61UkKU52Xo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:304693604721:android:b21437e89a663f9c6906d0",
         "android_client_info": {
           "package_name": "com.example.dreamstarbaby"

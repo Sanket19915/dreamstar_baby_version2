@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '432287109522',
     projectId: 'dream-baby-3f01e',
     storageBucket: 'dream-baby-3f01e.appspot.com',
-    iosBundleId: 'com.example.dreamstarbaby',
+    iosBundleId: 'com.dreamstar.baby',
   );
 }
