@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           TestimonialScreen(),
           AboutUsScreen(),
           const HomeContentScreen(),
-          const Center(child: Text("Community")),
+          // const Center(child: Text("Community")),
           ContactUsScreen(),
         ],
       ),
@@ -53,21 +53,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           "Testimonials",
           "About Us",
           "Home",
-          "Community",
+          // "Community",
           "Follow Us"
         ],
         icons: const [
           Icons.reviews,
           Icons.info,
           Icons.home,
-          Icons.group,
+          // Icons.group,
           Icons.follow_the_signs
         ],
         badges: const [
           null,
           null,
           null,
-          null,
+          // null,
           null,
         ],
         tabSize: 50,

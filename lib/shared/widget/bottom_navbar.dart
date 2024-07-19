@@ -21,7 +21,7 @@ class _BottoNavbarScreenState extends State<BottoNavbarScreen>
 
     _motionTabBarController = MotionTabBarController(
       initialIndex: 1,
-      length: 5,
+      length: 4,
       vsync: this,
     );
   }
@@ -43,7 +43,7 @@ class _BottoNavbarScreenState extends State<BottoNavbarScreen>
         "Testimonials",
         "About Us",
         "Home",
-        "Community",
+        // "Community",
         "Follow Us"
       ],
       // icons: const [
