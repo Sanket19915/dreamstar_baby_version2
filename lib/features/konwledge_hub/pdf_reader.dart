@@ -1,14 +1,12 @@
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 class PDFViewerScreen extends StatefulWidget {
   final String pdfPath;
   final String? week;
 
-  PDFViewerScreen({required this.pdfPath, this.week});
+  const PDFViewerScreen({super.key, required this.pdfPath, this.week});
 
   @override
   _PDFViewerScreenState createState() => _PDFViewerScreenState();
@@ -19,7 +17,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
   int _currentPage = 0;
   bool pdfReady = false;
   late PDFViewController _pdfViewController;
-  TextEditingController _pageController = TextEditingController();
+  final TextEditingController _pageController = TextEditingController();
   @override
   @override
   Widget build(BuildContext context) {
@@ -34,7 +32,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           onTap: () {
             Navigator.of(context).pop();
           },
-          child: Icon(Icons.arrow_back),
+          child: const Icon(Icons.arrow_back),
         ),
       ),
       body: Stack(
@@ -48,9 +46,9 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               enableSwipe: true,
               pageSnap: false,
               swipeHorizontal: true,
-              onRender: (_pages) {
+              onRender: (pages) {
                 setState(() {
-                  _totalPages = _pages!;
+                  _totalPages = pages!;
                   pdfReady = true;
                   _pdfViewController.setPage(int.parse(widget.week ?? "1") - 1);
                 });
@@ -65,7 +63,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               },
             ),
           ),
-          if (!pdfReady) Center(child: CircularProgressIndicator())
+          if (!pdfReady) const Center(child: CircularProgressIndicator())
         ],
       ),
       bottomNavigationBar: Container(
@@ -85,7 +83,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.mainColor.withOpacity(.7),
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black26,
                       offset: Offset(0, 2),
@@ -93,8 +91,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                     ),
                   ],
                 ),
-                padding: EdgeInsets.all(10),
-                child: Icon(
+                padding: const EdgeInsets.all(10),
+                child: const Icon(
                   Icons.arrow_back,
                   color: Colors.white,
                 ),
@@ -112,7 +110,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.mainColor.withOpacity(.7),
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black26,
                       offset: Offset(0, 2),
@@ -120,8 +118,8 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                     ),
                   ],
                 ),
-                padding: EdgeInsets.all(10),
-                child: Icon(
+                padding: const EdgeInsets.all(10),
+                child: const Icon(
                   Icons.arrow_forward,
                   color: Colors.white,
                 ),
@@ -130,44 +128,47 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           ],
         ),
       ),
-      floatingActionButton: Container(
-        width: 130,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-            border: Border.all(color: Colors.red)),
-        child: TextField(
-          controller: _pageController,
-          keyboardType: TextInputType.number,
-          textAlign: TextAlign.center,
-          decoration: InputDecoration(
-            hintText: 'Go to Week',
-            hintStyle: TextStyle(
-                color: AppColors.mainColor,
-                fontWeight: FontWeight.w700,
-                fontSize: 16),
-            contentPadding: EdgeInsets.symmetric(horizontal: 5),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          onSubmitted: (value) {
-            int page = int.tryParse(value) ?? 0;
-            if (page > 0 && page <= _totalPages) {
-              _currentPage = page - 1;
-              _pdfViewController.setPage(_currentPage);
-            } else {
-              // Handle invalid page number input
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Invalid page number'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-            _pageController.clear();
-          },
-        ),
-      ),
+      floatingActionButton:
+          widget.pdfPath.contains("TheNineMonthJourney_compressed")
+              ? Container(
+                  width: 130,
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                      border: Border.all(color: Colors.red)),
+                  child: TextField(
+                    controller: _pageController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                      hintText: 'Go to Week',
+                      hintStyle: const TextStyle(
+                          color: AppColors.mainColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onSubmitted: (value) {
+                      int page = int.tryParse(value) ?? 0;
+                      if (page > 0 && page <= _totalPages) {
+                        _currentPage = page - 1;
+                        _pdfViewController.setPage(_currentPage);
+                      } else {
+                        // Handle invalid page number input
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Invalid page number'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                      _pageController.clear();
+                    },
+                  ),
+                )
+              : null,
     );
   }
 }

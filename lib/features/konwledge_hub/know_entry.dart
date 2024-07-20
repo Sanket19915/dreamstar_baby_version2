@@ -64,9 +64,9 @@ class _KnowEntryState extends State<KnowEntry> {
           child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: isLoading
-                  ? Container(
+                  ? SizedBox(
                       height: height,
-                      child: Center(
+                      child: const Center(
                         child: SpinKitCircle(
                           color: AppColors.primaryColor,
                           size: 50.0,
@@ -137,7 +137,8 @@ class _KnowEntryState extends State<KnowEntry> {
                                     isLoading = true;
                                   });
                                   String pdfPath = await _loadPdfFromNetwork(
-                                      knowEntry[index].filePath);
+                                    knowEntry[index].filePath,
+                                  );
 
                                   Navigator.push(
                                     context,
@@ -194,7 +195,8 @@ class _KnowEntryState extends State<KnowEntry> {
           await http.get(Uri.parse("http://dreambaby.pro/storage/$filePath"));
       var bytes = data.bodyBytes;
       var dir = await getApplicationDocumentsDirectory();
-      File file = File("${dir.path}/sample.pdf");
+      String? newFileName = filePath?.split("/").last;
+      File file = File("${dir.path}/$newFileName");
       print(dir.path);
       File urlFile = await file.writeAsBytes(bytes);
       return urlFile.path;
