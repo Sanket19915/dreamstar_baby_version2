@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dream_baby/router/routes.dart';
+import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
@@ -256,6 +257,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         (value) {
           if (!value.containsKey("errors")) {
             print("error");
+            AuthService.saveToken(value["access_token"]);
             context.go(Routes.moreDetails, extra: value["user_id"].toString());
           } else {
             print("success");
