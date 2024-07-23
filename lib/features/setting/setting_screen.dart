@@ -9,12 +9,12 @@ import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -203,6 +203,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildSettingOption('Logout', Icons.logout, () async {
                     try {
                       await FirebaseAuth.instance.signOut();
+                      await AuthService.deleteToken();
                       SessionManager().clearSession(); // Clear session data
                       context.go(Routes.login);
                     } catch (e) {
@@ -214,9 +215,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           if (isLoading)
-            Padding(
-              padding: const EdgeInsets.only(top: 100),
-              child: const LinearProgressIndicator(),
+            const Padding(
+              padding: EdgeInsets.only(top: 100),
+              child: LinearProgressIndicator(),
             ), // Show LinearProgressIndicator while loading
         ],
       ),

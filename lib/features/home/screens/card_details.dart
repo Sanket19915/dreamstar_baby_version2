@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -8,6 +7,7 @@ import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +23,7 @@ class BabyCard extends StatefulWidget {
 class _BabyCardState extends State<BabyCard> {
   String firstName = '';
   String profilePicture = '';
+  bool isLoading = false;
   var weight = ' KG';
   var height = ' CM';
   var weeks = '';
@@ -34,8 +35,24 @@ class _BabyCardState extends State<BabyCard> {
   @override
   void initState() {
     super.initState();
-    _fetchUserProfile();
-    fetchBabyData(1, 1);
+    fetchUserDataAndBabyData();
+  }
+
+  Future<void> fetchUserDataAndBabyData() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await _fetchUserProfile();
+      await fetchBabyData(1, 1);
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchUserProfile() async {
@@ -75,12 +92,12 @@ class _BabyCardState extends State<BabyCard> {
     try {
       var response = await http.get(url, headers: headers);
 
-      if (response.statusCode == 200) {
-        var contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          var data = json.decode(response.body);
-
-          print(data);
+      var contentType = response.headers['content-type'];
+      if (contentType != null && contentType.contains('application/json')) {
+        var data = json.decode(response.body);
+        if (response.body.contains("message")) {
+          Fluttertoast.showToast(msg: data["message"]);
+        } else {
           setState(() {
             total_day = data['total_days']?.toString() ?? '0';
             var babyData = data['data'][0];
@@ -91,14 +108,12 @@ class _BabyCardState extends State<BabyCard> {
             sizes = babyData['size']?.toString() ?? '';
             images = babyData['image']?.toString() ?? '';
           });
-
-          print(
-              'total_days: $total_day, Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
-        } else {
-          throw Exception('Unexpected response format');
         }
+
+        print(
+            'total_days: $total_day, Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
       } else {
-        throw Exception('Failed to fetch baby data: ${response.reasonPhrase}');
+        throw Exception('Unexpected response format');
       }
     } catch (e) {
       print('Error fetching baby data: $e');
@@ -113,275 +128,283 @@ class _BabyCardState extends State<BabyCard> {
     double percent =
         (double.tryParse(total_day) ?? 0) / 280; // Compute the percentage here
     print('Percent: $percent'); // Debug print to check the value of percent
-    return Column(
-      children: [
-        InkWell(
-          onTap: () => GoRouter.of(context).push(Routes.settingsScreen),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+    return isLoading
+        ? const CircularProgressIndicator()
+        : Column(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(
-                    "http://dreambaby.pro/storage/$profilePicture"),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(
-                'Hi $firstName,',
-                style: GoogleFonts.lobsterTwo(
-                    color: AppColors.blackColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(
-          height: 15,
-        ),
-        ConstrainedBox(
-          constraints: BoxConstraints(
-              maxHeight: math.max(deviceHeight * .059, 170), minHeight: 170),
-          child: Container(
-            height: deviceHeight * 0.201,
-            decoration: BoxDecoration(
-              color: AppColors.cardColor.withOpacity(.3),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(20),
-              ),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Row(
+              InkWell(
+                onTap: () => GoRouter.of(context).push(Routes.settingsScreen),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                            left: 10, top: 20, right: 5, bottom: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AutoSizeText(
-                              'Baby’s milestone today',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  height: 1,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.greyTextColor),
-                              minFontSize: 9,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Weight:',
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 11,
-                                          height: 1,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.greyTextColor)),
-                                  TextSpan(
-                                    text: '  $weight',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.blackColor),
-                                  ),
-                                  TextSpan(
-                                    text: '*',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.greyTextColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Size:',
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 11,
-                                          height: 1,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.greyTextColor)),
-                                  TextSpan(
-                                    text: '        $sizes',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.blackColor),
-                                  ),
-                                  TextSpan(
-                                    text: '*',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.greyTextColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: 'Age:',
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 11,
-                                          height: 1,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.greyTextColor)),
-                                  TextSpan(
-                                    text:
-                                        '        $weeks Weeks \n               $days Days',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.blackColor),
-                                  ),
-                                  TextSpan(
-                                    text: '*',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.greyTextColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Spacer(),
-                            AutoSizeText(
-                              '*Std. Est.',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 10,
-                                  height: 1,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.greyTextColor),
-                              minFontSize: 7,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: NetworkImage(
+                          "http://dreambaby.pro/storage/$profilePicture"),
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(),
+                    const SizedBox(
+                      width: 10,
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(top: 20, right: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            AutoSizeText(
-                              'Your baby is the size of a',
-                              textAlign: TextAlign.end,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  height: 1,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.greyTextColor),
-                              minFontSize: 9,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.only(left: 20),
-                              child: images.isEmpty
-                                  ? Image.asset(
-                                      AppImages.bellPepper,
-                                      height: 40,
-                                    )
-                                  : Image.network(
-                                      "http://dreambaby.pro/storage/$images",
-                                      height: 40,
-                                    ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              child: AutoSizeText(
-                                height,
-                                textAlign: TextAlign.end,
-                                minFontSize: 14,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.lobsterTwo(
-                                    color: AppColors.babySizeColor,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                    Text(
+                      'Hi $firstName,',
+                      style: GoogleFonts.lobsterTwo(
+                          color: AppColors.blackColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500),
+                    )
                   ],
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 25),
-                  alignment: Alignment.center,
-                  child: CircularPercentIndicator(
-                    center: SizedBox(
-                      height: 134,
-                      child: Image(
-                        image: AssetImage(AppImages.baby),
-                        fit: BoxFit.cover,
-                      ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxHeight: math.max(deviceHeight * .059, 170),
+                    minHeight: 170),
+                child: Container(
+                  height: deviceHeight * 0.201,
+                  decoration: BoxDecoration(
+                    color: AppColors.cardColor.withOpacity(.3),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(20),
                     ),
-                    radius: 74.0,
-                    lineWidth: 8.0,
-                    animation: true,
-                    percent: percent,
-                    circularStrokeCap: CircularStrokeCap.round,
-                    backgroundColor: AppColors.whiteColor.withOpacity(.85),
-                    progressColor: AppColors.mainColor,
-                    rotateLinearGradient: true,
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 10, top: 20, right: 5, bottom: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AutoSizeText(
+                                    'Baby’s milestone today',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 11,
+                                        height: 1,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.greyTextColor),
+                                    minFontSize: 9,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text: 'Weight:',
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 11,
+                                                height: 1,
+                                                fontWeight: FontWeight.w500,
+                                                color:
+                                                    AppColors.greyTextColor)),
+                                        TextSpan(
+                                          text: '  $weight',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.blackColor),
+                                        ),
+                                        TextSpan(
+                                          text: '*',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.greyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text: 'Size:',
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 11,
+                                                height: 1,
+                                                fontWeight: FontWeight.w500,
+                                                color:
+                                                    AppColors.greyTextColor)),
+                                        TextSpan(
+                                          text: '        $sizes',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.blackColor),
+                                        ),
+                                        TextSpan(
+                                          text: '*',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.greyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  RichText(
+                                    textAlign: TextAlign.center,
+                                    text: TextSpan(
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text: 'Age:',
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 11,
+                                                height: 1,
+                                                fontWeight: FontWeight.w500,
+                                                color:
+                                                    AppColors.greyTextColor)),
+                                        TextSpan(
+                                          text:
+                                              '        $weeks Weeks \n               $days Days',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1.5,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.blackColor),
+                                        ),
+                                        TextSpan(
+                                          text: '*',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.greyTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  AutoSizeText(
+                                    '*Std. Est.',
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 10,
+                                        height: 1,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.greyTextColor),
+                                    minFontSize: 7,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Container(),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              padding:
+                                  const EdgeInsets.only(top: 20, right: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  AutoSizeText(
+                                    'Your baby is the size of a',
+                                    textAlign: TextAlign.end,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 11,
+                                        height: 1,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.greyTextColor),
+                                    minFontSize: 9,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: images.isEmpty
+                                        ? Image.asset(
+                                            AppImages.bellPepper,
+                                            height: 40,
+                                          )
+                                        : Image.network(
+                                            "http://dreambaby.pro/storage/$images",
+                                            height: 40,
+                                          ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: AutoSizeText(
+                                      height,
+                                      textAlign: TextAlign.end,
+                                      minFontSize: 14,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.lobsterTwo(
+                                          color: AppColors.babySizeColor,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 25),
+                        alignment: Alignment.center,
+                        child: CircularPercentIndicator(
+                          center: const SizedBox(
+                            height: 134,
+                            child: Image(
+                              image: AssetImage(AppImages.baby),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          radius: 74.0,
+                          lineWidth: 8.0,
+                          animation: true,
+                          percent: percent,
+                          circularStrokeCap: CircularStrokeCap.round,
+                          backgroundColor:
+                              AppColors.whiteColor.withOpacity(.85),
+                          progressColor: AppColors.mainColor,
+                          rotateLinearGradient: true,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
   }
 }

@@ -10,8 +10,8 @@ class AmazonLinkWidget extends StatelessWidget {
       {super.key, required this.height, required this.width});
 
   Future<void> _launchAmazon() async {
-    const amazonAppUrl = 'com.amazon.mobile.shopping://www.amazon.com';
-    const amazonWebUrl = 'https://www.amazon.com';
+    const amazonAppUrl = 'https://www.amazon.in/Sanskar-Manifestation-through-Garbha-Secrets/dp/9361561375/re[…]ooks&sprefix=dr+sonal+jayaswal%2Cstripbooks%2C279&sr=1-1-fkmr0';
+    const amazonWebUrl = 'https://www.amazon.in/Sanskar-Manifestation-through-Garbha-Secrets/dp/9361561375/re[…]ooks&sprefix=dr+sonal+jayaswal%2Cstripbooks%2C279&sr=1-1-fkmr0';
 
     if (await canLaunchUrl(Uri.parse(amazonAppUrl))) {
       await launchUrl(Uri.parse(amazonAppUrl));
@@ -25,7 +25,7 @@ class AmazonLinkWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // onTap: _launchAmazon,
+      onTap: _launchAmazon,
       child: Container(
         height: height * 0.150,
         width: width,
