@@ -220,6 +220,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         (value) {
           if (!value.containsKey("errors")) {
             print(value["user_id"]);
+              AuthService.saveToken(value["access_token"]);
             context.go(Routes.moreDetails, extra: value["user_id"].toString());
           } else {
             print(value["message"]);
