@@ -1,6 +1,5 @@
-package com.dreamstar.baby
+package com.dreamstarbaby
 
 import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity: FlutterActivity() {
-}
+class MainActivity : FlutterActivity() {}

@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDKd6ItHbpJwCWgNOgAnVMdf61UkKU52Xo',
-    appId: '1:304693604721:android:b21437e89a663f9c6906d0',
+    appId: '1:304693604721:android:2bf5ef24a258da846906d0',
     messagingSenderId: '304693604721',
     projectId: 'dreamstarbaby-e5f83',
     storageBucket: 'dreamstarbaby-e5f83.appspot.com',
@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '432287109522',
     projectId: 'dream-baby-3f01e',
     storageBucket: 'dream-baby-3f01e.appspot.com',
-    iosBundleId: 'com.dreamstar.baby',
+    iosBundleId: 'com.dreamstarbaby',
   );
 }

@@ -99,10 +99,10 @@ class ContactUsScreen extends StatelessWidget {
                         const Divider(),
                         ContactItem(
                           icon: Icons.web,
-                          text: 'www.dreamstarbaby.in',
+                          text: 'https://garbhasanskar.sonaljainjayaswal.com/',
                           onTap: () async {
                             final websiteUrl =
-                                Uri.parse('https://www.dreamstarbaby.in');
+                                Uri.parse('https://garbhasanskar.sonaljainjayaswal.com/');
                             if (await canLaunchUrl(websiteUrl)) {
                               await launchUrl(websiteUrl);
                             } else {

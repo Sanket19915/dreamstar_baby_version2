@@ -25,13 +25,13 @@ class AmazonLinkWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: _launchAmazon,
+      // onTap: _launchAmazon,
       child: Container(
         height: height * 0.150,
         width: width,
         decoration: const BoxDecoration(
           image: DecorationImage(
-              image: AssetImage(AppImages.book), fit: BoxFit.cover),
+              image: AssetImage(AppImages.productPic), fit: BoxFit.cover),
           borderRadius: BorderRadius.all(
             Radius.circular(15),
           ),
