@@ -8,6 +8,7 @@ class AppImages {
   static const hand = "assets/images/hand.gif";
   static const bg = "assets/images/bg.png";
   static const bg1 = "assets/images/bg.png";
+  static const noEddImg = "assets/images/no_edd_lmp.svg";
   static const bell = "assets/images/charm_bell.png";
   static const share = "assets/images/share-2.png";
   static const baby = "assets/images/baby.png";

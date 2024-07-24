@@ -7,6 +7,7 @@ import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +32,7 @@ class _BabyCardState extends State<BabyCard> {
   var sizes = '';
   var images = '';
   var total_day = '';
-
+  var babyData;
   @override
   void initState() {
     super.initState();
@@ -100,7 +101,7 @@ class _BabyCardState extends State<BabyCard> {
         } else {
           setState(() {
             total_day = data['total_days']?.toString() ?? '0';
-            var babyData = data['data'][0];
+             babyData = data['data'][0];
             weight = babyData['weight']?.toString() ?? '0.0 KG';
             height = babyData['height']?.toString() ?? '0 CM';
             weeks = babyData['week']?.toString() ?? '0';
@@ -159,7 +160,9 @@ class _BabyCardState extends State<BabyCard> {
               const SizedBox(
                 height: 15,
               ),
-              ConstrainedBox(
+          babyData == null
+                  ? SvgPicture.asset(AppImages.noEddImg)
+                  :     ConstrainedBox(
                 constraints: BoxConstraints(
                     maxHeight: math.max(deviceHeight * .059, 170),
                     minHeight: 170),
@@ -182,6 +185,7 @@ class _BabyCardState extends State<BabyCard> {
                               padding: const EdgeInsets.only(
                                   left: 10, top: 20, right: 5, bottom: 8),
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   AutoSizeText(

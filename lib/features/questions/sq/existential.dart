@@ -709,7 +709,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     ? "Intellectual"
                                     : widget.from == "Musical"
                                         ? "Intellectual"
-                                        : "Spirutal",
+                                        : "Spiritual",
         "intelligence_type": widget.from,
         "question_type": ""
       });

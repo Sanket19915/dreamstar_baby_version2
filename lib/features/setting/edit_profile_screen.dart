@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 
 import '../../router/routes.dart';
 import '../../services/auth_services.dart';
+import '../auth/screens/more_details.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile;
@@ -34,6 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController lastNameController;
   late TextEditingController phoneController;
   late TextEditingController emailController;
+  late TextEditingController eddController;
   // final TextEditingController passwordController = TextEditingController();
   // final TextEditingController confirmPasswordController =
   //     TextEditingController();
@@ -48,7 +50,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool isEmailValid = false;
   bool isPasswordValid = false;
   bool isConfirmPasswordValid = false;
-
+  DetailType selectType = DetailType.EDD;
+  bool isSelected = true;
   bool get isFormValid {
     return isFirstNameValid &&
             isLastNameValid &&
@@ -72,6 +75,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         TextEditingController(text: widget.userProfile['last_name']);
     phoneController =
         TextEditingController(text: widget.userProfile['phone_no']);
+    eddController = TextEditingController(
+        text: widget.userProfile["eed"] ?? widget.userProfile["lmp"]);
+
     emailController = TextEditingController(text: widget.userProfile['email']);
     if (firstNameController.text.isNotEmpty &&
         lastNameController.text.isNotEmpty &&
@@ -94,6 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        eddController.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
       });
     }
   }
@@ -383,17 +390,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           autoValidate: AutovalidateMode.disabled,
                           hintText:
                               'EDD or LMP', // Change as per your requirement
-                          controller: TextEditingController(
-                            text: selectedDate != null
-                                ? DateFormat('yyyy-MM-dd').format(selectedDate!)
-                                : '2024-07-09',
-                          ),
+                          controller: eddController,
+
+                          // TextEditingController(
+                          //   text: selectedDate != null
+                          //       ? DateFormat('yyyy-MM-dd').format(selectedDate!)
+                          //       : '2024-07-09',
+                          // ),
                           borderColor: AppColors.secondaryTextColor,
                           inputType: CustomTextInputType.text,
                         ),
                       ),
                     ),
                     const SizedBox(height: 10),
+
                     const SizedBox(height: 10),
                     // CustomTextField(
                     //   autoValidate: AutovalidateMode.onUserInteraction,
