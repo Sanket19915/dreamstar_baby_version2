@@ -179,11 +179,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 resendToken: resendToken,
                 phoneNumber: phoneNumber,
                 verificationId: verificationId,
-                onVerified: () {
-                  print(_profileImage?.path.isEmpty);
+                onVerified: () async {
                   (_profileImage?.path.isEmpty ?? true)
-                      ? _signUpWithoutImage()
-                      : _signUp(); // Callback to sign up after verification
+                      ? await _signUpWithoutImage()
+                      : await _signUp(); // Callback to sign up after verification
                 },
               ),
             ),
@@ -201,7 +200,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _signUpWithoutImage() async {
+  Future<void> _signUpWithoutImage() async {
     try {
       setState(() {
         isLoading = true;
@@ -220,7 +219,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         (value) {
           if (!value.containsKey("errors")) {
             print(value["user_id"]);
-              AuthService.saveToken(value["access_token"]);
+            AuthService.saveToken(value["access_token"]);
             context.go(Routes.moreDetails, extra: value["user_id"].toString());
           } else {
             print(value["message"]);
@@ -239,7 +238,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _signUp() async {
+  Future<void> _signUp() async {
     try {
       setState(() {
         isLoading = true;

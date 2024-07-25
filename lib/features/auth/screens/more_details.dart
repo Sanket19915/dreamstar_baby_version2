@@ -17,8 +17,8 @@ import '../../../shared/widget/custom_button.dart';
 enum DetailType { EDD, LMP }
 
 class MoreDetailsScreen extends StatefulWidget {
- final String ?userId;
-  const MoreDetailsScreen({super.key ,this.userId});
+  final String? userId;
+  const MoreDetailsScreen({super.key, this.userId});
 
   @override
   State<MoreDetailsScreen> createState() => _MoreDetailsScreenState();
@@ -28,6 +28,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   final TextEditingController dobController = TextEditingController();
 
   final TextEditingController eddController = TextEditingController();
+  ValueNotifier buttonNotifier = ValueNotifier(true);
   DetailType selectType = DetailType.EDD;
   bool isSelected = true;
   bool isLoading = false;
@@ -89,6 +90,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             borderColor: AppColors.secondaryTextColor,
                             hintText: 'Date of Birth',
                             readOnly: true,
+                            onChanged: (p0) {
+                              buttonNotifier.notifyListeners();
+                            },
                             suffix: InkWell(
                               onTap: () async {
                                 DateTime? pickedDate = await showDatePicker(
@@ -100,6 +104,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                 if (pickedDate != null) {
                                   dobController.text =
                                       "${pickedDate.toLocal()}".split(' ')[0];
+                                     buttonNotifier.notifyListeners();
                                 }
                               },
                               child: const Icon(
@@ -177,6 +182,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             ),
                           ),
                           CustomTextField(
+                            onChanged: (p0) {
+                              buttonNotifier.notifyListeners();
+                            },
                             controller: eddController,
                             borderColor: AppColors.secondaryTextColor,
                             hintText: 'Enter date',
@@ -188,15 +196,19 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                   initialDate: DateTime.now(),
                                   firstDate: selectType == DetailType.EDD
                                       ? DateTime.now()
-                                      : DateTime(1900),
+                                      : DateTime.now()
+                                          .subtract(const Duration(days: 280)),
                                   lastDate: selectType == DetailType.LMP
                                       ? DateTime.now()
-                                      : DateTime(2100),
+                                      : DateTime.now()
+                                          .add(const Duration(days: 280)),
                                 );
                                 if (pickedDate != null) {
                                   eddController.text =
                                       "${pickedDate.toLocal()}".split(' ')[0];
+                                     buttonNotifier.notifyListeners();
                                 }
+                              
                               },
                               child: const Icon(
                                 Icons.calendar_today_outlined,
@@ -253,48 +265,72 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          CustomButton(
-                            text: 'Submit',
-                            // isEnabled: isFormValid,
-                            borderColor:
-                                // isFormValid
-                                // ?
-                                AppColors.primaryColor,
-                            // : AppColors.secondaryTextColor.withOpacity(.5),
-                            backgroundColor:
-                                //  isFormValid
-                                // ?
-
-                                AppColors.primaryColor,
-                            // :
-                            //  AppColors.secondaryTextColor.withOpacity(.5),
-                            textStyle: CustomLabels.body3GreyTextStyle(
-                              fontSize: 16,
-                              color: AppColors.whiteColor,
-                            ),
-                            onPressed: () {
-                              submitAdditionalDetails(
-                                  dob: dobController.text,
-                                  userId: widget.userId??"",
-                                  eed: selectType == DetailType.EDD
-                                      ? eddController.text
-                                      : "",
-                                  lmp: selectType == DetailType.LMP
-                                      ? eddController.text
-                                      : "");
-                            },
-                          ),
-                          CustomButton(
-                            text: 'Skip',
-                            isEnabled: true,
-                            borderColor: AppColors.whiteColor,
-                            backgroundColor: AppColors.whiteColor,
-                            textStyle: CustomLabels.body3GreyTextStyle(
-                              fontSize: 14,
-                              color: AppColors.greyTextColor,
-                            ),
-                            onPressed: () => skipInformation(widget.userId ?? ""),
-                          ),
+                          ValueListenableBuilder(
+                              valueListenable: buttonNotifier,
+                              builder: (context, value, child) {
+                                return CustomButton(
+                                  text: 'Submit',
+                                  // isEnabled: isFormValid,
+                                  borderColor: (dobController.text.isNotEmpty &&
+                                          eddController.text.isNotEmpty)
+                                      // isFormValid
+                                      ? AppColors.primaryColor
+                                      : AppColors.secondaryTextColor
+                                          .withOpacity(.5),
+                                  backgroundColor:
+                                      (dobController.text.isNotEmpty &&
+                                              eddController.text.isNotEmpty)
+                                          //  isFormValid
+                                          ? AppColors.primaryColor
+                                          : AppColors.secondaryTextColor
+                                              .withOpacity(.5),
+                                  textStyle: CustomLabels.body3GreyTextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.whiteColor,
+                                  ),
+                                  isEnabled: (dobController.text.isNotEmpty &&
+                                      eddController.text.isNotEmpty),
+                                  onPressed: () {
+                                    submitAdditionalDetails(
+                                        dob: dobController.text,
+                                        userId: widget.userId ?? "",
+                                        eed: selectType == DetailType.EDD
+                                            ? eddController.text
+                                            : "",
+                                        lmp: selectType == DetailType.LMP
+                                            ? eddController.text
+                                            : "");
+                                  },
+                                );
+                              }),
+                          ValueListenableBuilder(
+                              valueListenable: buttonNotifier,
+                              builder: (context, value, child) {
+                                return CustomButton(
+                                  text: 'Skip',
+                                  isEnabled: (dobController.text.isEmpty &&
+                                      eddController.text.isEmpty),
+                                  borderColor: (dobController.text.isEmpty &&
+                                          eddController.text.isEmpty)
+                                      // isFormValid
+                                      ? AppColors.primaryColor
+                                      : AppColors.secondaryTextColor
+                                          .withOpacity(.5),
+                                  backgroundColor:
+                                      (dobController.text.isEmpty &&
+                                              eddController.text.isEmpty)
+                                          // isFormValid
+                                          ? AppColors.primaryColor
+                                          : AppColors.secondaryTextColor
+                                              .withOpacity(.5),
+                                  textStyle: CustomLabels.body3GreyTextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.whiteColor,
+                                  ),
+                                  onPressed: () =>
+                                      skipInformation(widget.userId ?? ""),
+                                );
+                              }),
                         ],
                       ),
                     ),
@@ -371,7 +407,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         isLoading = false;
       });
     } catch (e) {
-        Fluttertoast.showToast(msg: e.toString());
+      Fluttertoast.showToast(msg: e.toString());
     }
   }
 }

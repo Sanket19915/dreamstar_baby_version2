@@ -15,7 +15,8 @@ import 'package:http/http.dart' as http;
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class BabyCard extends StatefulWidget {
-  const BabyCard({super.key});
+  final bool? isrefresh;
+  const BabyCard({super.key, this.isrefresh = false});
 
   @override
   State<BabyCard> createState() => _BabyCardState();
@@ -37,6 +38,14 @@ class _BabyCardState extends State<BabyCard> {
   void initState() {
     super.initState();
     fetchUserDataAndBabyData();
+  }
+
+  @override
+  void didUpdateWidget(BabyCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isrefresh ?? false) {
+       fetchUserDataAndBabyData();
+    }
   }
 
   Future<void> fetchUserDataAndBabyData() async {
@@ -101,7 +110,7 @@ class _BabyCardState extends State<BabyCard> {
         } else {
           setState(() {
             total_day = data['total_days']?.toString() ?? '0';
-             babyData = data['data'][0];
+            babyData = data['data'][0];
             weight = babyData['weight']?.toString() ?? '0.0 KG';
             height = babyData['height']?.toString() ?? '0 CM';
             weeks = babyData['week']?.toString() ?? '0';
@@ -160,254 +169,268 @@ class _BabyCardState extends State<BabyCard> {
               const SizedBox(
                 height: 15,
               ),
-          babyData == null
+              babyData == null
                   ? SvgPicture.asset(AppImages.noEddImg)
-                  :     ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxHeight: math.max(deviceHeight * .059, 170),
-                    minHeight: 170),
-                child: Container(
-                  height: deviceHeight * 0.201,
-                  decoration: BoxDecoration(
-                    color: AppColors.cardColor.withOpacity(.3),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(20),
-                    ),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 4,
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                  left: 10, top: 20, right: 5, bottom: 8),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AutoSizeText(
-                                    'Baby’s milestone today',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.greyTextColor),
-                                    minFontSize: 9,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  RichText(
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                            text: 'Weight:',
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 11,
-                                                height: 1,
-                                                fontWeight: FontWeight.w500,
-                                                color:
-                                                    AppColors.greyTextColor)),
-                                        TextSpan(
-                                          text: '  $weight',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              height: 1,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.blackColor),
-                                        ),
-                                        TextSpan(
-                                          text: '*',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              height: 1,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.greyTextColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  RichText(
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                            text: 'Size:',
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 11,
-                                                height: 1,
-                                                fontWeight: FontWeight.w500,
-                                                color:
-                                                    AppColors.greyTextColor)),
-                                        TextSpan(
-                                          text: '        $sizes',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              height: 1,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.blackColor),
-                                        ),
-                                        TextSpan(
-                                          text: '*',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              height: 1,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.greyTextColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  RichText(
-                                    textAlign: TextAlign.center,
-                                    text: TextSpan(
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                            text: 'Age:',
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 11,
-                                                height: 1,
-                                                fontWeight: FontWeight.w500,
-                                                color:
-                                                    AppColors.greyTextColor)),
-                                        TextSpan(
-                                          text:
-                                              '        $weeks Weeks \n               $days Days',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              height: 1.5,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.blackColor),
-                                        ),
-                                        TextSpan(
-                                          text: '*',
-                                          style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              height: 1,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.greyTextColor),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  AutoSizeText(
-                                    '*Std. Est.',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 10,
-                                        height: 1,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.greyTextColor),
-                                    minFontSize: 7,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
+                  : ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: math.max(deviceHeight * .059, 170),
+                          minHeight: 170),
+                      child: Container(
+                        height: deviceHeight * 0.201,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardColor.withOpacity(.3),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
                           ),
-                          Expanded(
-                            flex: 3,
-                            child: Container(),
-                          ),
-                          Expanded(
-                            flex: 3,
-                            child: Container(
-                              alignment: Alignment.centerRight,
-                              padding:
-                                  const EdgeInsets.only(top: 20, right: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  AutoSizeText(
-                                    'Your baby is the size of a',
-                                    textAlign: TextAlign.end,
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        height: 1,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.greyTextColor),
-                                    minFontSize: 9,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.only(left: 20),
-                                    child: images.isEmpty
-                                        ? Image.asset(
-                                            AppImages.bellPepper,
-                                            height: 40,
-                                          )
-                                        : Image.network(
-                                            "http://dreambaby.pro/storage/$images",
-                                            height: 40,
-                                          ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    child: AutoSizeText(
-                                      height,
-                                      textAlign: TextAlign.end,
-                                      minFontSize: 14,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.lobsterTwo(
-                                          color: AppColors.babySizeColor,
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 25),
-                        alignment: Alignment.center,
-                        child: CircularPercentIndicator(
-                          center: const SizedBox(
-                            height: 134,
-                            child: Image(
-                              image: AssetImage(AppImages.baby),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          radius: 74.0,
-                          lineWidth: 8.0,
-                          animation: true,
-                          percent: percent,
-                          circularStrokeCap: CircularStrokeCap.round,
-                          backgroundColor:
-                              AppColors.whiteColor.withOpacity(.85),
-                          progressColor: AppColors.mainColor,
-                          rotateLinearGradient: true,
                         ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 10, top: 20, right: 5, bottom: 8),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AutoSizeText(
+                                          'Baby’s milestone today',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.greyTextColor),
+                                          minFontSize: 9,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        RichText(
+                                          textAlign: TextAlign.center,
+                                          text: TextSpan(
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                  text: 'Weight:',
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: 11,
+                                                      height: 1,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppColors
+                                                          .greyTextColor)),
+                                              TextSpan(
+                                                text: '  $weight',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 11,
+                                                    height: 1,
+                                                    fontWeight: FontWeight.w600,
+                                                    color:
+                                                        AppColors.blackColor),
+                                              ),
+                                              TextSpan(
+                                                text: '*',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 11,
+                                                    height: 1,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .greyTextColor),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        RichText(
+                                          textAlign: TextAlign.center,
+                                          text: TextSpan(
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                  text: 'Size:',
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: 11,
+                                                      height: 1,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppColors
+                                                          .greyTextColor)),
+                                              TextSpan(
+                                                text: '        $sizes',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 11,
+                                                    height: 1,
+                                                    fontWeight: FontWeight.w600,
+                                                    color:
+                                                        AppColors.blackColor),
+                                              ),
+                                              TextSpan(
+                                                text: '*',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 11,
+                                                    height: 1,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .greyTextColor),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        RichText(
+                                          textAlign: TextAlign.center,
+                                          text: TextSpan(
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                  text: 'Age:',
+                                                  style: GoogleFonts.poppins(
+                                                      fontSize: 11,
+                                                      height: 1,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppColors
+                                                          .greyTextColor)),
+                                              TextSpan(
+                                                text:
+                                                    '        $weeks Weeks \n               $days Days',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 11,
+                                                    height: 1.5,
+                                                    fontWeight: FontWeight.w600,
+                                                    color:
+                                                        AppColors.blackColor),
+                                              ),
+                                              TextSpan(
+                                                text: '*',
+                                                style: GoogleFonts.poppins(
+                                                    fontSize: 11,
+                                                    height: 1,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .greyTextColor),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        AutoSizeText(
+                                          '*Std. Est.',
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 10,
+                                              height: 1,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.greyTextColor),
+                                          minFontSize: 7,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(
+                                        top: 20, right: 15),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        AutoSizeText(
+                                          'Your baby is the size of a',
+                                          textAlign: TextAlign.end,
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              height: 1,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.greyTextColor),
+                                          minFontSize: 9,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          padding:
+                                              const EdgeInsets.only(left: 20),
+                                          child: images.isEmpty
+                                              ? Image.asset(
+                                                  AppImages.bellPepper,
+                                                  height: 40,
+                                                )
+                                              : Image.network(
+                                                  "http://dreambaby.pro/storage/$images",
+                                                  height: 40,
+                                                ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          child: AutoSizeText(
+                                            height,
+                                            textAlign: TextAlign.end,
+                                            minFontSize: 14,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.lobsterTwo(
+                                                color: AppColors.babySizeColor,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(left: 25),
+                              alignment: Alignment.center,
+                              child: CircularPercentIndicator(
+                                center: const SizedBox(
+                                  height: 134,
+                                  child: Image(
+                                    image: AssetImage(AppImages.baby),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                radius: 74.0,
+                                lineWidth: 8.0,
+                                animation: true,
+                                percent: percent,
+                                circularStrokeCap: CircularStrokeCap.round,
+                                backgroundColor:
+                                    AppColors.whiteColor.withOpacity(.85),
+                                progressColor: AppColors.mainColor,
+                                rotateLinearGradient: true,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
             ],
           );
   }

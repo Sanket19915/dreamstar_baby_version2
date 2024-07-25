@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class TestimonialScreen extends StatefulWidget {
+  const TestimonialScreen({super.key});
+
   @override
   _TestimonialScreenState createState() => _TestimonialScreenState();
 }
@@ -51,8 +54,8 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
       body: Column(
         children: [
           if (isLoading)
-            Padding(
-              padding: const EdgeInsets.only(top: 100),
+            const Padding(
+              padding: EdgeInsets.only(top: 100),
               child: LinearProgressIndicator(),
             ), // Show the LinearProgressIndicator when loading
           Expanded(
@@ -68,9 +71,9 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                 ),
               ),
               child: isLoading
-                  ? Container(
+                  ? SizedBox(
                       height: height,
-                      child: Center(
+                      child: const Center(
                         child: SpinKitCircle(
                           color: AppColors.primaryColor,
                           size: 50.0,
@@ -117,7 +120,8 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                                         CircleAvatar(
                                           backgroundImage: userImage != null &&
                                                   userImage.isNotEmpty
-                                              ? NetworkImage(userImage)
+                                              ? NetworkImage(
+                                                      "http://dreambaby.pro/storage/$userImage")
                                                   as ImageProvider<
                                                       Object> // Explicit cast to ImageProvider<Object>
                                               : const AssetImage(

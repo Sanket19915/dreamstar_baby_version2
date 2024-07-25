@@ -29,6 +29,7 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   final TextEditingController otpController = TextEditingController();
+  ValueNotifier buttonNotifier = ValueNotifier(true);
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading = false;
   String verificationId = "";
@@ -49,6 +50,8 @@ class _OTPScreenState extends State<OTPScreen> {
           .then((value) => print('User Login In Successful'));
 
       widget.onVerified();
+
+      await Future.delayed(const Duration(seconds: 4));
       setState(() {
         isLoading = false;
       }); // Call the callback to sign up
@@ -118,6 +121,9 @@ class _OTPScreenState extends State<OTPScreen> {
                               height:
                                   MediaQuery.of(context).size.height * 0.025),
                           CustomTextField(
+                            onChanged: (p0) {
+                              buttonNotifier.notifyListeners();
+                            },
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'Enter OTP',
                             controller: otpController,
@@ -128,19 +134,32 @@ class _OTPScreenState extends State<OTPScreen> {
                           SizedBox(
                               height:
                                   MediaQuery.of(context).size.height * 0.035),
-                          CustomButton(
-                            text: 'Verify',
-                            isEnabled: true,
-                            borderColor: AppColors.primaryColor,
-                            backgroundColor: AppColors.primaryColor,
-                            textStyle: CustomLabels.body3GreyTextStyle(
-                              fontSize: 16,
-                              color: AppColors.whiteColor,
-                            ),
-                            onPressed: () async {
-                              signInWithOTP();
-                            },
-                          ),
+                          ValueListenableBuilder(
+                              valueListenable: buttonNotifier,
+                              builder: (context, value, child) {
+                                return CustomButton(
+                                  text: 'Verify',
+                                  isEnabled: otpController.text.length == 6
+                                      ? true
+                                      : false,
+                                  borderColor: otpController.text.length == 6
+                                      ? AppColors.primaryColor
+                                      : AppColors.secondaryTextColor
+                                          .withOpacity(.5),
+                                  backgroundColor:
+                                      otpController.text.length == 6
+                                          ? AppColors.primaryColor
+                                          : AppColors.secondaryTextColor
+                                              .withOpacity(.5),
+                                  textStyle: CustomLabels.body3GreyTextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.whiteColor,
+                                  ),
+                                  onPressed: () async {
+                                    signInWithOTP();
+                                  },
+                                );
+                              }),
                         ],
                       ),
                     ),

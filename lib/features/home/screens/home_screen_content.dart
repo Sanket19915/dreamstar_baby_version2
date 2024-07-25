@@ -20,7 +20,7 @@ class HomeContentScreen extends StatefulWidget {
 class _HomeContentScreenState extends State<HomeContentScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _isAppBarTransparent = true;
-
+  bool isRefresh = false;
   @override
   void initState() {
     super.initState();
@@ -95,68 +95,81 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(AppImages.bg), fit: BoxFit.cover),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: height * 0.140,
-              ),
-              const BabyCard(),
-              SizedBox(
-                height: height * 0.02,
-              ),
-              AutoSizeText(
-                'Daily Activities for Baby’s Development ',
-                style: GoogleFonts.poppins(
-                    color: AppColors.blackColor,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600),
-                minFontSize: 13,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              SizedBox(
-                height: height * 0.02,
-              ),
-              const FourQuotients(),
-              const SizedBox(
-                height: 15,
-              ),
-              InkWell(
-                onTap: () => GoRouter.of(context).push(Routes.knowEntry),
-                child: Container(
-                  height: height * 0.11,
-                  width: width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage(AppImages.know), fit: BoxFit.cover),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
+      body: RefreshIndicator(
+        onRefresh: () => onRefresh(),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          physics: const BouncingScrollPhysics(),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage(AppImages.bg), fit: BoxFit.cover),
+            ),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: height * 0.140,
+                ),
+                 BabyCard(isrefresh: isRefresh),
+                SizedBox(
+                  height: height * 0.02,
+                ),
+                AutoSizeText(
+                  'Daily Activities for Baby’s Development ',
+                  style: GoogleFonts.poppins(
+                      color: AppColors.blackColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600),
+                  minFontSize: 13,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                SizedBox(
+                  height: height * 0.02,
+                ),
+                const FourQuotients(),
+                const SizedBox(
+                  height: 15,
+                ),
+                InkWell(
+                  onTap: () => GoRouter.of(context).push(Routes.knowEntry),
+                  child: Container(
+                    height: height * 0.11,
+                    width: width,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage(AppImages.know), fit: BoxFit.cover),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              AmazonLinkWidget(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-              ),
-            ],
+                const SizedBox(
+                  height: 10,
+                ),
+                AmazonLinkWidget(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> onRefresh() async {
+   setState(() {
+      isRefresh = true;
+    }); 
+    await Future.delayed(const Duration(seconds: 2));
+     setState(() {
+      isRefresh = false;
+    }); 
   }
 }
