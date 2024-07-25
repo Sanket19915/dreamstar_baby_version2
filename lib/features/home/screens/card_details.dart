@@ -44,7 +44,7 @@ class _BabyCardState extends State<BabyCard> {
   void didUpdateWidget(BabyCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isrefresh ?? false) {
-       fetchUserDataAndBabyData();
+      fetchUserDataAndBabyData();
     }
   }
 
@@ -110,7 +110,7 @@ class _BabyCardState extends State<BabyCard> {
         } else {
           setState(() {
             total_day = data['total_days']?.toString() ?? '0';
-            babyData = data['data'][0];
+            babyData = data["data"][0];
             weight = babyData['weight']?.toString() ?? '0.0 KG';
             height = babyData['height']?.toString() ?? '0 CM';
             weeks = babyData['week']?.toString() ?? '0';
@@ -214,7 +214,7 @@ class _BabyCardState extends State<BabyCard> {
                                           height: 20,
                                         ),
                                         RichText(
-                                          textAlign: TextAlign.center,
+                                          textAlign: TextAlign.start,
                                           text: TextSpan(
                                             children: <TextSpan>[
                                               TextSpan(
@@ -251,7 +251,7 @@ class _BabyCardState extends State<BabyCard> {
                                           height: 10,
                                         ),
                                         RichText(
-                                          textAlign: TextAlign.center,
+                                          textAlign: TextAlign.start,
                                           text: TextSpan(
                                             children: <TextSpan>[
                                               TextSpan(
@@ -264,7 +264,7 @@ class _BabyCardState extends State<BabyCard> {
                                                       color: AppColors
                                                           .greyTextColor)),
                                               TextSpan(
-                                                text: '        $sizes',
+                                                text: '       $sizes',
                                                 style: GoogleFonts.poppins(
                                                     fontSize: 11,
                                                     height: 1,
@@ -288,7 +288,7 @@ class _BabyCardState extends State<BabyCard> {
                                           height: 5,
                                         ),
                                         RichText(
-                                          textAlign: TextAlign.center,
+                                          textAlign: TextAlign.start,
                                           text: TextSpan(
                                             children: <TextSpan>[
                                               TextSpan(
@@ -302,7 +302,7 @@ class _BabyCardState extends State<BabyCard> {
                                                           .greyTextColor)),
                                               TextSpan(
                                                 text:
-                                                    '        $weeks Weeks \n               $days Days',
+                                                    '      $weeks Weeks \n               $days Days',
                                                 style: GoogleFonts.poppins(
                                                     fontSize: 11,
                                                     height: 1.5,

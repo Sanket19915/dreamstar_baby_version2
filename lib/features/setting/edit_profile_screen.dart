@@ -90,12 +90,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(
+    BuildContext context,
+  ) async {
+    widget.userProfile["eed"];
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate:
+          DateTime.now(),
+      firstDate: widget.userProfile["eed"] != null
+          ? DateTime.now()
+          : DateTime.now().subtract(const Duration(days: 280)),
+      lastDate: widget.userProfile["lmp"] != null
+          ? DateTime.now()
+          : DateTime.now().add(const Duration(days: 280)),
     );
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -196,6 +204,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'last_name': lastNameController.text,
           'phone_no': phoneController.text,
           'email': emailController.text,
+        widget.userProfile["eed"] != null? 'eed':'lmp': eddController.text
         })
         ..headers.addAll({
           'Content-Type': 'application/json',
@@ -240,6 +249,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'last_name': lastNameController.text,
           'phone_no': phoneController.text,
           'email': emailController.text,
+           widget.userProfile["eed"] != null ? 'eed' : 'lmp': eddController.text
         })
         ..headers.addAll({
           'Content-Type': 'application/json',
