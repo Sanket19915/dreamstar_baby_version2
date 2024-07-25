@@ -478,6 +478,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
                     data?.questionText ?? "",
+                      maxLines: isQuestionExpanded ? null : 4,
+                    overflow: isQuestionExpanded
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -485,22 +489,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
-                Text(
-                  data?.questionDescription ?? "",
-                  maxLines: isQuestionExpanded ? null : 4,
-                  overflow: isQuestionExpanded
-                      ? TextOverflow.visible
-                      : TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.blackColor,
-                  ),
-                ),
-                (data?.questionDescription.isEmpty ?? true)
+                 (data?.questionText.isEmpty ?? true)
                     ? Container()
-                    : ((data?.questionDescription.length ?? 0) < 100)
+                    : ((data?.questionText.length ?? 0) < 100)
                         ? Container()
                         : InkWell(
                             onTap: () {
@@ -509,7 +500,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               });
                             },
                             child: Text(
-                              isQuestionExpanded ? 'Read less' : 'Read more',
+                              isQuestionExpanded
+                                  ? 'Read less'
+                                  : 'Read more',
                               style: const TextStyle(
                                 color: Color(0xffE71C65),
                                 fontSize: 14,
@@ -517,6 +510,54 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               ),
                             ),
                           ),
+                const SizedBox(height: 30),
+                Container(
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.black)),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Text(
+                          data?.questionDescription ?? "",
+                          // maxLines: isQuestionExpanded ? null : 1,
+                          // overflow: isQuestionExpanded
+                          //     ? TextOverflow.visible
+                          //     : TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.blackColor,
+                          ),
+                        ),
+                      ),
+                      // (data?.questionDescription.isEmpty ?? true)
+                      //     ? Container()
+                      //     : ((data?.questionDescription.length ?? 0) < 100)
+                      //         ? Container()
+                      //         : InkWell(
+                      //             onTap: () {
+                      //               setState(() {
+                      //                 isQuestionExpanded = !isQuestionExpanded;
+                      //               });
+                      //             },
+                      //             child: Text(
+                      //               isQuestionExpanded
+                      //                   ? 'Read less'
+                      //                   : 'Read more',
+                      //               style: const TextStyle(
+                      //                 color: Color(0xffE71C65),
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w600,
+                      //               ),
+                      //             ),
+                      //           ),
+                  
+                  
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 20),
                 (data?.mainImage.isEmpty ?? true)
                     ? Container()
