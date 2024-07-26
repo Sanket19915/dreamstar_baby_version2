@@ -17,6 +17,7 @@ class AppImages {
   static const productPic = "assets/images/product_pic.jpeg";
   static const know = "assets/images/know.webp";
   static const exist = "assets/images/exist.png";
+  static const check = "assets/images/Check.png";
   static const kine = "assets/images/kine.png";
   static const inter = "assets/images/inter.png";
   static const intra = "assets/images/intra.png";

@@ -4,6 +4,7 @@ import 'package:dream_baby/models/options_model.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,8 @@ import '../../../services/auth_services.dart';
 
 class ExistentialScreen extends StatefulWidget {
   final String from;
-  const ExistentialScreen({super.key, required this.from});
+  final int index;
+  const ExistentialScreen({super.key, required this.from, required this.index});
 
   @override
   State<ExistentialScreen> createState() => _ExistentialScreenState();
@@ -33,6 +35,20 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   QuestionsModel? questionsModel;
   PageController controller = PageController();
   int _selectedIndex = 0;
+  bool? isCorrect;
+  bool isDisable = false;
+  ValueNotifier answerNotifier = ValueNotifier(true);
+  List<String> quotients = [
+    "Existential",
+    "Kinesthetic",
+    "Interpersonal",
+    "Intrapersonal",
+    "Naturalistic",
+    "Linguistic",
+    "Spatial Visual",
+    "Logical",
+    "Musical"
+  ];
   @override
   void initState() {
     super.initState();
@@ -60,6 +76,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   void dispose() {
     _scrollController.dispose();
     _controller.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     super.dispose();
   }
 
@@ -231,14 +250,22 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              _buildPageView(
-                                  questionsModel?.questions?.data[position],
-                                  devicewidth,
-                                  questionsModel
-                                          ?.questions?.data[position].options
-                                          .where((e) => e.image.isNotEmpty)
-                                          .toList() ??
-                                      []),
+                              ValueListenableBuilder(
+                                  valueListenable: answerNotifier,
+                                  builder: (context, value, child) {
+                                    print(
+                                        " answerNotifier.notifyListeners();==$isCorrect");
+                                    return _buildPageView(
+                                        questionsModel
+                                            ?.questions?.data[position],
+                                        devicewidth,
+                                        questionsModel?.questions
+                                                ?.data[position].options
+                                                .where(
+                                                    (e) => e.image.isNotEmpty)
+                                                .toList() ??
+                                            []);
+                                  }),
                               const SizedBox(height: 30),
                               Row(
                                 children: [
@@ -295,7 +322,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
-                                          Navigator.of(context).pop();
+                                         Navigator.of(context).pop();
+                                        
                                         } else {
                                           controller.nextPage(
                                               duration: const Duration(
@@ -322,13 +350,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     backgroundColor: WidgetStatePropertyAll(
                                         Color(0xFFE71C65)),
                                   ),
-                                  onPressed: () {
-                                    submitQuestions(
-                                        questionsModel?.questions
+                                  onPressed: () async {
+                                    await submitQuestions(
+                                        data: questionsModel
+                                            ?.questions?.data[position],
+                                        questionId: questionsModel?.questions
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "",
-                                        (questionsModel
+                                        answer: (questionsModel
                                                     ?.questions
                                                     ?.data[_selectedIndex]
                                                     .options
@@ -347,6 +377,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                             ?.questions?.data.length ==
                                         (_selectedIndex + 1)) {
                                       Navigator.of(context).pop();
+                                        Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (ctx) => ExistentialScreen(
+                                            from: quotients[widget.index + 1],
+                                            index: widget.index + 1,
+                                          ),
+                                        ),
+                                      ); 
                                     } else {
                                       controller.nextPage(
                                           duration:
@@ -370,12 +408,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                       width: double.infinity,
                                       child: ElevatedButton(
                                         style: ButtonStyle(
-                                          elevation:
-                                              const WidgetStatePropertyAll(0),
                                           backgroundColor:
                                               WidgetStatePropertyAll(
                                                   const Color(0xFFC4C8D0)
                                                       .withOpacity(0.5)),
+                                          elevation:
+                                              const WidgetStatePropertyAll(0),
                                         ),
                                         onPressed: () {
                                           showDialog(
@@ -478,7 +516,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
                     data?.questionText ?? "",
-                      maxLines: isQuestionExpanded ? null : 4,
+                    maxLines: isQuestionExpanded ? null : 4,
                     overflow: isQuestionExpanded
                         ? TextOverflow.visible
                         : TextOverflow.ellipsis,
@@ -489,9 +527,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     ),
                   ),
                 ),
-                 (data?.questionText.isEmpty ?? true)
+                (data?.questionText.isEmpty ?? true)
                     ? Container()
-                    : ((data?.questionText.length ?? 0) < 100)
+                    : ((data?.questionText.length ?? 0) < 175)
                         ? Container()
                         : InkWell(
                             onTap: () {
@@ -500,9 +538,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               });
                             },
                             child: Text(
-                              isQuestionExpanded
-                                  ? 'Read less'
-                                  : 'Read more',
+                              isQuestionExpanded ? 'Read less' : 'Read more',
                               style: const TextStyle(
                                 color: Color(0xffE71C65),
                                 fontSize: 14,
@@ -552,8 +588,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       //               ),
                       //             ),
                       //           ),
-                  
-                  
                     ],
                   ),
                 ),
@@ -633,33 +667,48 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   ),
                 ),
           for (int i = 0; i < (data?.options.length ?? 0); i++)
-            GestureDetector(
-              onTap: () => _selectOption(i),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
-                child: Container(
-                  width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: selectedOptionIndex == i
-                        ? Colors.blue
-                        : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${i + 1}. ${data?.options[i].text}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: selectedOptionIndex == i
-                          ? Colors.white
-                          : Colors.black,
+            ValueListenableBuilder(
+                valueListenable: answerNotifier,
+                builder: (ctx, value, child) {
+                  return GestureDetector(
+                    onTap: () => isDisable ? null : _selectOption(i),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: selectedOptionIndex == i
+                              ? ((selectedOptionIndex == i) &&
+                                      (isCorrect != null) &&
+                                      (isCorrect ?? false))
+                                  ? Colors.green
+                                  : ((selectedOptionIndex == i) &&
+                                          ((isCorrect != null) &&
+                                              !(isCorrect ?? false)))
+                                      ? Colors.red
+                                      : Colors.blue
+                              : Colors.grey[300],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: (data?.options[i].image.isNotEmpty ?? false)
+                            ? Image.network(
+                                "http://dreambaby.pro/storage/${data?.options[i].image}")
+                            : Text(
+                                '${i + 1}. ${data?.options[i].text}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: selectedOptionIndex == i
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  );
+                }),
           options.isEmpty
               ? Container()
               : GridView.builder(
@@ -674,12 +723,20 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   itemCount: options.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: () => _selectOption(index),
+                      onTap: () => isDisable ? null : _selectOption(index),
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: selectedOptionIndex == index
-                              ? Colors.blue
+                              ? ((selectedOptionIndex == index) &&
+                                      (isCorrect != null) &&
+                                      (isCorrect ?? false))
+                                  ? Colors.green
+                                  : ((selectedOptionIndex == index) &&
+                                          ((isCorrect != null) &&
+                                              !(isCorrect ?? false)))
+                                      ? Colors.red
+                                      : Colors.blue
                               : Colors.grey[300],
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -697,16 +754,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              '${index + 1}. ${options[index].text}',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: selectedOptionIndex == index
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
+                            options[index].image.isNotEmpty
+                                ? Image.network(
+                                    "http://dreambaby.pro/storage/${data?.options[index].image}")
+                                : Text(
+                                    '${index + 1}. ${options[index].text}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: selectedOptionIndex == index
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
                           ],
                         ),
                       ),
@@ -877,8 +937,23 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     }
   }
 
-  Future<void> submitQuestions(String questionId, String answer) async {
+  Future<void> submitQuestions(
+      {String? questionId, String? answer, Datum? data}) async {
     try {
+      if ((data?.correctAnswer.isNotEmpty ?? false) &&
+          ((selectedOptionIndex != null
+                  ? (selectedOptionIndex ?? 0) + 1
+                  : 0)) ==
+              int.parse(data?.correctAnswer.first.toString() ?? "0")) {
+        isCorrect = true;
+        isDisable = true;
+        answerNotifier.notifyListeners();
+      } else {
+        isCorrect = false;
+        isDisable = true;
+        answerNotifier.notifyListeners();
+      }
+
       // if (mounted) {
       //   setState(() {
       //     isLoading = true;
@@ -893,8 +968,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       var request = http.MultipartRequest(
           'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
       request.fields.addAll({
-        'question_id': questionId,
-        "answer": answer,
+        'question_id': questionId ?? "",
+        "answer": answer ?? "",
         "is_flagged": '0',
         "is_skipped": '0'
       });
@@ -907,11 +982,11 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       } else {
         print(response.reasonPhrase);
       }
-      // if (mounted) {
-      //   setState(() {
-      //     isLoading = false;
-      //   });
-      // }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

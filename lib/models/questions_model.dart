@@ -120,7 +120,7 @@ class Datum {
   dynamic mainAudio2;
   String youtubeLink;
   List<OptionsModel> options;
-  String correctAnswer;
+  List<dynamic> correctAnswer;
   bool feedback;
   String answerKeyInput;
   dynamic answerImage;
@@ -146,7 +146,7 @@ class Datum {
     this.mainAudio2,
     this.youtubeLink = "",
     this.options = const [],
-    this.correctAnswer = "",
+    this.correctAnswer = const [],
     this.feedback = false,
     this.answerKeyInput = "",
     this.answerImage,
@@ -178,7 +178,8 @@ class Datum {
                     .where((element) => element.text.isNotEmpty)
                     .toList() ??
                 []),
-        correctAnswer: json["correct_answer"] ?? "",
+        
+        correctAnswer:  jsonDecode(json["correct_answer"] )  ,
         feedback: json["feedback"] ?? false,
         answerKeyInput: json["answer_key_input"] ?? "",
         answerImage: json["answer_image"],

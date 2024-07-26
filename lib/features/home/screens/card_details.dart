@@ -416,7 +416,7 @@ class _BabyCardState extends State<BabyCard> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                radius: 74.0,
+                                radius: 70.0,
                                 lineWidth: 8.0,
                                 animation: true,
                                 percent: percent,

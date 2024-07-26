@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code
+
 import 'package:dream_baby/features/questions/sq/existential.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
@@ -12,6 +14,17 @@ class FourQuotients extends StatefulWidget {
 }
 
 class _FourQuotientsState extends State<FourQuotients> {
+  List<String> quotients = [
+    "Existential",
+    "Kinesthetic",
+    "Interpersonal",
+    "Intrapersonal",
+    "Naturalistic",
+    "Linguistic",
+    "Spatial Visual",
+    "Logical",
+    "Musical"
+  ];
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -78,21 +91,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) =>
-                                const ExistentialScreen(from: "Existential"),
+                            builder: (ctx) => ExistentialScreen(
+                              from: quotients[0],
+                              index: 0,
+                            ),
                           ),
                         );
                       },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          //color: Colors.green,
-                          image: DecorationImage(
-                              image: AssetImage(AppImages.exist),
-                              fit: BoxFit.cover),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              //color: Colors.green,
+                              image: DecorationImage(
+                                  image: AssetImage(AppImages.exist),
+                                  fit: BoxFit.cover),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                            ),
                           ),
-                        ),
+                     true
+                              ? Container()
+                              :     Padding(
+                            padding: const EdgeInsets.only(top: 8, right: 8),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Image.asset(
+                                AppImages.check,
+                                height: 15,
+                                width: 15,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -104,21 +136,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) =>
-                                const ExistentialScreen(from: "Kinesthetic"),
+                            builder: (ctx) => ExistentialScreen(
+                              from: quotients[1],
+                              index: 1,
+                            ),
                           ),
                         );
                       },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          // color: Colors.green,
-                          image: DecorationImage(
-                              image: AssetImage(AppImages.kine),
-                              fit: BoxFit.cover),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: const BoxDecoration(
+                              // color: Colors.green,
+                              image: DecorationImage(
+                                  image: AssetImage(AppImages.kine),
+                                  fit: BoxFit.cover),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(12),
+                              ),
+                            ),
                           ),
-                        ),
+                  true
+                              ? Container()
+                              :        Padding(
+                            padding: const EdgeInsets.only(top: 8, right: 8),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Image.asset(
+                                AppImages.check,
+                                height: 15,
+                                width: 15,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -153,19 +204,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
-                                                  const ExistentialScreen(
-                                                      from: "Interpersonal"),
+                                                  ExistentialScreen(
+                                                from: quotients[2],
+                                                index: 2,
+                                              ),
                                             ),
                                           );
                                         },
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.inter),
-                                                  fit: BoxFit.cover)),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          AppImages.inter),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                        true
+                                                ? Container()
+                                                :    Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 8),
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Image.asset(
+                                                  AppImages.check,
+                                                  height: 15,
+                                                  width: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -179,19 +251,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
-                                                  const ExistentialScreen(
-                                                      from: "Intrapersonal"),
+                                                  ExistentialScreen(
+                                                from: quotients[3],
+                                                index: 3,
+                                              ),
                                             ),
                                           );
                                         },
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.intra),
-                                                  fit: BoxFit.cover)),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          AppImages.intra),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                    true
+                                                ? Container()
+                                                :        Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 8),
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Image.asset(
+                                                  AppImages.check,
+                                                  height: 15,
+                                                  width: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -207,19 +300,37 @@ class _FourQuotientsState extends State<FourQuotients> {
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (ctx) =>
-                                              const ExistentialScreen(
-                                                  from: "Naturalistic"),
+                                          builder: (ctx) => ExistentialScreen(
+                                            from: quotients[4],
+                                            index: 4,
+                                          ),
                                         ),
                                       );
                                     },
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10)),
-                                          image: DecorationImage(
-                                              image: AssetImage(AppImages.natu),
-                                              fit: BoxFit.cover)),
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      AppImages.natu),
+                                                  fit: BoxFit.cover)),
+                                        ),
+                                   true? Container()  :  Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 8, right: 8),
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Image.asset(
+                                              AppImages.check,
+                                              height: 15,
+                                              width: 15,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   )),
                             ],
@@ -267,19 +378,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
-                                                  const ExistentialScreen(
-                                                      from: "Linguistic"),
+                                                  ExistentialScreen(
+                                                from: quotients[5],
+                                                index: 5,
+                                              ),
                                             ),
                                           );
                                         },
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.ling),
-                                                  fit: BoxFit.cover)),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          AppImages.ling),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                         true
+                                                ? Container()
+                                                :   Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 8),
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Image.asset(
+                                                  AppImages.check,
+                                                  height: 15,
+                                                  width: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -293,19 +425,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
-                                                  const ExistentialScreen(
-                                                      from: "Spatial Visual"),
+                                                  ExistentialScreen(
+                                                from: quotients[6],
+                                                index: 6,
+                                              ),
                                             ),
                                           );
                                         },
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.spat),
-                                                  fit: BoxFit.cover)),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          AppImages.spat),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                      true
+                                                ? Container()
+                                                :      Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 8),
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Image.asset(
+                                                  AppImages.check,
+                                                  height: 15,
+                                                  width: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -326,19 +479,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
-                                                  const ExistentialScreen(
-                                                      from: "Logical"),
+                                                  ExistentialScreen(
+                                                from: quotients[7],
+                                                index: 7,
+                                              ),
                                             ),
                                           );
                                         },
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.logi),
-                                                  fit: BoxFit.cover)),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          AppImages.logi),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                         true
+                                                ? Container()
+                                                :   Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 8),
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Image.asset(
+                                                  AppImages.check,
+                                                  height: 15,
+                                                  width: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -352,19 +526,40 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
-                                                  const ExistentialScreen(
-                                                      from: "Musical"),
+                                                  ExistentialScreen(
+                                                from: quotients[8],
+                                                index: 8,
+                                              ),
                                             ),
                                           );
                                         },
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.musi),
-                                                  fit: BoxFit.cover)),
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          AppImages.musi),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                       true
+                                                ? Container()
+                                                :     Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, right: 8),
+                                              child: Align(
+                                                alignment: Alignment.topRight,
+                                                child: Image.asset(
+                                                  AppImages.check,
+                                                  height: 15,
+                                                  width: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),

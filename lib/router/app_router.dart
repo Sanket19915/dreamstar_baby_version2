@@ -51,7 +51,7 @@ final appRoutes = <RouteBase>[
   GoRoute(
     path: Routes.ExistentialScreenScreen,
     builder: (context, state) => ExistentialScreen(
-      from: "",
+      from: "", index: 0,
     ),
   ),
   GoRoute(
