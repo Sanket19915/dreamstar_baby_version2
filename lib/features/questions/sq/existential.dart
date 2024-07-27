@@ -195,7 +195,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         const SizedBox(height: 20),
                         const Center(
                           child: Text(
-                              "Congratulations! You have completed all activities for today for this Quotient"),
+                              "Congratulations! All activities to be taken up today for this intelligence have been completed."),
                         )
                       ],
                     )
@@ -322,8 +322,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
-                                         Navigator.of(context).pop();
-                                        
+                                          Navigator.of(context).pop();
                                         } else {
                                           controller.nextPage(
                                               duration: const Duration(
@@ -377,14 +376,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                             ?.questions?.data.length ==
                                         (_selectedIndex + 1)) {
                                       Navigator.of(context).pop();
-                                        Navigator.of(context).push(
+                                      Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (ctx) => ExistentialScreen(
                                             from: quotients[widget.index + 1],
                                             index: widget.index + 1,
                                           ),
                                         ),
-                                      ); 
+                                      );
                                     } else {
                                       controller.nextPage(
                                           duration:
@@ -492,7 +491,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  data?.quotient ?? "",
+                  //data?.quotient ?? "",
+                  "Purpose",
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -515,11 +515,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
-                    data?.questionText ?? "",
-                    maxLines: isQuestionExpanded ? null : 4,
-                    overflow: isQuestionExpanded
-                        ? TextOverflow.visible
-                        : TextOverflow.ellipsis,
+                    data?.questionDescription ?? "",
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -527,90 +523,69 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     ),
                   ),
                 ),
-                (data?.questionText.isEmpty ?? true)
-                    ? Container()
-                    : ((data?.questionText.length ?? 0) < 175)
-                        ? Container()
-                        : InkWell(
-                            onTap: () {
-                              setState(() {
-                                isQuestionExpanded = !isQuestionExpanded;
-                              });
-                            },
-                            child: Text(
-                              isQuestionExpanded ? 'Read less' : 'Read more',
-                              style: const TextStyle(
-                                color: Color(0xffE71C65),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                const SizedBox(height: 30),
-                Container(
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.black)),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Text(
-                          data?.questionDescription ?? "",
-                          // maxLines: isQuestionExpanded ? null : 1,
-                          // overflow: isQuestionExpanded
-                          //     ? TextOverflow.visible
-                          //     : TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.blackColor,
-                          ),
-                        ),
-                      ),
-                      // (data?.questionDescription.isEmpty ?? true)
-                      //     ? Container()
-                      //     : ((data?.questionDescription.length ?? 0) < 100)
-                      //         ? Container()
-                      //         : InkWell(
-                      //             onTap: () {
-                      //               setState(() {
-                      //                 isQuestionExpanded = !isQuestionExpanded;
-                      //               });
-                      //             },
-                      //             child: Text(
-                      //               isQuestionExpanded
-                      //                   ? 'Read less'
-                      //                   : 'Read more',
-                      //               style: const TextStyle(
-                      //                 color: Color(0xffE71C65),
-                      //                 fontSize: 14,
-                      //                 fontWeight: FontWeight.w600,
-                      //               ),
-                      //             ),
-                      //           ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-                (data?.mainImage.isEmpty ?? true)
-                    ? Container()
-                    : Container(
-                        height: 200,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(12)),
-                          image: DecorationImage(
-                            image: NetworkImage(
-                                ("http://dreambaby.pro/storage/${data?.mainImage ?? ""}")),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
                 const SizedBox(height: 20),
               ],
             ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Question text and description..
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  data?.questionText ?? "",
+                  maxLines: isQuestionExpanded ? null : 4,
+                  overflow: isQuestionExpanded
+                      ? TextOverflow.visible
+                      : TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.blackColor,
+                  ),
+                ),
+              ),
+              (data?.questionText.isEmpty ?? true)
+                  ? Container()
+                  : ((data?.questionText.length ?? 0) < 175)
+                      ? Container()
+                      : InkWell(
+                          onTap: () {
+                            setState(() {
+                              isQuestionExpanded = !isQuestionExpanded;
+                            });
+                          },
+                          child: Text(
+                            textAlign: TextAlign.left,
+                            isQuestionExpanded ? 'Read less' : 'Read more',
+                            style: const TextStyle(
+                              color: Color(0xffE71C65),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+              const SizedBox(height: 30),
+
+              const SizedBox(height: 20),
+              (data?.mainImage.isEmpty ?? true)
+                  ? Container()
+                  : Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12)),
+                        image: DecorationImage(
+                          image: NetworkImage(
+                              ("http://dreambaby.pro/storage/${data?.mainImage ?? ""}")),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+              const SizedBox(height: 20),
+            ],
+          ),
           (data?.mainVideo?.isEmpty ?? true)
               ? Container()
               : SizedBox(
@@ -1117,10 +1092,25 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return YoutubePlayer(
-      controller: YoutubePlayerController(
-        initialVideoId: extractYouTubeVideoId(widget.view),
+    return YoutubePlayerBuilder(
+      player: YoutubePlayer(
+        showVideoProgressIndicator: true,
+        bottomActions: [],
+        controlsTimeOut: Duration(hours: 1),
+        controller: YoutubePlayerController(
+          initialVideoId: extractYouTubeVideoId(widget.view),
+        ),
       ),
+      builder: (
+        context,
+        player,
+      ) {
+        return Column(children: [
+          // some widgets
+          player,
+          //some other widgets
+        ]);
+      },
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:dream_baby/features/contact_us/contact_us_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen_content.dart';
 import 'package:dream_baby/features/testimonials_screen/testimonials_screen.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
+import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-tab-controller.dart';
@@ -88,13 +89,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _motionTabBarController.index = value;
           });
         },
-        // images: [
-        //   AppImages.testi,
-        //   AppImages.about,
-        //   AppImages.homenew,
-        //   AppImages.people,
-        //   AppImages.follow
-        // ],
+        images: [
+          AppImages.testi,
+          AppImages.about,
+          AppImages.homenew,
+          AppImages.people,
+          AppImages.follow
+        ],
       ),
     );
   }

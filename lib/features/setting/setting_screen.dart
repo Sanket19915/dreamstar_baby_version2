@@ -160,12 +160,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: IconButton(
                             icon: const Icon(Icons.edit,
                                 color: AppColors.mainColor),
-                            onPressed: () {
-                              context.push(
-                                Routes.EditProfileScreen,
-                                extra: userProfile, // Pass userProfile data
-                              );
-                            },
+                            onPressed: !(isLoading)
+                                ? () {
+                                    context.push(
+                                      Routes.EditProfileScreen,
+                                      extra:
+                                          userProfile, // Pass userProfile data
+                                    );
+                                  }
+                                : () {},
                           ),
                         ),
                       ),

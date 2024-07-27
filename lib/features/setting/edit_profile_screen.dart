@@ -53,12 +53,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   DetailType selectType = DetailType.EDD;
   bool isSelected = true;
   bool get isFormValid {
-    return isFirstNameValid &&
-            isLastNameValid &&
-            isPhoneValid &&
-            isEmailValid &&
-            ((_profileImage?.path.isNotEmpty ?? false) ||
-                widget.userProfile['profile_pic'] != null)
+    return isFirstNameValid && isLastNameValid && isPhoneValid && isEmailValid
+        // &&
+        //     ((_profileImage?.path.isNotEmpty ?? false) ||
+        //         widget.userProfile['profile_pic'] != null)
         //  &&
         // isPasswordValid &&
         // isConfirmPasswordValid
@@ -96,8 +94,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     widget.userProfile["eed"];
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate:
-          DateTime.now(),
+      initialDate: DateTime.now(),
       firstDate: widget.userProfile["eed"] != null
           ? DateTime.now()
           : DateTime.now().subtract(const Duration(days: 280)),
@@ -180,15 +177,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // }
 
   Future<void> _pickImage() async {
-    widget.userProfile["profile_pic"] = null;
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    setState(() {
-      if (pickedFile != null) {
-        _profileImage = File(pickedFile.path);
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final fileSize = await file.length();
+      const maxSizeInBytes = 2048 * 1024; // 2048 kilobytes
+
+      if (fileSize > maxSizeInBytes) {
+        Fluttertoast.showToast(
+            msg: "Profile pic must not be greater than 2MB.");
+      } else {
+        setState(() {
+          _profileImage = file;
+        });
       }
-    });
+    }
   }
 
   Future<void> _saveProfileWithoutImage() async {
@@ -204,7 +209,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'last_name': lastNameController.text,
           'phone_no': phoneController.text,
           'email': emailController.text,
-        widget.userProfile["eed"] != null? 'eed':'lmp': eddController.text
+          widget.userProfile["eed"] != null ? 'eed' : 'lmp': eddController.text
         })
         ..headers.addAll({
           'Content-Type': 'application/json',
@@ -221,13 +226,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         Fluttertoast.showToast(msg: finalResponse["message"]);
         context.go(Routes.home);
       } else {
-        Fluttertoast.showToast(msg: "Something went wrong");
+        Fluttertoast.showToast(msg: "Something went wrong: ${jsonData.body}");
       }
       setState(() {
         isLoading = false;
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: "Please upload profile pic");
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
       setState(() {
         isLoading = false;
       });
@@ -249,7 +254,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'last_name': lastNameController.text,
           'phone_no': phoneController.text,
           'email': emailController.text,
-           widget.userProfile["eed"] != null ? 'eed' : 'lmp': eddController.text
+          widget.userProfile["eed"] != null ? 'eed' : 'lmp': eddController.text
         })
         ..headers.addAll({
           'Content-Type': 'application/json',
@@ -258,6 +263,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         })
         ..files.add(await http.MultipartFile.fromPath(
             'profile_pic', _profileImage?.path ?? ""));
+
       var response = await request.send();
       var jsonData = await http.Response.fromStream(response);
       Map<String, dynamic>? finalResponse;
@@ -267,13 +273,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         Fluttertoast.showToast(msg: finalResponse["message"]);
         context.go(Routes.home);
       } else {
-        Fluttertoast.showToast(msg: "Something went wrong");
+        Fluttertoast.showToast(msg: "Something went wrong: ${jsonData.body}");
       }
       setState(() {
         isLoading = false;
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: "Please upload profile pic");
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
       setState(() {
         isLoading = false;
       });
@@ -451,7 +457,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.whiteColor,
                       ),
                       onPressed: isFormValid
-                          ? _profileImage == null
+                          ? _profileImage == null &&
+                                  widget.userProfile["profile_pic"] == null
                               ? _saveProfileWithoutImage
                               : _saveProfile
                           : null,

@@ -1,10 +1,14 @@
 // ignore_for_file: dead_code
 
+import 'dart:convert';
+
 import 'package:dream_baby/features/questions/sq/existential.dart';
+import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class FourQuotients extends StatefulWidget {
   const FourQuotients({super.key});
@@ -25,6 +29,38 @@ class _FourQuotientsState extends State<FourQuotients> {
     "Logical",
     "Musical"
   ];
+
+  Map<String, bool> quotientStatuses = {};
+
+  void initState() {
+    super.initState();
+    fetchQuotientStatuses();
+  }
+
+  Future<void> fetchQuotientStatuses() async {
+    var token = await AuthService.getToken();
+    var headers = {'Authorization': 'Bearer $token'};
+    var request = http.Request(
+        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      final data = json.decode(responseData);
+      final statuses = data['statuses'] as Map<String, dynamic>;
+
+      setState(() {
+        quotientStatuses =
+            statuses.map((key, value) => MapEntry(key, value as bool));
+      });
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -92,8 +128,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (ctx) => ExistentialScreen(
-                              from: quotients[0],
                               index: 0,
+                              from: quotients[0],
                             ),
                           ),
                         );
@@ -111,17 +147,21 @@ class _FourQuotientsState extends State<FourQuotients> {
                               ),
                             ),
                           ),
-                     true
-                              ? Container()
-                              :     Padding(
-                            padding: const EdgeInsets.only(top: 8, right: 8),
+                          Padding(
+                            padding: EdgeInsets.only(top: 8, right: 8),
                             child: Align(
                               alignment: Alignment.topRight,
-                              child: Image.asset(
-                                AppImages.check,
-                                height: 15,
-                                width: 15,
-                              ),
+                              child: quotientStatuses['Existential'] == true
+                                  ? Image.asset(
+                                      AppImages.check,
+                                      height: 15,
+                                      width: 15,
+                                    )
+                                  : Image.asset(
+                                      AppImages.uncheck,
+                                      height: 15,
+                                      width: 15,
+                                    ),
                             ),
                           ),
                         ],
@@ -156,17 +196,21 @@ class _FourQuotientsState extends State<FourQuotients> {
                               ),
                             ),
                           ),
-                  true
-                              ? Container()
-                              :        Padding(
+                          Padding(
                             padding: const EdgeInsets.only(top: 8, right: 8),
                             child: Align(
                               alignment: Alignment.topRight,
-                              child: Image.asset(
-                                AppImages.check,
-                                height: 15,
-                                width: 15,
-                              ),
+                              child: quotientStatuses['Kinesthetic'] == true
+                                  ? Image.asset(
+                                      AppImages.check,
+                                      height: 15,
+                                      width: 15,
+                                    )
+                                  : Image.asset(
+                                      AppImages.uncheck,
+                                      height: 15,
+                                      width: 15,
+                                    ),
                             ),
                           ),
                         ],
@@ -223,18 +267,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                           AppImages.inter),
                                                       fit: BoxFit.cover)),
                                             ),
-                                        true
-                                                ? Container()
-                                                :    Padding(
+                                            Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 8, right: 8),
                                               child: Align(
                                                 alignment: Alignment.topRight,
-                                                child: Image.asset(
-                                                  AppImages.check,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
+                                                child: quotientStatuses[
+                                                            'Interpersonal'] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppImages.check,
+                                                        height: 15,
+                                                        width: 15,
+                                                      )
+                                                    : Image.asset(
+                                                        AppImages.uncheck,
+                                                        height: 15,
+                                                        width: 15,
+                                                      ),
                                               ),
                                             ),
                                           ],
@@ -270,18 +320,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                           AppImages.intra),
                                                       fit: BoxFit.cover)),
                                             ),
-                                    true
-                                                ? Container()
-                                                :        Padding(
+                                            Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 8, right: 8),
                                               child: Align(
                                                 alignment: Alignment.topRight,
-                                                child: Image.asset(
-                                                  AppImages.check,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
+                                                child: quotientStatuses[
+                                                            'Intrapersonal'] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppImages.check,
+                                                        height: 15,
+                                                        width: 15,
+                                                      )
+                                                    : Image.asset(
+                                                        AppImages.uncheck,
+                                                        height: 15,
+                                                        width: 15,
+                                                      ),
                                               ),
                                             ),
                                           ],
@@ -318,16 +374,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                       AppImages.natu),
                                                   fit: BoxFit.cover)),
                                         ),
-                                   true? Container()  :  Padding(
+                                        Padding(
                                           padding: const EdgeInsets.only(
                                               top: 8, right: 8),
                                           child: Align(
                                             alignment: Alignment.topRight,
-                                            child: Image.asset(
-                                              AppImages.check,
-                                              height: 15,
-                                              width: 15,
-                                            ),
+                                            child: quotientStatuses[
+                                                        'Naturalistic'] ==
+                                                    true
+                                                ? Image.asset(
+                                                    AppImages.check,
+                                                    height: 15,
+                                                    width: 15,
+                                                  )
+                                                : Image.asset(
+                                                    AppImages.uncheck,
+                                                    height: 15,
+                                                    width: 15,
+                                                  ),
                                           ),
                                         ),
                                       ],
@@ -397,18 +461,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                           AppImages.ling),
                                                       fit: BoxFit.cover)),
                                             ),
-                                         true
-                                                ? Container()
-                                                :   Padding(
+                                            Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 8, right: 8),
                                               child: Align(
                                                 alignment: Alignment.topRight,
-                                                child: Image.asset(
-                                                  AppImages.check,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
+                                                child: quotientStatuses[
+                                                            'Logical'] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppImages.check,
+                                                        height: 15,
+                                                        width: 15,
+                                                      )
+                                                    : Image.asset(
+                                                        AppImages.uncheck,
+                                                        height: 15,
+                                                        width: 15,
+                                                      ),
                                               ),
                                             ),
                                           ],
@@ -444,18 +514,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                           AppImages.spat),
                                                       fit: BoxFit.cover)),
                                             ),
-                                      true
-                                                ? Container()
-                                                :      Padding(
+                                            Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 8, right: 8),
                                               child: Align(
                                                 alignment: Alignment.topRight,
-                                                child: Image.asset(
-                                                  AppImages.check,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
+                                                child: quotientStatuses[
+                                                            'Linguistic'] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppImages.check,
+                                                        height: 15,
+                                                        width: 15,
+                                                      )
+                                                    : Image.asset(
+                                                        AppImages.uncheck,
+                                                        height: 15,
+                                                        width: 15,
+                                                      ),
                                               ),
                                             ),
                                           ],
@@ -498,18 +574,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                           AppImages.logi),
                                                       fit: BoxFit.cover)),
                                             ),
-                                         true
-                                                ? Container()
-                                                :   Padding(
+                                            Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 8, right: 8),
                                               child: Align(
                                                 alignment: Alignment.topRight,
-                                                child: Image.asset(
-                                                  AppImages.check,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
+                                                child: quotientStatuses[
+                                                            'Spatial Visual'] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppImages.check,
+                                                        height: 15,
+                                                        width: 15,
+                                                      )
+                                                    : Image.asset(
+                                                        AppImages.uncheck,
+                                                        height: 15,
+                                                        width: 15,
+                                                      ),
                                               ),
                                             ),
                                           ],
@@ -545,18 +627,24 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                           AppImages.musi),
                                                       fit: BoxFit.cover)),
                                             ),
-                                       true
-                                                ? Container()
-                                                :     Padding(
+                                            Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 8, right: 8),
                                               child: Align(
                                                 alignment: Alignment.topRight,
-                                                child: Image.asset(
-                                                  AppImages.check,
-                                                  height: 15,
-                                                  width: 15,
-                                                ),
+                                                child: quotientStatuses[
+                                                            'Musical'] ==
+                                                        true
+                                                    ? Image.asset(
+                                                        AppImages.check,
+                                                        height: 15,
+                                                        width: 15,
+                                                      )
+                                                    : Image.asset(
+                                                        AppImages.uncheck,
+                                                        height: 15,
+                                                        width: 15,
+                                                      ),
                                               ),
                                             ),
                                           ],

@@ -136,7 +136,7 @@ class _BabyCardState extends State<BabyCard> {
     double deviceHeight = MediaQuery.of(context).size.height;
     print(total_day);
     double percent =
-        (double.tryParse(total_day) ?? 0) / 280; // Compute the percentage here
+        (double.tryParse(total_day) ?? 0) / 281; // Compute the percentage here
     print('Percent: $percent'); // Debug print to check the value of percent
     return isLoading
         ? const CircularProgressIndicator()
@@ -387,11 +387,12 @@ class _BabyCardState extends State<BabyCard> {
                                           height: 10,
                                         ),
                                         Container(
+                                          margin: EdgeInsets.only(left: 10),
                                           alignment: Alignment.center,
                                           child: AutoSizeText(
                                             height,
-                                            textAlign: TextAlign.end,
-                                            minFontSize: 14,
+                                            textAlign: TextAlign.start,
+                                            minFontSize: 13,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.lobsterTwo(
@@ -410,7 +411,7 @@ class _BabyCardState extends State<BabyCard> {
                               alignment: Alignment.center,
                               child: CircularPercentIndicator(
                                 center: const SizedBox(
-                                  height: 134,
+                                  height: 124,
                                   child: Image(
                                     image: AssetImage(AppImages.baby),
                                     fit: BoxFit.cover,
