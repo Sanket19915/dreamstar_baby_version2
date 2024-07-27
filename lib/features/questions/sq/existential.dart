@@ -19,7 +19,12 @@ import '../../../services/auth_services.dart';
 class ExistentialScreen extends StatefulWidget {
   final String from;
   final int index;
-  const ExistentialScreen({super.key, required this.from, required this.index});
+  final Map<String, bool> quotientStatuses;
+  const ExistentialScreen(
+      {super.key,
+      required this.from,
+      required this.index,
+      required this.quotientStatuses});
 
   @override
   State<ExistentialScreen> createState() => _ExistentialScreenState();
@@ -253,8 +258,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               ValueListenableBuilder(
                                   valueListenable: answerNotifier,
                                   builder: (context, value, child) {
-                                    print(
-                                        " answerNotifier.notifyListeners();==$isCorrect");
                                     return _buildPageView(
                                         questionsModel
                                             ?.questions?.data[position],
@@ -283,10 +286,62 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                        if (questionsModel
+                                          if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
                                           Navigator.of(context).pop();
+                                          int nextIndex = widget.index;
+
+                                          // Find the next incomplete quotient index (status is false)
+                                          while (nextIndex <
+                                              quotients.length - 1) {
+                                            nextIndex++;
+                                            if (widget.quotientStatuses[
+                                                    quotients[nextIndex]] ==
+                                                false) {
+                                              break;
+                                            }
+                                          }
+
+                                          // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                                          if (nextIndex ==
+                                                  quotients.length - 1 &&
+                                              widget.quotientStatuses[
+                                                      quotients[nextIndex]] ==
+                                                  true) {
+                                            for (int i = 0;
+                                                i < quotients.length;
+                                                i++) {
+                                              if (widget.quotientStatuses[
+                                                      quotients[i]] ==
+                                                  false) {
+                                                nextIndex = i;
+                                                break;
+                                              }
+                                            }
+                                          }
+
+                                          // Ensure the index is within bounds and valid (incomplete status)
+                                          if (nextIndex < quotients.length &&
+                                              widget.quotientStatuses[
+                                                      quotients[nextIndex]] ==
+                                                  false) {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (ctx) =>
+                                                    ExistentialScreen(
+                                                  from: quotients[nextIndex],
+                                                  quotientStatuses:
+                                                      widget.quotientStatuses,
+                                                  index: nextIndex,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            // Handle case where no incomplete screen was found
+                                            Navigator.of(context)
+                                                .popUntil((e) => e.isFirst);
+                                          }
                                         } else {
                                           controller.nextPage(
                                               duration: const Duration(
@@ -319,10 +374,62 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                        if (questionsModel
+                                          if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
                                           Navigator.of(context).pop();
+                                          int nextIndex = widget.index;
+
+                                          // Find the next incomplete quotient index (status is false)
+                                          while (nextIndex <
+                                              quotients.length - 1) {
+                                            nextIndex++;
+                                            if (widget.quotientStatuses[
+                                                    quotients[nextIndex]] ==
+                                                false) {
+                                              break;
+                                            }
+                                          }
+
+                                          // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                                          if (nextIndex ==
+                                                  quotients.length - 1 &&
+                                              widget.quotientStatuses[
+                                                      quotients[nextIndex]] ==
+                                                  true) {
+                                            for (int i = 0;
+                                                i < quotients.length;
+                                                i++) {
+                                              if (widget.quotientStatuses[
+                                                      quotients[i]] ==
+                                                  false) {
+                                                nextIndex = i;
+                                                break;
+                                              }
+                                            }
+                                          }
+
+                                          // Ensure the index is within bounds and valid (incomplete status)
+                                          if (nextIndex < quotients.length &&
+                                              widget.quotientStatuses[
+                                                      quotients[nextIndex]] ==
+                                                  false) {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (ctx) =>
+                                                    ExistentialScreen(
+                                                  from: quotients[nextIndex],
+                                                  quotientStatuses:
+                                                      widget.quotientStatuses,
+                                                  index: nextIndex,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            // Handle case where no incomplete screen was found
+                                            Navigator.of(context)
+                                                .popUntil((e) => e.isFirst);
+                                          }
                                         } else {
                                           controller.nextPage(
                                               duration: const Duration(
@@ -376,14 +483,55 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                             ?.questions?.data.length ==
                                         (_selectedIndex + 1)) {
                                       Navigator.of(context).pop();
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (ctx) => ExistentialScreen(
-                                            from: quotients[widget.index + 1],
-                                            index: widget.index + 1,
+                                      int nextIndex = widget.index;
+
+                                      // Find the next incomplete quotient index (status is false)
+                                      while (nextIndex < quotients.length - 1) {
+                                        nextIndex++;
+                                        if (widget.quotientStatuses[
+                                                quotients[nextIndex]] ==
+                                            false) {
+                                          break;
+                                        }
+                                      }
+
+                                      // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                                      if (nextIndex == quotients.length - 1 &&
+                                          widget.quotientStatuses[
+                                                  quotients[nextIndex]] ==
+                                              true) {
+                                        for (int i = 0;
+                                            i < quotients.length;
+                                            i++) {
+                                          if (widget.quotientStatuses[
+                                                  quotients[i]] ==
+                                              false) {
+                                            nextIndex = i;
+                                            break;
+                                          }
+                                        }
+                                      }
+
+                                      // Ensure the index is within bounds and valid (incomplete status)
+                                      if (nextIndex < quotients.length &&
+                                          widget.quotientStatuses[
+                                                  quotients[nextIndex]] ==
+                                              false) {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (ctx) => ExistentialScreen(
+                                              from: quotients[nextIndex],
+                                              quotientStatuses:
+                                                  widget.quotientStatuses,
+                                              index: nextIndex,
+                                            ),
                                           ),
-                                        ),
-                                      );
+                                        );
+                                      } else {
+                                        // Handle case where no incomplete screen was found
+                                        Navigator.of(context)
+                                            .popUntil((e) => e.isFirst);
+                                      }
                                     } else {
                                       controller.nextPage(
                                           duration:
@@ -642,48 +790,50 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   ),
                 ),
           for (int i = 0; i < (data?.options.length ?? 0); i++)
-            ValueListenableBuilder(
-                valueListenable: answerNotifier,
-                builder: (ctx, value, child) {
-                  return GestureDetector(
-                    onTap: () => isDisable ? null : _selectOption(i),
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 10.0),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: selectedOptionIndex == i
-                              ? ((selectedOptionIndex == i) &&
-                                      (isCorrect != null) &&
-                                      (isCorrect ?? false))
-                                  ? Colors.green
-                                  : ((selectedOptionIndex == i) &&
-                                          ((isCorrect != null) &&
-                                              !(isCorrect ?? false)))
-                                      ? Colors.red
-                                      : Colors.blue
-                              : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: (data?.options[i].image.isNotEmpty ?? false)
-                            ? Image.network(
-                                "http://dreambaby.pro/storage/${data?.options[i].image}")
-                            : Text(
-                                '${i + 1}. ${data?.options[i].text}',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: selectedOptionIndex == i
-                                      ? Colors.white
-                                      : Colors.black,
+            if ((data?.options[i].image.isNotEmpty ?? false) &&
+                (data?.options[i].text.isEmpty ?? false))
+              ValueListenableBuilder(
+                  valueListenable: answerNotifier,
+                  builder: (ctx, value, child) {
+                    return GestureDetector(
+                      onTap: () => isDisable ? null : _selectOption(i),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: selectedOptionIndex == i
+                                ? ((selectedOptionIndex == i) &&
+                                        (isCorrect != null) &&
+                                        (isCorrect ?? false))
+                                    ? Colors.green
+                                    : ((selectedOptionIndex == i) &&
+                                            ((isCorrect != null) &&
+                                                !(isCorrect ?? false)))
+                                        ? Colors.red
+                                        : Colors.blue
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: (data?.options[i].image.isNotEmpty ?? false)
+                              ? Image.network(
+                                  "http://dreambaby.pro/storage/${data?.options[i].image}")
+                              : Text(
+                                  '${i + 1}. ${data?.options[i].text}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: selectedOptionIndex == i
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
-                              ),
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
           options.isEmpty
               ? Container()
               : GridView.builder(
@@ -722,14 +872,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: NetworkImage(options[index].image),
+                                    image: NetworkImage(
+                                        "http://dreambaby.pro/storage/${data?.options[index].image}"),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(height: 8),
-                            options[index].image.isNotEmpty
+                            options[index].image.isNotEmpty &&
+                                    options[index].text.isEmpty
                                 ? Image.network(
                                     "http://dreambaby.pro/storage/${data?.options[index].image}")
                                 : Text(
@@ -1095,8 +1247,8 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
     return YoutubePlayerBuilder(
       player: YoutubePlayer(
         showVideoProgressIndicator: true,
-        bottomActions: [],
-        controlsTimeOut: Duration(hours: 1),
+        bottomActions: const [],
+        controlsTimeOut: const Duration(hours: 1),
         controller: YoutubePlayerController(
           initialVideoId: extractYouTubeVideoId(widget.view),
         ),

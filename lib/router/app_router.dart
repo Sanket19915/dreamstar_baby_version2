@@ -48,12 +48,12 @@ final appRoutes = <RouteBase>[
     path: Routes.BottoNavbarScreen,
     builder: (context, state) => BottoNavbarScreen(),
   ),
-  GoRoute(
-    path: Routes.ExistentialScreenScreen,
-    builder: (context, state) => ExistentialScreen(
-      from: "", index: 0,
-    ),
-  ),
+  // GoRoute(
+  //   path: Routes.ExistentialScreenScreen,
+  //   builder: (context, state) => ExistentialScreen(
+  //     from: "", index: 0,
+  //   ),
+  // ),
   GoRoute(
     path: Routes.notification,
     pageBuilder: (context, state) {

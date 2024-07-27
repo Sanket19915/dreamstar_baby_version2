@@ -125,14 +125,19 @@ class _FourQuotientsState extends State<FourQuotients> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).push(
+                        Navigator.of(context)
+                            .push(
                           MaterialPageRoute(
                             builder: (ctx) => ExistentialScreen(
                               index: 0,
                               from: quotients[0],
+                              quotientStatuses: quotientStatuses,
                             ),
                           ),
-                        );
+                        )
+                            .then((e) {
+                          fetchQuotientStatuses();
+                        });
                       },
                       child: Stack(
                         children: [
@@ -178,10 +183,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                           MaterialPageRoute(
                             builder: (ctx) => ExistentialScreen(
                               from: quotients[1],
+                              quotientStatuses: quotientStatuses,
                               index: 1,
                             ),
                           ),
-                        );
+                        )
+                            .then((e) {
+                          fetchQuotientStatuses();
+                        });
                       },
                       child: Stack(
                         children: [
@@ -250,10 +259,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               builder: (ctx) =>
                                                   ExistentialScreen(
                                                 from: quotients[2],
+                                                quotientStatuses:
+                                                    quotientStatuses,
                                                 index: 2,
                                               ),
                                             ),
-                                          );
+                                          )
+                                              .then((e) {
+                                            fetchQuotientStatuses();
+                                          });
                                         },
                                         child: Stack(
                                           children: [
@@ -303,10 +317,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               builder: (ctx) =>
                                                   ExistentialScreen(
                                                 from: quotients[3],
+                                                quotientStatuses:
+                                                    quotientStatuses,
                                                 index: 3,
                                               ),
                                             ),
-                                          );
+                                          )
+                                              .then((e) {
+                                            fetchQuotientStatuses();
+                                          });
                                         },
                                         child: Stack(
                                           children: [
@@ -358,10 +377,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                         MaterialPageRoute(
                                           builder: (ctx) => ExistentialScreen(
                                             from: quotients[4],
+                                            quotientStatuses: quotientStatuses,
                                             index: 4,
                                           ),
                                         ),
-                                      );
+                                      )
+                                          .then((e) {
+                                        fetchQuotientStatuses();
+                                      });
                                     },
                                     child: Stack(
                                       children: [
@@ -444,10 +467,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               builder: (ctx) =>
                                                   ExistentialScreen(
                                                 from: quotients[5],
+                                                quotientStatuses:
+                                                    quotientStatuses,
                                                 index: 5,
                                               ),
                                             ),
-                                          );
+                                          )
+                                              .then((e) {
+                                            fetchQuotientStatuses();
+                                          });
                                         },
                                         child: Stack(
                                           children: [
@@ -497,10 +525,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               builder: (ctx) =>
                                                   ExistentialScreen(
                                                 from: quotients[6],
+                                                quotientStatuses:
+                                                    quotientStatuses,
                                                 index: 6,
                                               ),
                                             ),
-                                          );
+                                          )
+                                              .then((e) {
+                                            fetchQuotientStatuses();
+                                          });
                                         },
                                         child: Stack(
                                           children: [
@@ -557,10 +590,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               builder: (ctx) =>
                                                   ExistentialScreen(
                                                 from: quotients[7],
+                                                quotientStatuses:
+                                                    quotientStatuses,
                                                 index: 7,
                                               ),
                                             ),
-                                          );
+                                          )
+                                              .then((e) {
+                                            fetchQuotientStatuses();
+                                          });
                                         },
                                         child: Stack(
                                           children: [
@@ -610,10 +648,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               builder: (ctx) =>
                                                   ExistentialScreen(
                                                 from: quotients[8],
+                                                quotientStatuses:
+                                                    quotientStatuses,
                                                 index: 8,
                                               ),
                                             ),
-                                          );
+                                          )
+                                              .then((e) {
+                                            fetchQuotientStatuses();
+                                          });
                                         },
                                         child: Stack(
                                           children: [
