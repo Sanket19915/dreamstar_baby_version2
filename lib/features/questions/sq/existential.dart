@@ -834,6 +834,51 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       ),
                     );
                   }),
+                  for (int i = 0; i < (data?.options.length ?? 0); i++)
+            if ((data?.options[i].image.isEmpty ?? false) &&
+                (data?.options[i].text.isNotEmpty ?? false))
+              ValueListenableBuilder(
+                  valueListenable: answerNotifier,
+                  builder: (ctx, value, child) {
+                    return GestureDetector(
+                      onTap: () => isDisable ? null : _selectOption(i),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: selectedOptionIndex == i
+                                ? ((selectedOptionIndex == i) &&
+                                        (isCorrect != null) &&
+                                        (isCorrect ?? false))
+                                    ? Colors.green
+                                    : ((selectedOptionIndex == i) &&
+                                            ((isCorrect != null) &&
+                                                !(isCorrect ?? false)))
+                                        ? Colors.red
+                                        : Colors.blue
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: (data?.options[i].image.isNotEmpty ?? false)
+                              ? Image.network(
+                                  "http://dreambaby.pro/storage/${data?.options[i].image}")
+                              : Text(
+                                  '${i + 1}. ${data?.options[i].text}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: selectedOptionIndex == i
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    );
+                  }),
           options.isEmpty
               ? Container()
               : GridView.builder(
