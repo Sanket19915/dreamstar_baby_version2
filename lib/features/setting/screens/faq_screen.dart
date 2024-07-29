@@ -12,16 +12,16 @@ class FAQScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color(0xffF7F3FD),
         elevation: 0,
-        leading: InkWell(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-            size: 24,
-          ),
-        ),
+        // leading: InkWell(
+        //   onTap: () {
+        //     Navigator.of(context).pop();
+        //   },
+        //   child: const Icon(
+        //     Icons.arrow_back,
+        //     color: Colors.black,
+        //     size: 24,
+        //   ),
+        // ),
         centerTitle: true,
         title: Text(
           'FAQ',

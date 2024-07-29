@@ -40,13 +40,7 @@ class _BottoNavbarScreenState extends State<BottoNavbarScreen>
           _motionTabBarController, // ADD THIS if you need to change your tab programmatically
       initialSelectedTab: "Home",
       useSafeArea: true, // default: true, apply safe area wrapper
-      labels: const [
-        "Testimonials",
-        "About Us",
-        "Home",
-        // "Community",
-        "Follow Us"
-      ],
+      labels: const ["Testimonials", "About Us", "Home", "FAQ", "Contact Us"],
       // icons: const [
       //   Icons.dashboard,
       //   Icons.home,

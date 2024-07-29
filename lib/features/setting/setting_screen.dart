@@ -175,13 +175,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  _buildSettingOption('FAQ', Icons.question_answer, () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => FAQScreen(),
-                      ),
-                    );
-                  }),
+                  // _buildSettingOption('FAQ', Icons.question_answer, () {
+                  //   Navigator.of(context).push(
+                  //     MaterialPageRoute(
+                  //       builder: (context) => FAQScreen(),
+                  //     ),
+                  //   );
+                  // }),
                   _buildSettingOption('Privacy Policy', Icons.privacy_tip, () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

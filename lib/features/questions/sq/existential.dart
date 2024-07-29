@@ -286,7 +286,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                          if (questionsModel
+                                        if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
                                           Navigator.of(context).pop();
@@ -374,7 +374,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                          if (questionsModel
+                                        if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
                                           Navigator.of(context).pop();
@@ -834,7 +834,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       ),
                     );
                   }),
-                  for (int i = 0; i < (data?.options.length ?? 0); i++)
+          for (int i = 0; i < (data?.options.length ?? 0); i++)
             if ((data?.options[i].image.isEmpty ?? false) &&
                 (data?.options[i].text.isNotEmpty ?? false))
               ValueListenableBuilder(
@@ -1288,7 +1288,6 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return YoutubePlayerBuilder(
       player: YoutubePlayer(
         showVideoProgressIndicator: true,

@@ -1,6 +1,7 @@
 import 'package:dream_baby/features/about_us/about_us_screen.dart';
 import 'package:dream_baby/features/contact_us/contact_us_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen_content.dart';
+import 'package:dream_baby/features/setting/screens/faq_screen.dart';
 import 'package:dream_baby/features/testimonials_screen/testimonials_screen.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
@@ -23,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     _motionTabBarController = MotionTabBarController(
       initialIndex: 2,
-      length: 4,
+      length: 5,
       vsync: this,
     );
   }
@@ -43,32 +44,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           TestimonialScreen(),
           AboutUsScreen(),
           const HomeContentScreen(),
-          // const Center(child: Text("Community")),
+          FAQScreen(),
           ContactUsScreen(),
         ],
       ),
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
-        labels: const [
-          "Testimonials",
-          "About Us",
-          "Home",
-          // "Community",
-          "Follow Us"
-        ],
+        labels: const ["Testimonials", "About Us", "Home", "FAQ", "Contact Us"],
         icons: const [
           Icons.reviews,
           Icons.info,
           Icons.home,
-          // Icons.group,
+          Icons.question_answer,
           Icons.follow_the_signs
         ],
         badges: const [
           null,
           null,
           null,
-          // null,
+          null,
           null,
         ],
         tabSize: 50,
@@ -115,7 +110,7 @@ class CommunityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Community"));
+    return FAQScreen();
   }
 }
 

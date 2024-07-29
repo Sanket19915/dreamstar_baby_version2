@@ -177,6 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // }
 
   Future<void> _pickImage() async {
+    widget.userProfile["profile_pic"] = null;
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
@@ -356,6 +357,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     "http://dreambaby.pro/storage/${widget.userProfile["profile_pic"]}"),
                               )),
                     const SizedBox(height: 20),
+                    Container(
+                      padding: EdgeInsets.only(left: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'First Name',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.blackColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                     CustomTextField(
                       autoValidate: AutovalidateMode.onUserInteraction,
                       hintText: 'First Name',
@@ -366,6 +379,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       validator: firstNameValidator,
                     ),
                     const SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.only(left: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Last Name',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.blackColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                     CustomTextField(
                       autoValidate: AutovalidateMode.onUserInteraction,
                       hintText: 'Last Name',
@@ -376,6 +401,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       validator: lastNameValidator,
                     ),
                     const SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.only(left: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Phone No',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.blackColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                     CustomTextField(
                       autoValidate: AutovalidateMode.onUserInteraction,
                       hintText: 'Phone Number',
@@ -389,6 +426,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       validator: phoneValidator,
                     ),
                     const SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.only(left: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Email ID',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.blackColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                     CustomTextField(
                       autoValidate: AutovalidateMode.onUserInteraction,
                       hintText: 'Email',
@@ -399,6 +448,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       validator: emailValidator,
                     ),
                     const SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.only(left: 5),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'EDD or LMP',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.blackColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
                     GestureDetector(
                       onTap: () => _selectDate(context),
                       child: AbsorbPointer(
@@ -457,8 +518,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.whiteColor,
                       ),
                       onPressed: isFormValid
-                          ? _profileImage == null &&
-                                  widget.userProfile["profile_pic"] == null
+                          ? _profileImage == null
+                              //&& widget.userProfile["profile_pic"] == null
                               ? _saveProfileWithoutImage
                               : _saveProfile
                           : null,

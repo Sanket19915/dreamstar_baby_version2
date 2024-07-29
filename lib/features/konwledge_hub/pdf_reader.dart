@@ -1,6 +1,7 @@
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PDFViewerScreen extends StatefulWidget {
   final String pdfPath;
@@ -64,6 +65,11 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                     setState(() {
                       _currentPage = page!;
                     });
+                  },
+                  onLinkHandler: (String? uri) {
+                    if (uri != null) {
+                      _launchURL(uri);
+                    }
                   },
                 ),
               ),
@@ -176,5 +182,13 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 )
               : null,
     );
+  }
+
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
