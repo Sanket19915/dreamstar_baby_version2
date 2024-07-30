@@ -105,13 +105,13 @@ class _BottoNavbarScreenState extends State<BottoNavbarScreen>
           _motionTabBarController!.index = value;
         });
       },
-      images: [
-        AppImages.testi,
-        AppImages.about,
-        AppImages.homenew,
-        AppImages.people,
-        AppImages.follow
-      ],
+      // images: [
+      //   AppImages.testi,
+      //   AppImages.about,
+      //   AppImages.homenew,
+      //   AppImages.people,
+      //   AppImages.follow
+      // ],
     );
   }
 }
