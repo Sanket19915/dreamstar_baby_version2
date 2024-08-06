@@ -23,7 +23,14 @@ void main() async {
   await Hive.openBox('userBox');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
+  ).then((value) {
+     // Set up your error logging here
+      FlutterError.onError = (FlutterErrorDetails details) {
+        // Log to console
+        print("Firebase initializeApp error = ${details.exceptionAsString()}");
+        // Send to a remote logging service
+      };
+  },);
   final token = await TokenService.getToken();
   if (token != null) {
     // Attempt to login using the token

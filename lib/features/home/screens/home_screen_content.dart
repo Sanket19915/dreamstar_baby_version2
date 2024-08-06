@@ -127,8 +127,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
+
                 SizedBox(
-                  height: height * 0.02,
+                  height: height * 0.01,
                 ),
                 const FourQuotients(),
                 const SizedBox(

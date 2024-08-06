@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dream_baby/features/questions/sq/video_player_screen.dart';
 import 'package:dream_baby/models/options_model.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
@@ -734,6 +735,35 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               const SizedBox(height: 20),
             ],
           ),
+          if ((data?.mainVideo?.isNotEmpty ?? true) &&
+              (data?.youtubeLink.isNotEmpty ?? true))
+            Align(
+              alignment: Alignment.topRight,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  elevation: const WidgetStatePropertyAll(0),
+                  backgroundColor: WidgetStatePropertyAll(
+                      const Color(0xFFC4C8D0).withOpacity(0.5)),
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => VideoPlayerScreen(
+                        youtubeLink: data?.youtubeLink ?? "",
+                        isYoutube:
+                            (data?.youtubeLink.isEmpty ?? true) ? false : true,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Full Screen',
+                  style: TextStyle(
+                      color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+                ),
+              ),
+            ),
+          const SizedBox(height: 5),
           (data?.mainVideo?.isEmpty ?? true)
               ? Container()
               : SizedBox(

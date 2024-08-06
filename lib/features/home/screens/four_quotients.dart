@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dream_baby/features/questions/sq/existential.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
@@ -31,7 +32,9 @@ class _FourQuotientsState extends State<FourQuotients> {
   ];
 
   Map<String, bool> quotientStatuses = {};
+  bool allQuotientStatuses = false;
 
+  @override
   void initState() {
     super.initState();
     fetchQuotientStatuses();
@@ -56,6 +59,14 @@ class _FourQuotientsState extends State<FourQuotients> {
         quotientStatuses =
             statuses.map((key, value) => MapEntry(key, value as bool));
       });
+
+      List<bool> quotientStatusesList =
+          quotientStatuses.entries.map((e) => e.value).toList();
+
+      if (quotientStatusesList.isNotEmpty) {
+        allQuotientStatuses =
+            quotientStatusesList.every((element) => element == true);
+      }
     } else {
       print(response.reasonPhrase);
     }
@@ -63,10 +74,36 @@ class _FourQuotientsState extends State<FourQuotients> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return SizedBox(
       height: 388,
       child: Column(
         children: [
+          if (allQuotientStatuses)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+              decoration: const BoxDecoration(
+                color: AppColors.mainColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20),
+                ),
+              ),
+              child: Center(
+                child: AutoSizeText(
+                  'All activities are completed for the day',
+                  style: GoogleFonts.poppins(
+                      color: AppColors.whiteColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                  minFontSize: 13,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ),
+          SizedBox(
+            height: height * 0.01,
+          ),
           Expanded(
             flex: 1,
             child: Row(
@@ -153,7 +190,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(top: 8, right: 8),
+                            padding: const EdgeInsets.only(top: 8, right: 8),
                             child: Align(
                               alignment: Alignment.topRight,
                               child: quotientStatuses['Existential'] == true
@@ -179,7 +216,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        Navigator.of(context).push(
+                        Navigator.of(context)
+                            .push(
                           MaterialPageRoute(
                             builder: (ctx) => ExistentialScreen(
                               from: quotients[1],
@@ -254,7 +292,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       flex: 1,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
+                                          Navigator.of(context)
+                                              .push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
                                                   ExistentialScreen(
@@ -312,7 +351,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       flex: 1,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
+                                          Navigator.of(context)
+                                              .push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
                                                   ExistentialScreen(
@@ -373,7 +413,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                   flex: 1,
                                   child: InkWell(
                                     onTap: () {
-                                      Navigator.of(context).push(
+                                      Navigator.of(context)
+                                          .push(
                                         MaterialPageRoute(
                                           builder: (ctx) => ExistentialScreen(
                                             from: quotients[4],
@@ -462,7 +503,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       flex: 1,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
+                                          Navigator.of(context)
+                                              .push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
                                                   ExistentialScreen(
@@ -520,7 +562,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       flex: 1,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
+                                          Navigator.of(context)
+                                              .push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
                                                   ExistentialScreen(
@@ -585,7 +628,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       flex: 1,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
+                                          Navigator.of(context)
+                                              .push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
                                                   ExistentialScreen(
@@ -643,7 +687,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       flex: 1,
                                       child: InkWell(
                                         onTap: () {
-                                          Navigator.of(context).push(
+                                          Navigator.of(context)
+                                              .push(
                                             MaterialPageRoute(
                                               builder: (ctx) =>
                                                   ExistentialScreen(
@@ -774,3 +819,11 @@ class _FourQuotientsState extends State<FourQuotients> {
     );
   }
 }
+
+// String abc() {
+//   switch (totalBlockAssists) {
+//     case "Total Block Assists":
+//       break;
+//     default:
+//   }
+// }
