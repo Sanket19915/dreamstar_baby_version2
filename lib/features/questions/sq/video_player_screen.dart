@@ -37,8 +37,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         );
       });
     if (widget.youtubeLink?.isNotEmpty ?? false) {
+      String? videoId;
+      if (!(widget.youtubeLink?.contains("iframe")??false)) {
+        videoId = YoutubePlayer.convertUrlToId(widget.youtubeLink ?? "");
+      } else {
+        videoId = extractYouTubeVideoId(widget.youtubeLink ?? "");
+      }
       youtubePlayerController = YoutubePlayerController(
-        initialVideoId: extractYouTubeVideoId(widget.youtubeLink ?? ""),
+        initialVideoId: videoId ?? "",
         flags: const YoutubePlayerFlags(
           autoPlay: true,
           loop: true,
@@ -52,6 +58,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void dispose() {
     videoPlayerController?.dispose();
+    youtubePlayerController?.dispose();
     chewieController?.dispose();
     super.dispose();
   }

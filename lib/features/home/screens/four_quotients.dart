@@ -12,7 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class FourQuotients extends StatefulWidget {
-  const FourQuotients({super.key});
+  final void Function() notifyWidget;
+  const FourQuotients({super.key, required this.notifyWidget});
 
   @override
   State<FourQuotients> createState() => _FourQuotientsState();
@@ -66,6 +67,8 @@ class _FourQuotientsState extends State<FourQuotients> {
       if (quotientStatusesList.isNotEmpty) {
         allQuotientStatuses =
             quotientStatusesList.every((element) => element == true);
+
+        setState(() {});
       }
     } else {
       print(response.reasonPhrase);
@@ -174,6 +177,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                         )
                             .then((e) {
                           fetchQuotientStatuses();
+                          widget.notifyWidget();
                         });
                       },
                       child: Stack(
@@ -228,6 +232,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                         )
                             .then((e) {
                           fetchQuotientStatuses();
+                          widget.notifyWidget();
                         });
                       },
                       child: Stack(
@@ -306,6 +311,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           )
                                               .then((e) {
                                             fetchQuotientStatuses();
+                                            widget.notifyWidget();
                                           });
                                         },
                                         child: Stack(
@@ -365,6 +371,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           )
                                               .then((e) {
                                             fetchQuotientStatuses();
+                                            widget.notifyWidget();
                                           });
                                         },
                                         child: Stack(
@@ -425,6 +432,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       )
                                           .then((e) {
                                         fetchQuotientStatuses();
+                                        widget.notifyWidget();
                                       });
                                     },
                                     child: Stack(
@@ -517,6 +525,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           )
                                               .then((e) {
                                             fetchQuotientStatuses();
+                                            widget.notifyWidget();
                                           });
                                         },
                                         child: Stack(
@@ -576,6 +585,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           )
                                               .then((e) {
                                             fetchQuotientStatuses();
+                                            widget.notifyWidget();
                                           });
                                         },
                                         child: Stack(
@@ -642,6 +652,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           )
                                               .then((e) {
                                             fetchQuotientStatuses();
+                                            widget.notifyWidget();
                                           });
                                         },
                                         child: Stack(
@@ -701,6 +712,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           )
                                               .then((e) {
                                             fetchQuotientStatuses();
+                                            widget.notifyWidget();
                                           });
                                         },
                                         child: Stack(

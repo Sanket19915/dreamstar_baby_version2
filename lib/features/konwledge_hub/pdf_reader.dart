@@ -36,47 +36,51 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           child: const Icon(Icons.arrow_back),
         ),
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: PDFView(
-                  pageFling: true,
-                  fitEachPage: true,
-                  fitPolicy: FitPolicy.BOTH,
-                  filePath: widget.pdfPath,
-                  autoSpacing: false,
-                  enableSwipe: true,
-                  pageSnap: false,
-                  swipeHorizontal: true,
-                  onRender: (pages) {
-                    setState(() {
-                      _totalPages = pages!;
-                      pdfReady = true;
-                      _pdfViewController
-                          .setPage(int.parse(widget.week ?? "1") - 1);
-                    });
-                  },
-                  onViewCreated: (PDFViewController vc) {
-                    _pdfViewController = vc;
-                  },
-                  onPageChanged: (int? page, int? total) {
-                    setState(() {
-                      _currentPage = page!;
-                    });
-                  },
-                  onLinkHandler: (String? uri) {
-                    if (uri != null) {
-                      _launchURL(uri);
-                    }
-                  },
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height - 50,
+        width: MediaQuery.of(context).size.width,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
+              children: [
+                Positioned.fill(
+                  child: PDFView(
+                    pageFling: true,
+                    fitEachPage: true,
+                    fitPolicy: FitPolicy.BOTH,
+                    filePath: widget.pdfPath,
+                    autoSpacing: true,
+                    enableSwipe: true,
+                    pageSnap: false,
+                    swipeHorizontal: true,
+                    onRender: (pages) {
+                      setState(() {
+                        _totalPages = pages!;
+                        pdfReady = true;
+                        _pdfViewController
+                            .setPage(int.parse(widget.week ?? "1") - 1);
+                      });
+                    },
+                    onViewCreated: (PDFViewController vc) {
+                      _pdfViewController = vc;
+                    },
+                    onPageChanged: (int? page, int? total) {
+                      setState(() {
+                        _currentPage = page!;
+                      });
+                    },
+                    onLinkHandler: (String? uri) {
+                      if (uri != null) {
+                        _launchURL(uri);
+                      }
+                    },
+                  ),
                 ),
-              ),
-              if (!pdfReady) const Center(child: CircularProgressIndicator())
-            ],
-          );
-        },
+                if (!pdfReady) const Center(child: CircularProgressIndicator())
+              ],
+            );
+          },
+        ),
       ),
       bottomNavigationBar: Container(
         color: Colors.grey[200],

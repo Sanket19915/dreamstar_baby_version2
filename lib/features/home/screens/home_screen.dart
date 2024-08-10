@@ -4,7 +4,6 @@ import 'package:dream_baby/features/home/screens/home_screen_content.dart';
 import 'package:dream_baby/features/setting/screens/faq_screen.dart';
 import 'package:dream_baby/features/testimonials_screen/testimonials_screen.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
-import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-tab-controller.dart';
@@ -41,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: TabBarView(
         controller: _motionTabBarController,
         children: <Widget>[
-          TestimonialScreen(),
+          const TestimonialScreen(),
           AboutUsScreen(),
           const HomeContentScreen(),
           FAQScreen(),
@@ -49,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ],
       ),
       bottomNavigationBar: MotionTabBar(
+        images: const [],
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         labels: const ["Testimonials", "About Us", "Home", "FAQ", "Contact Us"],
