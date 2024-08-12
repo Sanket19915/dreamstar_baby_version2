@@ -60,6 +60,7 @@ class _FourQuotientsState extends State<FourQuotients> {
         quotientStatuses =
             statuses.map((key, value) => MapEntry(key, value as bool));
       });
+      print(quotientStatuses);
 
       List<bool> quotientStatusesList =
           quotientStatuses.entries.map((e) => e.value).toList();

@@ -294,67 +294,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
-                                          print("pop 2");
-                                          Navigator.of(context).pop();
                                           int nextIndex = widget.index;
-                                          if (_controller.value.isInitialized) {
-                                            _controller.dispose();
-                                          }
 
-                                          // Find the next incomplete quotient index (status is false)
-                                          while (nextIndex <
-                                              quotients.length - 1) {
-                                            nextIndex++;
-                                            if (widget.quotientStatuses[
-                                                    quotients[nextIndex]] ==
-                                                false) {
-                                              break;
-                                            }
-                                          }
-
-                                          // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                          if (nextIndex ==
-                                                  quotients.length - 1 &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  true) {
-                                            for (int i = 0;
-                                                i < quotients.length;
-                                                i++) {
-                                              if (widget.quotientStatuses[
-                                                      quotients[i]] ==
-                                                  false) {
-                                                nextIndex = i;
-                                                break;
-                                              }
-                                            }
-                                          }
-
-                                          // Ensure the index is within bounds and valid (incomplete status)
-                                          if (nextIndex < quotients.length &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  false) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (ctx) =>
-                                                    ExistentialScreen(
-                                                  from: quotients[nextIndex],
-                                                  quotientStatuses:
-                                                      widget.quotientStatuses,
-                                                  index: nextIndex,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            // Handle case where no incomplete screen was found
-                                            // Navigator.of(context)
-                                            //     .popUntil((e) => e.isFirst);
-
-                                            print("pop 3");
-                                            await getTodaysQuestionStatus(
-                                                context);
-                                          }
+                                          await getTodaysQuestionStatus(
+                                              context, nextIndex);
                                         } else {
                                           controller.nextPage(
                                               duration: const Duration(
@@ -390,66 +333,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         if (questionsModel
                                                 ?.questions?.data.length ==
                                             (_selectedIndex + 1)) {
-                                          print("pop 4");
-                                          Navigator.of(context).pop();
                                           int nextIndex = widget.index;
-                                          if (_controller.value.isInitialized) {
-                                            _controller.dispose();
-                                          }
 
-                                          // Find the next incomplete quotient index (status is false)
-                                          while (nextIndex <
-                                              quotients.length - 1) {
-                                            nextIndex++;
-                                            if (widget.quotientStatuses[
-                                                    quotients[nextIndex]] ==
-                                                false) {
-                                              break;
-                                            }
-                                          }
-
-                                          // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                          if (nextIndex ==
-                                                  quotients.length - 1 &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  true) {
-                                            for (int i = 0;
-                                                i < quotients.length;
-                                                i++) {
-                                              if (widget.quotientStatuses[
-                                                      quotients[i]] ==
-                                                  false) {
-                                                nextIndex = i;
-                                                break;
-                                              }
-                                            }
-                                          }
-
-                                          // Ensure the index is within bounds and valid (incomplete status)
-                                          if (nextIndex < quotients.length &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  false) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (ctx) =>
-                                                    ExistentialScreen(
-                                                  from: quotients[nextIndex],
-                                                  quotientStatuses:
-                                                      widget.quotientStatuses,
-                                                  index: nextIndex,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            // Handle case where no incomplete screen was found
-                                            // Navigator.of(context)
-                                            //     .popUntil((e) => e.isFirst);
-                                            print("pop 5");
-                                            await getTodaysQuestionStatus(
-                                                context);
-                                          }
+                                          await getTodaysQuestionStatus(
+                                              context, nextIndex);
                                         } else {
                                           controller.nextPage(
                                               duration: const Duration(
@@ -478,6 +365,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   ),
                                   onPressed: () async {
                                     await submitQuestions(
+                                        ctx: context,
                                         data: questionsModel
                                             ?.questions?.data[position],
                                         questionId: questionsModel?.questions
@@ -499,119 +387,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                             0]
                                                     .text ??
                                                 "");
-                                    if (isCorrect ?? false) {
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return Dialog(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(20),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    const Text(
-                                                      'Congratulations your answer is correct.',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          fontSize: 24,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: AppColors
-                                                              .mainColor),
-                                                    ),
-                                                    const SizedBox(height: 20),
-                                                    Text(
-                                                      questionsModel
-                                                              ?.questions
-                                                              ?.data[position]
-                                                              .answerKeyInput ??
-                                                          "",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                    const SizedBox(height: 20),
-                                                    ElevatedButton(
-                                                      onPressed: () {
-                                                        print("pop 6");
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      child:
-                                                          const Text('Close'),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          });
-                                    }
+
                                     if (questionsModel
                                             ?.questions?.data.length ==
                                         (_selectedIndex + 1)) {
-                                      print("pop 7");
-                                      Navigator.of(context).pop();
                                       int nextIndex = widget.index;
-                                      if (_controller.value.isInitialized) {
-                                        _controller.dispose();
-                                      }
 
-                                      // Find the next incomplete quotient index (status is false)
-                                      while (nextIndex < quotients.length - 1) {
-                                        nextIndex++;
-                                        if (widget.quotientStatuses[
-                                                quotients[nextIndex]] ==
-                                            false) {
-                                          break;
-                                        }
-                                      }
-
-                                      // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                      if (nextIndex == quotients.length - 1 &&
-                                          widget.quotientStatuses[
-                                                  quotients[nextIndex]] ==
-                                              true) {
-                                        for (int i = 0;
-                                            i < quotients.length;
-                                            i++) {
-                                          if (widget.quotientStatuses[
-                                                  quotients[i]] ==
-                                              false) {
-                                            nextIndex = i;
-                                            break;
-                                          }
-                                        }
-                                      }
-
-                                      // Ensure the index is within bounds and valid (incomplete status)
-                                      if (nextIndex < quotients.length &&
-                                          widget.quotientStatuses[
-                                                  quotients[nextIndex]] ==
-                                              false) {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (ctx) => ExistentialScreen(
-                                              from: quotients[nextIndex],
-                                              quotientStatuses:
-                                                  widget.quotientStatuses,
-                                              index: nextIndex,
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        // Handle case where no incomplete screen was found
-                                        await getTodaysQuestionStatus(context);
-                                      }
+                                      await getTodaysQuestionStatus(
+                                          context, nextIndex);
                                     } else {
                                       controller.nextPage(
                                           duration:
@@ -644,25 +427,22 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         ),
                                         onPressed: () {
                                           showDialog(
+                                            barrierDismissible: false,
                                             context: context,
                                             builder: (context) {
                                               return AlertDialog(
-                                                title: FittedBox(
-                                                  fit: BoxFit.scaleDown,
-                                                  child: Text(
-                                                    'Answer key : ${questionsModel?.questions?.data[position].answerKeyInput}',
-                                                    style: const TextStyle(
-                                                        color:
-                                                            Color(0xFF200F31),
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize: 16),
-                                                  ),
+                                                title: Text(
+                                                  'Answer key : ${questionsModel?.questions?.data[position].answerKeyInput}',
+                                                  style: const TextStyle(
+                                                      color: Color(0xFF200F31),
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 16),
                                                 ),
                                                 actions: [
                                                   ElevatedButton(
                                                       onPressed: () {
-                                                        print("pop 8");
+                                                        print("pop 2");
                                                         Navigator.of(context)
                                                             .pop();
                                                       },
@@ -1106,15 +886,17 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         "question_type": ""
       });
       request.headers.addAll(headers);
-
+      print(widget.from);
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
 
         questionsModel = questionsModelFromJson(responseData);
+        setState(() {});
+        await Future.delayed(const Duration(milliseconds: 500));
 
-        print(questionsModel);
+        print("questions length ==${questionsModel?.questions?.data.length}");
       } else {
         print(response.reasonPhrase);
       }
@@ -1153,7 +935,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
       var request = http.MultipartRequest(
           'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
-      request.fields.addAll({'question_id': questionId, "is_flagged": "1"});
+      request.fields.addAll(
+          {'question_id': questionId, "is_flagged": '1', "is_skipped": '0'});
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1198,7 +981,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
       var request = http.MultipartRequest(
           'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
-      request.fields.addAll({'question_id': questionId, 'is_skipped': "1"});
+      request.fields.addAll(
+          {'question_id': questionId, "is_flagged": '0', "is_skipped": '1'});
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1229,7 +1013,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   }
 
   Future<void> submitQuestions(
-      {String? questionId, String? answer, Datum? data}) async {
+      {String? questionId,
+      String? answer,
+      Datum? data,
+      BuildContext? ctx}) async {
     try {
       if ((data?.correctAnswer.isNotEmpty ?? false) &&
           ((selectedOptionIndex != null
@@ -1239,6 +1026,48 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         isCorrect = true;
         isDisable = true;
         answerNotifier.notifyListeners();
+
+        await showDialog(
+          barrierDismissible: false,
+            context: ctx!,
+            builder: (BuildContext context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Congratulations your answer is correct.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.mainColor),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        data?.answerKeyInput ?? "",
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          print("pop 3");
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
       } else {
         isCorrect = false;
         isDisable = true;
@@ -1295,8 +1124,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     }
   }
 
-  Future<void> getTodaysQuestionStatus(BuildContext ctx) async {
+  Future<void> getTodaysQuestionStatus(BuildContext ctx, int nextIndex) async {
     try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
       var token = await AuthService.getToken();
       var headers = {
         'Content-Type': 'application/json',
@@ -1323,9 +1157,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
         print(todayQuestionStatus);
 
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+
+        await showDialog(
+            barrierDismissible: false,
+            context: ctx,
+            builder: (BuildContext ctx1) {
               return Dialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
@@ -1341,18 +1182,103 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         todayQuestionStatus,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.mainColor),
                       ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).popUntil((e) => e.isFirst);
-                        },
-                        child: const Text('Close'),
-                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      AppColors.whiteColor)),
+                              onPressed: () {
+                                Navigator.of(ctx1).pop();
+                                Navigator.of(ctx).pop();
+                              },
+                              child: const Text(
+                                'Exit',
+                                style: TextStyle(
+                                    color: AppColors.mainColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      AppColors.mainColor)),
+                              onPressed: () async {
+                                Navigator.of(ctx1).pop();
+                                await getQuestions();
+
+                                if (questionsModel?.questions?.data.isEmpty ??
+                                    true) {
+                                  // Find the next incomplete quotient index (status is false)
+                                  while (nextIndex < quotients.length - 1) {
+                                    nextIndex++;
+                                    if (widget.quotientStatuses[
+                                            quotients[nextIndex]] ==
+                                        false) {
+                                      break;
+                                    }
+                                  }
+                                  // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                                  if (nextIndex == quotients.length - 1 &&
+                                      widget.quotientStatuses[
+                                              quotients[nextIndex]] ==
+                                          true) {
+                                    for (int i = 0; i < quotients.length; i++) {
+                                      if (widget
+                                              .quotientStatuses[quotients[i]] ==
+                                          false) {
+                                        nextIndex = i;
+                                        break;
+                                      }
+                                    }
+                                  }
+                                  // Ensure the index is within bounds and valid (incomplete status)
+                                  if (nextIndex < quotients.length &&
+                                      widget.quotientStatuses[
+                                              quotients[nextIndex]] ==
+                                          false) {
+                                    Navigator.of(ctx).pop();
+                                    print(
+                                        "questions == ${quotients[nextIndex]}");
+                                    print("questions next index $nextIndex");
+                                    Navigator.of(ctx).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ExistentialScreen(
+                                          from: quotients[nextIndex],
+                                          quotientStatuses:
+                                              widget.quotientStatuses,
+                                          index: nextIndex,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    // Handle case where no incomplete screen was found
+                                    Navigator.of(context)
+                                        .popUntil((e) => e.isFirst);
+                                  }
+                                }
+                              },
+                              child: const Text(
+                                'Continue',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),

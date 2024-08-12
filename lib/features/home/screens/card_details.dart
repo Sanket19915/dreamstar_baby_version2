@@ -137,7 +137,7 @@ class _BabyCardState extends State<BabyCard> {
     print(total_day);
     double percent =
         (double.tryParse(total_day) ?? 0) / 281; // Compute the percentage here
-    print('Percent: $percent'); // Debug print to check the value of percent
+    // print('Percent: $percent'); // Debug print to check the value of percent
     return isLoading
         ? const CircularProgressIndicator()
         : Column(

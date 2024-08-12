@@ -15,21 +15,30 @@ class SplashScreen1 extends StatefulWidget {
 
 class _SplashScreen1State extends State<SplashScreen1> {
   late VideoPlayerController _videoController;
+  bool _isCallOngoing = false; // Flag to determine if a call is ongoing
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize the video player controller
     _videoController = VideoPlayerController.asset('assets/images/splash.mp4')
       ..initialize().then((_) {
-        setState(() {});
-        _videoController.play();
+        if (!_isCallOngoing) {
+          setState(() {});
+          _videoController.play();
+        }
       });
 
     _videoController.addListener(() {
-      if (_videoController.value.position == _videoController.value.duration) {
+      if (!_isCallOngoing &&
+          _videoController.value.position == _videoController.value.duration) {
         navigateAfterDelay();
       }
     });
+
+    // Placeholder: Update _isCallOngoing based on your call status mechanism
+    checkCallStatus();
   }
 
   @override
@@ -38,9 +47,24 @@ class _SplashScreen1State extends State<SplashScreen1> {
     super.dispose();
   }
 
+  void checkCallStatus() async {
+    // Implement your logic to check if a call is ongoing
+    // For example, check from a call manager or a service
+    bool callInProgress = await isCallInProgress(); // Replace with your method
+
+    setState(() {
+      _isCallOngoing = callInProgress;
+    });
+  }
+
+  Future<bool> isCallInProgress() async {
+    // Replace this with actual implementation
+    // Example: return await CallService.isCallActive();
+    return false; // Default to no call ongoing
+  }
+
   void navigateAfterDelay() async {
     var box = Hive.box('userBox');
-//    bool isLoggedIn = box.get('isLoggedIn', defaultValue: false);
     bool isLoggedIn = SessionManager().isLoggedIn();
 
     if (isLoggedIn) {
@@ -56,18 +80,30 @@ class _SplashScreen1State extends State<SplashScreen1> {
       backgroundColor: AppColors.appPinkLight,
       body: Stack(
         children: [
-          _videoController.value.isInitialized
-              ? SizedBox.expand(
-                  child: FittedBox(
-                    fit: BoxFit.fill,
-                    child: SizedBox(
-                      width: _videoController.value.size.width,
-                      height: _videoController.value.size.height,
-                      child: VideoPlayer(_videoController),
-                    ),
-                  ),
-                )
-              : const Center(child: CircularProgressIndicator()),
+          if (_isCallOngoing)
+            const Center(
+              child: Text(
+                'Welcome to DreamStart Baby',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.mainColor,
+                ),
+              ),
+            )
+          else if (_videoController.value.isInitialized)
+            SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.fill,
+                child: SizedBox(
+                  width: _videoController.value.size.width,
+                  height: _videoController.value.size.height,
+                  child: VideoPlayer(_videoController),
+                ),
+              ),
+            )
+          else
+            const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
