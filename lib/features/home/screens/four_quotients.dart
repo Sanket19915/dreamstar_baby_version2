@@ -547,7 +547,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               child: Align(
                                                 alignment: Alignment.topRight,
                                                 child: quotientStatuses[
-                                                            'Logical'] ==
+                                                            'Linguistic'] ==
+                                                        // 'Logical'] ==
                                                         true
                                                     ? Image.asset(
                                                         AppImages.check,
@@ -607,7 +608,8 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               child: Align(
                                                 alignment: Alignment.topRight,
                                                 child: quotientStatuses[
-                                                            'Linguistic'] ==
+                                                            'Spatial Visual'] ==
+                                                        //  'Linguistic'] ==
                                                         true
                                                     ? Image.asset(
                                                         AppImages.check,
@@ -674,7 +676,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                                               child: Align(
                                                 alignment: Alignment.topRight,
                                                 child: quotientStatuses[
-                                                            'Spatial Visual'] ==
+                                                            'Logical'] ==
                                                         true
                                                     ? Image.asset(
                                                         AppImages.check,

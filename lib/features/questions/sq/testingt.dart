@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:dream_baby/features/questions/sq/video_player_screen.dart';
@@ -11,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:vibration/vibration.dart';
 import 'package:video_player/video_player.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../../models/questions_model.dart';
@@ -36,14 +37,17 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   bool _isAppBarTransparent = true;
   bool isQuestionExpanded = false;
   late VideoPlayerController _controller;
+
   int? selectedOptionIndex;
   bool isLoading = false;
   QuestionsModel? questionsModel;
   PageController controller = PageController();
   int _selectedIndex = 0;
+
   bool? isCorrect;
   bool isDisable = false;
   ValueNotifier answerNotifier = ValueNotifier(true);
+  String todayQuestionStatus = "";
   List<String> quotients = [
     "Existential",
     "Kinesthetic",
@@ -59,6 +63,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   void initState() {
     super.initState();
     getQuestions();
+    fetchQuestions();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels > 0) {
         setState(() {
@@ -101,6 +106,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   Widget build(BuildContext context) {
     double deviceheight = MediaQuery.of(context).size.height;
     double devicewidth = MediaQuery.of(context).size.width;
+    int nextIndex = _selectedIndex + 1;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -109,6 +115,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
         leading: InkWell(
           onTap: () {
+            print("pop 1");
             context.pop();
           },
           child: const Icon(
@@ -215,7 +222,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           selectedOptionIndex = null;
                         });
                       },
-                      itemBuilder: (context, position) {
+                      itemBuilder: (ctx, position) {
                         return SingleChildScrollView(
                           child: Column(
                             children: [
@@ -282,72 +289,34 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                             const Color(0xFFC4C8D0)
                                                 .withOpacity(0.5)),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         skipQuestions(questionsModel?.questions
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                        if (questionsModel
-                                                ?.questions?.data.length ==
-                                            (_selectedIndex + 1)) {
-                                          Navigator.of(context).pop();
-                                          int nextIndex = widget.index;
-
-                                          // Find the next incomplete quotient index (status is false)
-                                          while (nextIndex <
-                                              quotients.length - 1) {
-                                            nextIndex++;
-                                            if (widget.quotientStatuses[
-                                                    quotients[nextIndex]] ==
-                                                false) {
-                                              break;
-                                            }
-                                          }
-
-                                          // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                          if (nextIndex ==
-                                                  quotients.length - 1 &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  true) {
-                                            for (int i = 0;
-                                                i < quotients.length;
-                                                i++) {
-                                              if (widget.quotientStatuses[
-                                                      quotients[i]] ==
-                                                  false) {
-                                                nextIndex = i;
-                                                break;
-                                              }
-                                            }
-                                          }
-
-                                          // Ensure the index is within bounds and valid (incomplete status)
-                                          if (nextIndex < quotients.length &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  false) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (ctx) =>
-                                                    ExistentialScreen(
-                                                  from: quotients[nextIndex],
-                                                  quotientStatuses:
-                                                      widget.quotientStatuses,
-                                                  index: nextIndex,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            // Handle case where no incomplete screen was found
-                                            Navigator.of(context)
-                                                .popUntil((e) => e.isFirst);
-                                          }
+                                        if (totalQuestionsCount == 1) {
+                                          int nextIndex = widget.index + 1;
+                                          await getTodaysQuestionStatus(
+                                              context, nextIndex);
                                         } else {
-                                          controller.nextPage(
-                                              duration: const Duration(
-                                                  milliseconds: 500),
-                                              curve: Curves.linear);
+                                          if (nextIndex <
+                                              (questionsModel?.questions?.data
+                                                      .length ??
+                                                  0)) {
+                                            // Access the ID of the next question
+                                            var nextQuestionId = questionsModel
+                                                ?.questions?.data[nextIndex].id;
+                                            controller.nextPage(
+                                                duration: const Duration(
+                                                    milliseconds: 500),
+                                                curve: Curves.linear);
+
+                                            // Continue with your logic, e.g., navigating to the next question
+                                          } else {
+                                            // Handle the case where the index is out of bounds
+                                            print(
+                                                'No more questions available.');
+                                          }
                                         }
                                       },
                                       child: const Text(
@@ -370,68 +339,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                             const Color(0xFFC4C8D0)
                                                 .withOpacity(0.5)),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         flagQuestions(questionsModel?.questions
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                        if (questionsModel
-                                                ?.questions?.data.length ==
-                                            (_selectedIndex + 1)) {
-                                          Navigator.of(context).pop();
-                                          int nextIndex = widget.index;
-
-                                          // Find the next incomplete quotient index (status is false)
-                                          while (nextIndex <
-                                              quotients.length - 1) {
-                                            nextIndex++;
-                                            if (widget.quotientStatuses[
-                                                    quotients[nextIndex]] ==
-                                                false) {
-                                              break;
-                                            }
-                                          }
-
-                                          // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                          if (nextIndex ==
-                                                  quotients.length - 1 &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  true) {
-                                            for (int i = 0;
-                                                i < quotients.length;
-                                                i++) {
-                                              if (widget.quotientStatuses[
-                                                      quotients[i]] ==
-                                                  false) {
-                                                nextIndex = i;
-                                                break;
-                                              }
-                                            }
-                                          }
-
-                                          // Ensure the index is within bounds and valid (incomplete status)
-                                          if (nextIndex < quotients.length &&
-                                              widget.quotientStatuses[
-                                                      quotients[nextIndex]] ==
-                                                  false) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (ctx) =>
-                                                    ExistentialScreen(
-                                                  from: quotients[nextIndex],
-                                                  quotientStatuses:
-                                                      widget.quotientStatuses,
-                                                  index: nextIndex,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            // Handle case where no incomplete screen was found
-                                            Navigator.of(context)
-                                                .popUntil((e) => e.isFirst);
-                                          }
+                                        if (totalQuestionsCount == 1) {
+                                          print("this is here");
+                                          int nextIndex = widget.index + 1;
+                                          await getTodaysQuestionStatus(
+                                              context, nextIndex);
                                         } else {
+                                          int nextIndex = widget.index + 1;
+                                          print("this is next: $nextIndex");
                                           controller.nextPage(
                                               duration: const Duration(
                                                   milliseconds: 500),
@@ -459,6 +379,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   ),
                                   onPressed: () async {
                                     await submitQuestions(
+                                        ctx: context,
                                         data: questionsModel
                                             ?.questions?.data[position],
                                         questionId: questionsModel?.questions
@@ -480,60 +401,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                             0]
                                                     .text ??
                                                 "");
-                                    if (questionsModel
-                                            ?.questions?.data.length ==
-                                        (_selectedIndex + 1)) {
-                                      Navigator.of(context).pop();
+
+                                    if (totalQuestionsCount == 1) {
                                       int nextIndex = widget.index;
 
-                                      // Find the next incomplete quotient index (status is false)
-                                      while (nextIndex < quotients.length - 1) {
-                                        nextIndex++;
-                                        if (widget.quotientStatuses[
-                                                quotients[nextIndex]] ==
-                                            false) {
-                                          break;
-                                        }
-                                      }
-
-                                      // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                      if (nextIndex == quotients.length - 1 &&
-                                          widget.quotientStatuses[
-                                                  quotients[nextIndex]] ==
-                                              true) {
-                                        for (int i = 0;
-                                            i < quotients.length;
-                                            i++) {
-                                          if (widget.quotientStatuses[
-                                                  quotients[i]] ==
-                                              false) {
-                                            nextIndex = i;
-                                            break;
-                                          }
-                                        }
-                                      }
-
-                                      // Ensure the index is within bounds and valid (incomplete status)
-                                      if (nextIndex < quotients.length &&
-                                          widget.quotientStatuses[
-                                                  quotients[nextIndex]] ==
-                                              false) {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (ctx) => ExistentialScreen(
-                                              from: quotients[nextIndex],
-                                              quotientStatuses:
-                                                  widget.quotientStatuses,
-                                              index: nextIndex,
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        // Handle case where no incomplete screen was found
-                                        Navigator.of(context)
-                                            .popUntil((e) => e.isFirst);
-                                      }
+                                      await getTodaysQuestionStatus(
+                                          context, nextIndex);
                                     } else {
+                                      int nextIndex = widget.index + 1;
+                                      print("this is next: $nextIndex");
                                       controller.nextPage(
                                           duration:
                                               const Duration(milliseconds: 500),
@@ -565,6 +441,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         ),
                                         onPressed: () {
                                           showDialog(
+                                            barrierDismissible: false,
                                             context: context,
                                             builder: (context) {
                                               return AlertDialog(
@@ -573,13 +450,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                   style: const TextStyle(
                                                       color: Color(0xFF200F31),
                                                       fontWeight:
-                                                          FontWeight.w500),
+                                                          FontWeight.w500,
+                                                      fontSize: 16),
                                                 ),
                                                 actions: [
                                                   ElevatedButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
+                                                      onPressed: () {
+                                                        print("pop 2");
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                       child: const Text(
                                                         'Okay',
                                                         style: TextStyle(
@@ -706,7 +586,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Question text and description..
               SizedBox(
                 height: 8,
               ),
@@ -725,7 +604,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 child: Text(
                   data?.questionText ?? "",
                   textAlign: TextAlign.justify,
-                  maxLines: isQuestionExpanded ? null : 4,
+                  maxLines: isQuestionExpanded ? null : 5,
                   overflow: isQuestionExpanded
                       ? TextOverflow.visible
                       : TextOverflow.ellipsis,
@@ -762,7 +641,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               (data?.mainImage.isEmpty ?? true)
                   ? Container()
                   : Container(
-                      height: 200,
+                      height: 220,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius:
@@ -777,34 +656,37 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               const SizedBox(height: 20),
             ],
           ),
-          if ((data?.mainVideo?.isNotEmpty ?? true) &&
-              (data?.youtubeLink.isNotEmpty ?? true))
-            Align(
-              alignment: Alignment.topRight,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  elevation: const WidgetStatePropertyAll(0),
-                  backgroundColor: WidgetStatePropertyAll(
-                      const Color(0xFFC4C8D0).withOpacity(0.5)),
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => VideoPlayerScreen(
-                        youtubeLink: data?.youtubeLink ?? "",
-                        isYoutube:
-                            (data?.youtubeLink.isEmpty ?? true) ? false : true,
-                      ),
+          (data?.mainVideo?.isEmpty ?? true)
+              ? Container()
+              : Align(
+                  alignment: Alignment.topRight,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      elevation: const WidgetStatePropertyAll(0),
+                      backgroundColor: WidgetStatePropertyAll(
+                          const Color(0xFFC4C8D0).withOpacity(0.5)),
                     ),
-                  );
-                },
-                child: const Text(
-                  'Full Screen',
-                  style: TextStyle(
-                      color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+                    onPressed: () {
+                      _controller.dispose();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) => VideoPlayerScreen(
+                            youtubeLink: data?.youtubeLink ?? "",
+                            isYoutube: (data?.youtubeLink.isEmpty ?? true)
+                                ? false
+                                : true,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Full Screen',
+                      style: TextStyle(
+                          color: Color(0xFF200F31),
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
                 ),
-              ),
-            ),
           const SizedBox(height: 5),
           (data?.mainVideo?.isEmpty ?? true)
               ? Container()
@@ -842,7 +724,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           (data?.youtubeLink.isEmpty ?? true)
               ? Container()
               : SizedBox(
-                  height: 200,
+                  height: 250,
                   child: YouTubeWebView(
                     view: data?.youtubeLink ?? "",
                   ),
@@ -991,7 +873,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   image: DecorationImage(
                                     image: NetworkImage(
                                         "http://dreambaby.pro/storage/${data?.options[index].image}"),
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
@@ -1023,6 +905,80 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     );
   }
 
+  int totalQuestionsCount = 0; // Track total number of questions
+  Future<void> fetchQuestions() async {
+    try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+      var token = await AuthService.getToken();
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+      var request =
+          http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
+      request.body = json.encode({
+        // "quotient": widget.from == "Kinesthetic"
+        //     ? "Physical"
+        //     : widget.from == "Interpersonal"
+        //         ? "Emotional"
+        //         : widget.from == "Intrapersonal"
+        //             ? "Emotional"
+        //             : widget.from == "Naturalistic"
+        //                 ? "Emotional"
+        //                 : widget.from == "Linguistic"
+        //                     //: widget.from == "Logical"
+        //                     ? "Intellectual"
+        //                     : widget.from == "Spatial Visual"
+        //                         //  : widget.from == ""
+        //                         ? "Intellectual"
+        //                         : widget.from == "Logical"
+        //                             // : widget.from == "Logical"
+        //                             ? "Intellectual"
+        //                             : widget.from == "Musical"
+        //                                 ? "Existential"
+        //                                 : "Spiritual",
+      });
+      request.headers.addAll(headers);
+      print("this is widget: ");
+      print(widget.from);
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        String responseData = await response.stream.bytesToString();
+        var data = jsonDecode(responseData);
+        totalQuestionsCount = data['questions']['total'] ?? 0;
+        print("this is total: $totalQuestionsCount");
+
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        print("questions length ==$totalQuestionsCount");
+      } else {
+        print(response.reasonPhrase);
+      }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> getQuestions() async {
     try {
       if (mounted) {
@@ -1046,28 +1002,31 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     ? "Emotional"
                     : widget.from == "Naturalistic"
                         ? "Emotional"
-                        : widget.from == "Logical"
+                        : widget.from == "Linguistic"
+                            //: widget.from == "Logical"
                             ? "Intellectual"
-                            : widget.from == "Linguistic"
+                            : widget.from == "Spatial Visual"
+                                //  : widget.from == ""
                                 ? "Intellectual"
-                                : widget.from == "Spatial Visual"
+                                : widget.from == "Logical"
+                                    // : widget.from == "Logical"
                                     ? "Intellectual"
                                     : widget.from == "Musical"
-                                        ? "Intellectual"
+                                        ? "Existential"
                                         : "Spiritual",
         "intelligence_type": widget.from,
         "question_type": ""
       });
       request.headers.addAll(headers);
-
+      print(widget.from);
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
 
         questionsModel = questionsModelFromJson(responseData);
-
-        print(questionsModel);
+        setState(() {});
+        await Future.delayed(const Duration(milliseconds: 500));
       } else {
         print(response.reasonPhrase);
       }
@@ -1151,7 +1110,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       };
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://dreambaby.pro/api/skip-question'));
+          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
       request.fields.addAll(
           {'question_id': questionId, "is_flagged": '0', "is_skipped": '1'});
       request.headers.addAll(headers);
@@ -1184,7 +1143,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   }
 
   Future<void> submitQuestions(
-      {String? questionId, String? answer, Datum? data}) async {
+      {String? questionId,
+      String? answer,
+      Datum? data,
+      BuildContext? ctx}) async {
     try {
       if ((data?.correctAnswer.isNotEmpty ?? false) &&
           ((selectedOptionIndex != null
@@ -1194,6 +1156,48 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         isCorrect = true;
         isDisable = true;
         answerNotifier.notifyListeners();
+
+        await showDialog(
+            barrierDismissible: false,
+            context: ctx!,
+            builder: (BuildContext context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Congratulations your answer is correct.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.mainColor),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        data?.answerKeyInput ?? "",
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          print("pop 3");
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
       } else {
         isCorrect = false;
         isDisable = true;
@@ -1224,6 +1228,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
+        String responseData = await response.stream.bytesToString();
+        print(responseData);
         print(questionsModel);
       } else {
         print(response.reasonPhrase);
@@ -1247,6 +1253,179 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       // }
     }
   }
+
+  Future<void> getTodaysQuestionStatus(BuildContext ctx, int nextIndex) async {
+    try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+      var token = await AuthService.getToken();
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+
+      var request = http.Request(
+          'GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
+
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        String responseData = await response.stream.bytesToString();
+        print(responseData);
+
+        int? skipped = jsonDecode(responseData)['skipped'] ?? 0;
+        int? flagged = jsonDecode(responseData)['flagged'] ?? 0;
+        int? submitted = jsonDecode(responseData)['submitted'] ?? 0;
+
+        String todayQuestionStatus =
+            "You have Submitted $submitted activity, Skipped $skipped activity and Flagged $flagged activity.";
+
+        print(todayQuestionStatus);
+
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+
+        await showDialog(
+            barrierDismissible: false,
+            context: ctx,
+            builder: (BuildContext ctx1) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        todayQuestionStatus,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.mainColor),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      AppColors.whiteColor)),
+                              onPressed: () {
+                                Navigator.of(ctx1).pop();
+                                Navigator.of(ctx).pop();
+                              },
+                              child: const Text(
+                                'Exit',
+                                style: TextStyle(
+                                    color: AppColors.mainColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      AppColors.mainColor)),
+                              onPressed: () async {
+                                Navigator.of(ctx1).pop();
+                                //await getQuestions();
+                                await fetchQuestions();
+
+                                if (questionsModel?.questions?.data.isEmpty ??
+                                    true) {
+                                  // Find the next incomplete quotient index (status is false)
+                                  while (nextIndex < quotients.length - 1) {
+                                    nextIndex++;
+                                    if (widget.quotientStatuses[
+                                            quotients[nextIndex]] ==
+                                        false) {
+                                      break;
+                                    }
+                                  }
+                                  // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                                  if (nextIndex == quotients.length - 1 &&
+                                      widget.quotientStatuses[
+                                              quotients[nextIndex]] ==
+                                          true) {
+                                    for (int i = 0; i < quotients.length; i++) {
+                                      if (widget
+                                              .quotientStatuses[quotients[i]] ==
+                                          false) {
+                                        nextIndex = i;
+                                        break;
+                                      }
+                                    }
+                                  }
+                                  // Ensure the index is within bounds and valid (incomplete status)
+                                  if (nextIndex < quotients.length &&
+                                      widget.quotientStatuses[
+                                              quotients[nextIndex]] ==
+                                          false) {
+                                    Navigator.of(ctx).pop();
+                                    print(
+                                        "questions == ${quotients[nextIndex]}");
+                                    print("questions next index $nextIndex");
+                                    Navigator.of(ctx).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ExistentialScreen(
+                                          from: quotients[nextIndex],
+                                          quotientStatuses:
+                                              widget.quotientStatuses,
+                                          index: nextIndex,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    // Handle case where no incomplete screen was found
+                                    Navigator.of(context)
+                                        .popUntil((e) => e.isFirst);
+                                  }
+                                }
+                              },
+                              child: const Text(
+                                'Continue',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              );
+            });
+      } else {
+        print(response.reasonPhrase);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
 }
 
 class YouTubeWebView extends StatefulWidget {
@@ -1258,7 +1437,7 @@ class YouTubeWebView extends StatefulWidget {
 }
 
 class _YouTubeWebViewState extends State<YouTubeWebView> {
-  late final WebViewController _controller;
+  YoutubePlayerController? youtubePlayerController;
 
 //   @override
 //   void initState() {
@@ -1348,6 +1527,30 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
 //     );
 //   }
 
+  @override
+  void initState() {
+    String? videoId;
+    if (!widget.view.contains("iframe")) {
+      videoId = YoutubePlayer.convertUrlToId(widget.view);
+    } else {
+      videoId = extractYouTubeVideoId(widget.view);
+    }
+    youtubePlayerController = YoutubePlayerController(
+      initialVideoId: videoId ?? "",
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        loop: true,
+      ),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    youtubePlayerController?.dispose();
+    super.dispose();
+  }
+
   String extractYouTubeVideoId(String iframe) {
     final idRegExp =
         RegExp(r'src="https:\/\/www\.youtube\.com\/embed\/([^"?]+)');
@@ -1362,25 +1565,62 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayerBuilder(
-      player: YoutubePlayer(
-        showVideoProgressIndicator: true,
-        bottomActions: const [],
-        controlsTimeOut: const Duration(hours: 1),
-        controller: YoutubePlayerController(
-          initialVideoId: extractYouTubeVideoId(widget.view),
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topRight,
+          child: ElevatedButton(
+            style: ButtonStyle(
+              elevation: const WidgetStatePropertyAll(0),
+              backgroundColor: WidgetStatePropertyAll(
+                  const Color(0xFFC4C8D0).withOpacity(0.5)),
+            ),
+            onPressed: () {
+              youtubePlayerController?.pause();
+              Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (ctx) => VideoPlayerScreen(
+                    youtubeLink: widget.view,
+                    isYoutube: true,
+                  ),
+                ),
+              )
+                  .then(
+                (value) {
+                  youtubePlayerController?.play();
+                },
+              );
+            },
+            child: const Text(
+              'Full Screen',
+              style: TextStyle(
+                  color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+            ),
+          ),
         ),
-      ),
-      builder: (
-        context,
-        player,
-      ) {
-        return Column(children: [
-          // some widgets
-          player,
-          //some other widgets
-        ]);
-      },
+        YoutubePlayerBuilder(
+          player: YoutubePlayer(
+            showVideoProgressIndicator: true,
+            bottomActions: const [],
+            controlsTimeOut: const Duration(hours: 1),
+            controller: youtubePlayerController ??
+                YoutubePlayerController(
+                  initialVideoId: extractYouTubeVideoId(widget.view),
+                ),
+          ),
+          builder: (
+            context,
+            player,
+          ) {
+            return Column(children: [
+              // some widgets
+              player,
+              //some other widgets
+            ]);
+          },
+        ),
+      ],
     );
   }
 }
