@@ -25,15 +25,15 @@ class HomeContentScreen extends StatefulWidget {
 
 class _HomeContentScreenState extends State<HomeContentScreen> {
   List<String> quotients = [
-    "Existential",
     "Kinesthetic",
-    "Interpersonal",
-    "Intrapersonal",
-    "Naturalistic",
+    "Logical",
     "Linguistic",
     "Spatial Visual",
-    "Logical",
-    "Musical"
+    "Musical",
+    "Intrapersonal",
+    "Interpersonal",
+    "Naturalistic",
+    "Existential",
   ];
   String todayQuestionStatus = "";
   Map<String, bool> quotientStatuses = {};
@@ -43,6 +43,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   @override
   void initState() {
     super.initState();
+    fetchQuotientStatuses();
     getTodaysQuestionStatus();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels > 0) {
@@ -138,20 +139,41 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.of(context)
-                        .push(
-                      MaterialPageRoute(
-                        builder: (ctx) => ExistentialScreen(
-                          index: 0,
-                          from: quotients[0],
-                          quotientStatuses: quotientStatuses,
+                    int nextIndex = -1;
+                    while (nextIndex < quotients.length - 1) {
+                      nextIndex++;
+                      if (quotientStatuses[quotients[nextIndex]] == false) {
+                        break;
+                      }
+                    }
+                    // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                    if (nextIndex == quotients.length - 1 &&
+                        quotientStatuses[quotients[nextIndex]] == true) {
+                      for (int i = 0; i < quotients.length; i++) {
+                        if (quotientStatuses[quotients[i]] == false) {
+                          nextIndex = i;
+                          break;
+                        }
+                      }
+                    }
+                    // Ensure the index is within bounds and valid (incomplete status)
+                    if (nextIndex < quotients.length &&
+                        quotientStatuses[quotients[nextIndex]] == false) {
+                      Navigator.of(context)
+                          .push(
+                        MaterialPageRoute(
+                          builder: (ctx) => ExistentialScreen(
+                            from: quotients[nextIndex],
+                            quotientStatuses: quotientStatuses,
+                            index: nextIndex,
+                          ),
                         ),
-                      ),
-                    )
-                        .then((e) {
-                      fetchQuotientStatuses();
-                      getTodaysQuestionStatus();
-                    });
+                      )
+                          .then((e) {
+                        fetchQuotientStatuses();
+                        getTodaysQuestionStatus();
+                      });
+                    }
                   },
                   child: AutoSizeText(
                     'Daily Activities for Baby’s Development ',
@@ -168,15 +190,54 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   height: height * 0.01,
                 ),
                 if (todayQuestionStatus.isNotEmpty)
-                  Align(
-                    alignment: Alignment.center,
-                    child: AutoSizeText(
-                      todayQuestionStatus,
-                      style: GoogleFonts.poppins(
-                          color: AppColors.blackColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600),
-                      minFontSize: 13,
+                  GestureDetector(
+                    onTap: () {
+                      int nextIndex = -1;
+                      while (nextIndex < quotients.length - 1) {
+                        nextIndex++;
+                        if (quotientStatuses[quotients[nextIndex]] == false) {
+                          break;
+                        }
+                      }
+                      // If no incomplete quotient was found and nextIndex is at the end, check from the start
+                      if (nextIndex == quotients.length - 1 &&
+                          quotientStatuses[quotients[nextIndex]] == true) {
+                        for (int i = 0; i < quotients.length; i++) {
+                          if (quotientStatuses[quotients[i]] == false) {
+                            nextIndex = i;
+                            break;
+                          }
+                        }
+                      }
+                      // Ensure the index is within bounds and valid (incomplete status)
+                      if (nextIndex < quotients.length &&
+                          quotientStatuses[quotients[nextIndex]] == false) {
+                        Navigator.of(context)
+                            .push(
+                          MaterialPageRoute(
+                            builder: (ctx) => ExistentialScreen(
+                              from: quotients[nextIndex],
+                              quotientStatuses: quotientStatuses,
+                              index: nextIndex,
+                            ),
+                          ),
+                        )
+                            .then((e) {
+                          fetchQuotientStatuses();
+                          getTodaysQuestionStatus();
+                        });
+                      }
+                    },
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: AutoSizeText(
+                        todayQuestionStatus,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.blackColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600),
+                        minFontSize: 13,
+                      ),
                     ),
                   ),
                 SizedBox(

@@ -21,8 +21,8 @@ import '../../../services/auth_services.dart';
 class ExistentialScreen extends StatefulWidget {
   final String from;
   final int index;
-  final Map<String, bool> quotientStatuses;
-  const ExistentialScreen(
+  Map<String, bool> quotientStatuses;
+  ExistentialScreen(
       {super.key,
       required this.from,
       required this.index,
@@ -49,15 +49,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   ValueNotifier answerNotifier = ValueNotifier(true);
   String todayQuestionStatus = "";
   List<String> quotients = [
-    "Existential",
     "Kinesthetic",
-    "Interpersonal",
-    "Intrapersonal",
-    "Naturalistic",
+    "Logical",
     "Linguistic",
     "Spatial Visual",
-    "Logical",
-    "Musical"
+    "Musical",
+    "Intrapersonal",
+    "Interpersonal",
+    "Naturalistic",
+    "Existential",
   ];
   @override
   void initState() {
@@ -294,29 +294,18 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                        if (totalQuestionsCount == 1) {
-                                          int nextIndex = widget.index + 1;
+                                        if (questionsModel
+                                                ?.questions?.data.length ==
+                                            (_selectedIndex + 1)) {
+                                          int nextIndex = widget.index;
+
                                           await getTodaysQuestionStatus(
                                               context, nextIndex);
                                         } else {
-                                          if (nextIndex <
-                                              (questionsModel?.questions?.data
-                                                      .length ??
-                                                  0)) {
-                                            // Access the ID of the next question
-                                            var nextQuestionId = questionsModel
-                                                ?.questions?.data[nextIndex].id;
-                                            controller.nextPage(
-                                                duration: const Duration(
-                                                    milliseconds: 500),
-                                                curve: Curves.linear);
-
-                                            // Continue with your logic, e.g., navigating to the next question
-                                          } else {
-                                            // Handle the case where the index is out of bounds
-                                            print(
-                                                'No more questions available.');
-                                          }
+                                          controller.nextPage(
+                                              duration: const Duration(
+                                                  milliseconds: 500),
+                                              curve: Curves.linear);
                                         }
                                       },
                                       child: const Text(
@@ -344,14 +333,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                 ?.data[_selectedIndex].id
                                                 .toString() ??
                                             "");
-                                        if (totalQuestionsCount == 1) {
-                                          print("this is here");
-                                          int nextIndex = widget.index + 1;
+                                        if (questionsModel
+                                                ?.questions?.data.length ==
+                                            (_selectedIndex + 1)) {
+                                          int nextIndex = widget.index;
+
                                           await getTodaysQuestionStatus(
                                               context, nextIndex);
                                         } else {
-                                          int nextIndex = widget.index + 1;
-                                          print("this is next: $nextIndex");
                                           controller.nextPage(
                                               duration: const Duration(
                                                   milliseconds: 500),
@@ -402,14 +391,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                     .text ??
                                                 "");
 
-                                    if (totalQuestionsCount == 1) {
+                                    if (questionsModel
+                                            ?.questions?.data.length ==
+                                        (_selectedIndex + 1)) {
                                       int nextIndex = widget.index;
 
                                       await getTodaysQuestionStatus(
                                           context, nextIndex);
                                     } else {
-                                      int nextIndex = widget.index + 1;
-                                      print("this is next: $nextIndex");
                                       controller.nextPage(
                                           duration:
                                               const Duration(milliseconds: 500),
@@ -545,7 +534,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       right: (data?.isPurposeExpanded ?? false) ? 10 : 0,
                       bottom: (data?.isPurposeExpanded ?? false) ? 5 : 0),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
                       border: Border.all(
                           color: (data?.isPurposeExpanded ?? false)
                               ? AppColors.greyTextColor
@@ -586,7 +575,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
               // Question text and description..
@@ -1002,17 +991,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     ? "Emotional"
                     : widget.from == "Naturalistic"
                         ? "Emotional"
-                        : widget.from == "Linguistic"
-                            //: widget.from == "Logical"
+                        : widget.from == "Logical"
                             ? "Intellectual"
-                            : widget.from == "Spatial Visual"
-                                //  : widget.from == ""
+                            : widget.from == "Linguistic"
                                 ? "Intellectual"
-                                : widget.from == "Logical"
-                                    // : widget.from == "Logical"
+                                : widget.from == "Spatial Visual"
                                     ? "Intellectual"
                                     : widget.from == "Musical"
-                                        ? "Existential"
+                                        ? "Intellectual"
                                         : "Spiritual",
         "intelligence_type": widget.from,
         "question_type": ""
@@ -1287,93 +1273,95 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
         print(todayQuestionStatus);
 
-        if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
+        await fetchQuotientStatuses();
+        // if (questionsModel?.questions?.data.isEmpty ?? true) {
+        // Find the next incomplete quotient index (status is false)
+        while (nextIndex < quotients.length - 1) {
+          nextIndex++;
+          if (widget.quotientStatuses[quotients[nextIndex]] == false) {
+            break;
+          }
         }
+        // If no incomplete quotient was found and nextIndex is at the end, check from the start
+        if (nextIndex == quotients.length - 1 &&
+            widget.quotientStatuses[quotients[nextIndex]] == true) {
+          for (int i = 0; i < quotients.length; i++) {
+            if (widget.quotientStatuses[quotients[i]] == false) {
+              nextIndex = i;
+              break;
+            }
+          }
+        }
+        // Ensure the index is within bounds and valid (incomplete status)
+        if (nextIndex < quotients.length &&
+            widget.quotientStatuses[quotients[nextIndex]] == false) {
+          Navigator.of(ctx).pop();
+          print("questions == ${quotients[nextIndex]}");
+          print("questions next index $nextIndex");
 
-        await showDialog(
-            barrierDismissible: false,
-            context: ctx,
-            builder: (BuildContext ctx1) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        todayQuestionStatus,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.mainColor),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      AppColors.whiteColor)),
-                              onPressed: () {
-                                Navigator.of(ctx1).pop();
-                                Navigator.of(ctx).pop();
-                              },
-                              child: const Text(
-                                'Exit',
-                                style: TextStyle(
-                                    color: AppColors.mainColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
+          Navigator.of(ctx).push(
+            MaterialPageRoute(
+              builder: (context) => ExistentialScreen(
+                from: quotients[nextIndex],
+                quotientStatuses: widget.quotientStatuses,
+                index: nextIndex,
+              ),
+            ),
+          );
+        } else {
+          showDialog(
+              barrierDismissible: false,
+              context: ctx,
+              builder: (BuildContext ctx1) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          todayQuestionStatus,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.mainColor),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        AppColors.whiteColor)),
+                                onPressed: () {
+                                  Navigator.of(ctx1).pop();
+                                  Navigator.of(ctx).pop();
+                                },
+                                child: const Text(
+                                  'Exit',
+                                  style: TextStyle(
+                                      color: AppColors.mainColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      AppColors.mainColor)),
-                              onPressed: () async {
-                                Navigator.of(ctx1).pop();
-                                //await getQuestions();
-                                await fetchQuestions();
-
-                                if (questionsModel?.questions?.data.isEmpty ??
-                                    true) {
-                                  // Find the next incomplete quotient index (status is false)
-                                  while (nextIndex < quotients.length - 1) {
-                                    nextIndex++;
-                                    if (widget.quotientStatuses[
-                                            quotients[nextIndex]] ==
-                                        false) {
-                                      break;
-                                    }
-                                  }
-                                  // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                  if (nextIndex == quotients.length - 1 &&
-                                      widget.quotientStatuses[
-                                              quotients[nextIndex]] ==
-                                          true) {
-                                    for (int i = 0; i < quotients.length; i++) {
-                                      if (widget
-                                              .quotientStatuses[quotients[i]] ==
-                                          false) {
-                                        nextIndex = i;
-                                        break;
-                                      }
-                                    }
-                                  }
-                                  // Ensure the index is within bounds and valid (incomplete status)
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        AppColors.mainColor)),
+                                onPressed: () async {
+                                  Navigator.of(ctx1).pop();
+                                  await getQuestions();
                                   if (nextIndex < quotients.length &&
                                       widget.quotientStatuses[
                                               quotients[nextIndex]] ==
@@ -1382,6 +1370,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     print(
                                         "questions == ${quotients[nextIndex]}");
                                     print("questions next index $nextIndex");
+
                                     Navigator.of(ctx).push(
                                       MaterialPageRoute(
                                         builder: (context) => ExistentialScreen(
@@ -1397,24 +1386,25 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     Navigator.of(context)
                                         .popUntil((e) => e.isFirst);
                                   }
-                                }
-                              },
-                              child: const Text(
-                                'Continue',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
+                                },
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              );
-            });
+                );
+              });
+        }
+        // }
       } else {
         print(response.reasonPhrase);
       }
@@ -1424,6 +1414,36 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           content: Text(e.toString()),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> fetchQuotientStatuses() async {
+    var token = await AuthService.getToken();
+    var headers = {'Authorization': 'Bearer $token'};
+    var request = http.Request(
+        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      final data = json.decode(responseData);
+      final statuses = data['statuses'] as Map<String, dynamic>;
+
+      setState(() {
+        widget.quotientStatuses =
+            statuses.map((key, value) => MapEntry(key, value as bool));
+      });
+    } else {
+      print(response.reasonPhrase);
     }
   }
 }
