@@ -46,12 +46,12 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                 Positioned.fill(
                   child: PDFView(
                     pageFling: true,
-                    fitEachPage: true,
+                    fitEachPage: false,
                     fitPolicy: FitPolicy.BOTH,
                     filePath: widget.pdfPath,
-                    autoSpacing: true,
+                    autoSpacing: false,
                     enableSwipe: true,
-                    pageSnap: false,
+                    pageSnap: true,
                     swipeHorizontal: true,
                     onRender: (pages) {
                       setState(() {

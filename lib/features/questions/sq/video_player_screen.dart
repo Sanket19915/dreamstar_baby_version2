@@ -32,7 +32,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       }).then((value) {
         chewieController = ChewieController(
           videoPlayerController: videoPlayerController!,
-          autoPlay: true,
+          autoPlay: false,
           looping: true,
         );
       });
@@ -46,7 +46,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       youtubePlayerController = YoutubePlayerController(
         initialVideoId: videoId ?? "",
         flags: const YoutubePlayerFlags(
-          autoPlay: true,
+          autoPlay: false,
           loop: true,
         ),
       );

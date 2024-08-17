@@ -129,27 +129,32 @@ class _KnowEntryState extends State<KnowEntry> {
                                 //     print('Error fetching baby data: $e');
                                 //     throw Exception('Error fetching baby data: $e');
                                 //   }
-                                if (knowEntry[index]
-                                        .filePath
-                                        ?.contains(".pdf") ??
-                                    false) {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  String pdfPath = await _loadPdfFromNetwork(
-                                    knowEntry[index].filePath,
-                                  );
 
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PDFViewerScreen(
-                                          pdfPath: pdfPath, week: week),
-                                    ),
-                                  );
-                                  setState(() {
-                                    isLoading = false;
-                                  });
+                                try {
+                                  if (knowEntry[index]
+                                          .filePath
+                                          ?.contains(".pdf") ??
+                                      false) {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                    String pdfPath = await _loadPdfFromNetwork(
+                                      knowEntry[index].filePath,
+                                    );
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PDFViewerScreen(
+                                            pdfPath: pdfPath, week: week),
+                                      ),
+                                    );
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                } catch (e) {
+                                  Fluttertoast.showToast(msg: e.toString());
                                 }
 
                                 // }
