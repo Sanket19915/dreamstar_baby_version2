@@ -1330,8 +1330,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         await fetchQuotientStatuses();
         // if (questionsModel?.questions?.data.isEmpty ?? true) {
         // Find the next incomplete quotient index (status is false)
+        print("current index == $nextIndex");
         while (nextIndex < quotients.length - 1) {
           nextIndex++;
+          print("updated index == $nextIndex");
           if (widget.quotientStatuses[quotients[nextIndex]] == false) {
             break;
           }

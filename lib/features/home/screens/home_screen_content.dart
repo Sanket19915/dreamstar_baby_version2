@@ -180,6 +180,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                     style: GoogleFonts.poppins(
                         color: AppColors.blackColor,
                         fontSize: 15,
+                        decoration: TextDecoration.underline,
                         fontWeight: FontWeight.w600),
                     minFontSize: 13,
                     overflow: TextOverflow.ellipsis,
@@ -234,6 +235,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         todayQuestionStatus,
                         style: GoogleFonts.poppins(
                             color: AppColors.blackColor,
+                            decoration: TextDecoration.underline,
                             fontSize: 15,
                             fontWeight: FontWeight.w600),
                         minFontSize: 13,

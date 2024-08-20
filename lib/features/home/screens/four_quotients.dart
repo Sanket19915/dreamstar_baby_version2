@@ -97,6 +97,7 @@ class _FourQuotientsState extends State<FourQuotients> {
                   'All activities are completed for the day',
                   style: GoogleFonts.poppins(
                       color: AppColors.whiteColor,
+                      decoration: TextDecoration.underline,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                   minFontSize: 13,
