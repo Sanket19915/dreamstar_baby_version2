@@ -21,8 +21,8 @@ import '../../../services/auth_services.dart';
 class ExistentialScreen extends StatefulWidget {
   final String from;
   final int index;
-  final Map<String, bool> quotientStatuses;
-  const ExistentialScreen(
+  Map<String, bool> quotientStatuses;
+  ExistentialScreen(
       {super.key,
       required this.from,
       required this.index,
@@ -43,25 +43,27 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   QuestionsModel? questionsModel;
   PageController controller = PageController();
   int _selectedIndex = 0;
+
   bool? isCorrect;
   bool isDisable = false;
   ValueNotifier answerNotifier = ValueNotifier(true);
   String todayQuestionStatus = "";
   List<String> quotients = [
-    "Existential",
     "Kinesthetic",
-    "Interpersonal",
-    "Intrapersonal",
-    "Naturalistic",
+    "Logical",
     "Linguistic",
     "Spatial Visual",
-    "Logical",
-    "Musical"
+    "Musical",
+    "Intrapersonal",
+    "Interpersonal",
+    "Naturalistic",
+    "Existential",
   ];
   @override
   void initState() {
     super.initState();
     getQuestions();
+    fetchQuestions();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels > 0) {
         setState(() {
@@ -104,6 +106,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   Widget build(BuildContext context) {
     double deviceheight = MediaQuery.of(context).size.height;
     double devicewidth = MediaQuery.of(context).size.width;
+    int nextIndex = _selectedIndex + 1;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -502,53 +505,94 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 data?.isPurposeExpanded = !(data.isPurposeExpanded ?? false);
               });
             },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                Text(
-                  //data?.quotient ?? "",
-                  "Purpose",
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.blackColor,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      //data?.quotient ?? "",
+                      "Purpose",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.blackColor,
+                      ),
+                    ),
+                    Icon(
+                      data?.isPurposeExpanded ?? false
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: AppColors.blackColor,
+                    ),
+                  ],
                 ),
-                Icon(
-                  data?.isPurposeExpanded ?? false
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: AppColors.blackColor,
+                Container(
+                  padding: EdgeInsets.only(
+                      top: (data?.isPurposeExpanded ?? false) ? 10 : 0,
+                      left: (data?.isPurposeExpanded ?? false) ? 10 : 0,
+                      right: (data?.isPurposeExpanded ?? false) ? 10 : 0,
+                      bottom: (data?.isPurposeExpanded ?? false) ? 5 : 0),
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(
+                          color: (data?.isPurposeExpanded ?? false)
+                              ? AppColors.greyTextColor
+                              : Colors.transparent)),
+                  child: Column(
+                    children: [
+                      if (data?.isPurposeExpanded ?? false)
+                        Column(
+                          children: [
+                            // Question text and description..
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                data?.questionDescription ?? "",
+                                textAlign: TextAlign.justify,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          if (data?.isPurposeExpanded ?? false)
-            Column(
-              children: [
-                // Question text and description..
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    data?.questionDescription ?? "",
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.blackColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
+          if (data?.isPurposeExpanded == false)
+            Container(
+              height: 1,
+              color: Colors.black,
+              width: MediaQuery.of(context).size.width,
             ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(
+                height: 8,
+              ),
               // Question text and description..
+              Text(
+                //data?.quotient ?? "",
+                "Question:",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.blackColor,
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   data?.questionText ?? "",
+                  textAlign: TextAlign.justify,
                   maxLines: isQuestionExpanded ? null : 5,
                   overflow: isQuestionExpanded
                       ? TextOverflow.visible
@@ -856,6 +900,80 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     );
   }
 
+  int totalQuestionsCount = 0; // Track total number of questions
+  Future<void> fetchQuestions() async {
+    try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+      var token = await AuthService.getToken();
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+      var request =
+          http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
+      request.body = json.encode({
+        // "quotient": widget.from == "Kinesthetic"
+        //     ? "Physical"
+        //     : widget.from == "Interpersonal"
+        //         ? "Emotional"
+        //         : widget.from == "Intrapersonal"
+        //             ? "Emotional"
+        //             : widget.from == "Naturalistic"
+        //                 ? "Emotional"
+        //                 : widget.from == "Linguistic"
+        //                     //: widget.from == "Logical"
+        //                     ? "Intellectual"
+        //                     : widget.from == "Spatial Visual"
+        //                         //  : widget.from == ""
+        //                         ? "Intellectual"
+        //                         : widget.from == "Logical"
+        //                             // : widget.from == "Logical"
+        //                             ? "Intellectual"
+        //                             : widget.from == "Musical"
+        //                                 ? "Existential"
+        //                                 : "Spiritual",
+      });
+      request.headers.addAll(headers);
+      print("this is widget: ");
+      print(widget.from);
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        String responseData = await response.stream.bytesToString();
+        var data = jsonDecode(responseData);
+        totalQuestionsCount = data['questions']['total'] ?? 0;
+        print("this is total: $totalQuestionsCount");
+
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        print("questions length ==$totalQuestionsCount");
+      } else {
+        print(response.reasonPhrase);
+      }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> getQuestions() async {
     try {
       if (mounted) {
@@ -901,8 +1019,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         questionsModel = questionsModelFromJson(responseData);
         setState(() {});
         await Future.delayed(const Duration(milliseconds: 500));
-
-        print("questions length ==${questionsModel?.questions?.data.length}");
       } else {
         print(response.reasonPhrase);
       }
@@ -1211,92 +1327,95 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
         print(todayQuestionStatus);
 
-        if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
+        await fetchQuotientStatuses();
+        // if (questionsModel?.questions?.data.isEmpty ?? true) {
+        // Find the next incomplete quotient index (status is false)
+        while (nextIndex < quotients.length - 1) {
+          nextIndex++;
+          if (widget.quotientStatuses[quotients[nextIndex]] == false) {
+            break;
+          }
         }
+        // If no incomplete quotient was found and nextIndex is at the end, check from the start
+        if (nextIndex == quotients.length - 1 &&
+            widget.quotientStatuses[quotients[nextIndex]] == true) {
+          for (int i = 0; i < quotients.length; i++) {
+            if (widget.quotientStatuses[quotients[i]] == false) {
+              nextIndex = i;
+              break;
+            }
+          }
+        }
+        // Ensure the index is within bounds and valid (incomplete status)
+        if (nextIndex < quotients.length &&
+            widget.quotientStatuses[quotients[nextIndex]] == false) {
+          Navigator.of(ctx).pop();
+          print("questions == ${quotients[nextIndex]}");
+          print("questions next index $nextIndex");
 
-        await showDialog(
-            barrierDismissible: false,
-            context: ctx,
-            builder: (BuildContext ctx1) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        todayQuestionStatus,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.mainColor),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      AppColors.whiteColor)),
-                              onPressed: () {
-                                Navigator.of(ctx1).pop();
-                                Navigator.of(ctx).pop();
-                              },
-                              child: const Text(
-                                'Exit',
-                                style: TextStyle(
-                                    color: AppColors.mainColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
+          Navigator.of(ctx).push(
+            MaterialPageRoute(
+              builder: (context) => ExistentialScreen(
+                from: quotients[nextIndex],
+                quotientStatuses: widget.quotientStatuses,
+                index: nextIndex,
+              ),
+            ),
+          );
+        } else {
+          showDialog(
+              barrierDismissible: false,
+              context: ctx,
+              builder: (BuildContext ctx1) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          todayQuestionStatus,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.mainColor),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        AppColors.whiteColor)),
+                                onPressed: () {
+                                  Navigator.of(ctx1).pop();
+                                  Navigator.of(ctx).pop();
+                                },
+                                child: const Text(
+                                  'Exit',
+                                  style: TextStyle(
+                                      color: AppColors.mainColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      AppColors.mainColor)),
-                              onPressed: () async {
-                                Navigator.of(ctx1).pop();
-                                await getQuestions();
-
-                                if (questionsModel?.questions?.data.isEmpty ??
-                                    true) {
-                                  // Find the next incomplete quotient index (status is false)
-                                  while (nextIndex < quotients.length - 1) {
-                                    nextIndex++;
-                                    if (widget.quotientStatuses[
-                                            quotients[nextIndex]] ==
-                                        false) {
-                                      break;
-                                    }
-                                  }
-                                  // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                                  if (nextIndex == quotients.length - 1 &&
-                                      widget.quotientStatuses[
-                                              quotients[nextIndex]] ==
-                                          true) {
-                                    for (int i = 0; i < quotients.length; i++) {
-                                      if (widget
-                                              .quotientStatuses[quotients[i]] ==
-                                          false) {
-                                        nextIndex = i;
-                                        break;
-                                      }
-                                    }
-                                  }
-                                  // Ensure the index is within bounds and valid (incomplete status)
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        AppColors.mainColor)),
+                                onPressed: () async {
+                                  Navigator.of(ctx1).pop();
+                                  await getQuestions();
                                   if (nextIndex < quotients.length &&
                                       widget.quotientStatuses[
                                               quotients[nextIndex]] ==
@@ -1305,6 +1424,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     print(
                                         "questions == ${quotients[nextIndex]}");
                                     print("questions next index $nextIndex");
+
                                     Navigator.of(ctx).push(
                                       MaterialPageRoute(
                                         builder: (context) => ExistentialScreen(
@@ -1320,24 +1440,25 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     Navigator.of(context)
                                         .popUntil((e) => e.isFirst);
                                   }
-                                }
-                              },
-                              child: const Text(
-                                'Continue',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
+                                },
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              );
-            });
+                );
+              });
+        }
+        // }
       } else {
         print(response.reasonPhrase);
       }
@@ -1347,6 +1468,36 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           content: Text(e.toString()),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> fetchQuotientStatuses() async {
+    var token = await AuthService.getToken();
+    var headers = {'Authorization': 'Bearer $token'};
+    var request = http.Request(
+        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      final data = json.decode(responseData);
+      final statuses = data['statuses'] as Map<String, dynamic>;
+
+      setState(() {
+        widget.quotientStatuses =
+            statuses.map((key, value) => MapEntry(key, value as bool));
+      });
+    } else {
+      print(response.reasonPhrase);
     }
   }
 }
