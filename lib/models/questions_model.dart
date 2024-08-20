@@ -174,12 +174,8 @@ class Datum {
         youtubeLink: json["youtube_link"] ?? "",
         options: (json["options"] == null && json["options"] == [])
             ? []
-            : (optionsModelFromJson(json["options"])
-                    .where((element) => element.text.isNotEmpty)
-                    .toList() ??
-                []),
-        
-        correctAnswer:  jsonDecode(json["correct_answer"] )  ,
+            : (optionsModelFromJson(json["options"]).toList() ?? []),
+        correctAnswer: jsonDecode(json["correct_answer"]),
         feedback: json["feedback"] ?? false,
         answerKeyInput: json["answer_key_input"] ?? "",
         answerImage: json["answer_image"],

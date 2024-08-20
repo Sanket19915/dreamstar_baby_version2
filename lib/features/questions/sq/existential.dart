@@ -675,19 +675,22 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   ),
                 ),
           const SizedBox(height: 20),
-          data?.options.isEmpty ?? true
-              ? Container()
-              : Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Answer Options:',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.blackColor,
-                    ),
-                  ),
+          if (data?.options.every(
+                (element) =>
+                    element.text.isNotEmpty || element.image.isNotEmpty,
+              ) ??
+              false)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Answer Options:',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.blackColor,
                 ),
+              ),
+            ),
           for (int i = 0; i < (data?.options.length ?? 0); i++)
             if ((data?.options[i].image.isNotEmpty ?? false) &&
                 (data?.options[i].text.isEmpty ?? false))
@@ -778,7 +781,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       ),
                     );
                   }),
-          options.isEmpty
+          options.every(
+                  (element) => element.text.isEmpty || element.image.isEmpty)
               ? Container()
               : GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
@@ -823,11 +827,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            // const SizedBox(height: 8),
                             options[index].image.isNotEmpty &&
                                     options[index].text.isEmpty
                                 ? Image.network(
-                                    "http://dreambaby.pro/storage/${data?.options[index].image}")
+                                    "http://dreambaby.pro/storage/${data?.options[index].image}",
+                                    fit: BoxFit.contain,
+                                  )
                                 : Text(
                                     '${index + 1}. ${options[index].text}',
                                     style: GoogleFonts.poppins(
@@ -1089,7 +1095,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first)].text}.',
+                          ((data?.options.length ?? 0) <=
+                                  int.parse(
+                                      data?.correctAnswer.first.toString() ??
+                                          "0"))
+                              ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
+                              : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               fontSize: 24,

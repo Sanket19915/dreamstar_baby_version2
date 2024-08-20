@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FAQScreen extends StatelessWidget {
+  const FAQScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: Color(0xffF7F3FD),
+        backgroundColor: const Color(0xffF7F3FD),
         elevation: 0,
         // leading: InkWell(
         //   onTap: () {
@@ -83,6 +85,7 @@ class FAQScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               answer,
+              textAlign: TextAlign.justify,
               style: GoogleFonts.poppins(
                 fontSize: 15,
                 color: Colors.white,
