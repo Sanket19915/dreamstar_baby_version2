@@ -1338,9 +1338,108 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             break;
           }
         }
+
+        if (nextIndex == quotients.length - 1) {
+          showDialog(
+              barrierDismissible: false,
+              context: ctx,
+              builder: (BuildContext ctx1) {
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          todayQuestionStatus,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.mainColor),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        AppColors.whiteColor)),
+                                onPressed: () {
+                                  Navigator.of(ctx1).pop();
+                                  Navigator.of(ctx).pop();
+                                },
+                                child: const Text(
+                                  'Exit',
+                                  style: TextStyle(
+                                      color: AppColors.mainColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                        AppColors.mainColor)),
+                                onPressed: () async {
+                                  Navigator.of(ctx1).pop();
+                                  await getQuestions();
+                                  if (nextIndex < quotients.length &&
+                                      widget.quotientStatuses[
+                                              quotients[nextIndex]] ==
+                                          false) {
+                                    Navigator.of(ctx).pop();
+                                    print(
+                                        "questions == ${quotients[nextIndex]}");
+                                    print("questions next index $nextIndex");
+
+                                    Navigator.of(ctx).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ExistentialScreen(
+                                          from: quotients[nextIndex],
+                                          quotientStatuses:
+                                              widget.quotientStatuses,
+                                          index: nextIndex,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    // Handle case where no incomplete screen was found
+                                    Navigator.of(context)
+                                        .popUntil((e) => e.isFirst);
+                                  }
+                                },
+                                child: const Text(
+                                  'Continue',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              });
+          return;
+        }
         // If no incomplete quotient was found and nextIndex is at the end, check from the start
         if (nextIndex == quotients.length - 1 &&
             widget.quotientStatuses[quotients[nextIndex]] == true) {
+          //!-- find last questions...
           for (int i = 0; i < quotients.length; i++) {
             if (widget.quotientStatuses[quotients[i]] == false) {
               nextIndex = i;
@@ -1348,6 +1447,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             }
           }
         }
+        print("quotients.length ${quotients.length}");
         // Ensure the index is within bounds and valid (incomplete status)
         if (nextIndex < quotients.length &&
             widget.quotientStatuses[quotients[nextIndex]] == false) {
