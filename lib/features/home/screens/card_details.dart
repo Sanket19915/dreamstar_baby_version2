@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shimmer/shimmer.dart';
 
 class BabyCard extends StatefulWidget {
   final bool? isrefresh;
@@ -143,7 +144,45 @@ class _BabyCardState extends State<BabyCard> {
         (double.tryParse(total_day) ?? 0) / 281; // Compute the percentage here
     // print('Percent: $percent'); // Debug print to check the value of percent
     return isLoading
-        ? const CircularProgressIndicator()
+        ? Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.grey[300],
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      width: 100,
+                      height: 20,
+                      color: Colors.grey[300],
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  width: double.infinity,
+                  height: deviceHeight * 0.201,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
         : Column(
             children: [
               InkWell(

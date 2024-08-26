@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../services/auth_services.dart';
 import '../../questions/sq/existential.dart';
@@ -75,8 +76,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor:
-            _isAppBarTransparent ? Colors.transparent : AppColors.whiteColor,
+        backgroundColor: Color(0xffF0F1FC),
         leadingWidth: double.infinity,
         leading: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -173,7 +173,6 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                             onExit: () {
                               fetchQuotientStatuses();
                               getTodaysQuestionStatus();
-                              setState(() {});
                             },
                           ),
                         ),
@@ -269,8 +268,78 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   future: fetchQuotientStatuses(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          height: 420,
+                          margin: EdgeInsets.only(right: 20),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 190.0,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Container(
+                                    margin: EdgeInsets.only(right: 10),
+                                    height: 190.0,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
+                                    height: 190.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Container(
+                                    margin: EdgeInsets.only(right: 10),
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
+                                    height: 190.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     } else if (snapshot.hasError) {
                       return Center(
