@@ -174,6 +174,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                               index: 0,
                               from: quotients[0],
                               quotientStatuses: quotientStatuses,
+                              onExit: () {
+                                // Add the logic you want to execute when exiting the ExistentialScreen
+                                // For example, you might want to refresh the quotient statuses
+                                fetchQuotientStatuses();
+                                widget.notifyWidget();
+                              },
                             ),
                           ),
                         )
@@ -229,6 +235,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                               from: quotients[1],
                               quotientStatuses: quotientStatuses,
                               index: 1,
+                              onExit: () {
+                                // Add the logic you want to execute when exiting the ExistentialScreen
+                                // For example, you might want to refresh the quotient statuses
+                                fetchQuotientStatuses();
+                                widget.notifyWidget();
+                              },
                             ),
                           ),
                         )
@@ -308,6 +320,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 quotientStatuses:
                                                     quotientStatuses,
                                                 index: 2,
+                                                onExit: () {
+                                                  // Add the logic you want to execute when exiting the ExistentialScreen
+                                                  // For example, you might want to refresh the quotient statuses
+                                                  fetchQuotientStatuses();
+                                                  widget.notifyWidget();
+                                                },
                                               ),
                                             ),
                                           )
@@ -368,6 +386,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 quotientStatuses:
                                                     quotientStatuses,
                                                 index: 3,
+                                                onExit: () {
+                                                  // Add the logic you want to execute when exiting the ExistentialScreen
+                                                  // For example, you might want to refresh the quotient statuses
+                                                  fetchQuotientStatuses();
+                                                  widget.notifyWidget();
+                                                },
                                               ),
                                             ),
                                           )
@@ -429,6 +453,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                                             from: quotients[4],
                                             quotientStatuses: quotientStatuses,
                                             index: 4,
+                                            onExit: () {
+                                              // Add the logic you want to execute when exiting the ExistentialScreen
+                                              // For example, you might want to refresh the quotient statuses
+                                              fetchQuotientStatuses();
+                                              widget.notifyWidget();
+                                            },
                                           ),
                                         ),
                                       )
@@ -522,6 +552,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 quotientStatuses:
                                                     quotientStatuses,
                                                 index: 5,
+                                                onExit: () {
+                                                  // Add the logic you want to execute when exiting the ExistentialScreen
+                                                  // For example, you might want to refresh the quotient statuses
+                                                  fetchQuotientStatuses();
+                                                  widget.notifyWidget();
+                                                },
                                               ),
                                             ),
                                           )
@@ -583,6 +619,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 quotientStatuses:
                                                     quotientStatuses,
                                                 index: 6,
+                                                onExit: () {
+                                                  // Add the logic you want to execute when exiting the ExistentialScreen
+                                                  // For example, you might want to refresh the quotient statuses
+                                                  fetchQuotientStatuses();
+                                                  widget.notifyWidget();
+                                                },
                                               ),
                                             ),
                                           )
@@ -651,6 +693,12 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 quotientStatuses:
                                                     quotientStatuses,
                                                 index: 7,
+                                                onExit: () {
+                                                  // Add the logic you want to execute when exiting the ExistentialScreen
+                                                  // For example, you might want to refresh the quotient statuses
+                                                  fetchQuotientStatuses();
+                                                  widget.notifyWidget();
+                                                },
                                               ),
                                             ),
                                           )
@@ -711,6 +759,10 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 quotientStatuses:
                                                     quotientStatuses,
                                                 index: 8,
+                                                onExit: () {
+                                                  fetchQuotientStatuses();
+                                                  widget.notifyWidget();
+                                                },
                                               ),
                                             ),
                                           )

@@ -21,11 +21,13 @@ import '../../../services/auth_services.dart';
 class ExistentialScreen extends StatefulWidget {
   final String from;
   final int index;
+  final Function() onExit;
   Map<String, bool> quotientStatuses;
   ExistentialScreen(
       {super.key,
       required this.from,
       required this.index,
+      required this.onExit,
       required this.quotientStatuses});
 
   @override
@@ -64,22 +66,29 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     super.initState();
     getQuestions();
     fetchQuestions();
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels > 0) {
-        setState(() {
-          _isAppBarTransparent = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isAppBarTransparent = false;
+          });
+        }
       } else {
-        setState(() {
-          _isAppBarTransparent = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isAppBarTransparent = true;
+          });
+        }
       }
     });
 
     _controller = VideoPlayerController.network(
         'https://www.w3schools.com/html/mov_bbb.mp4')
       ..initialize().then((_) {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
   }
 
@@ -87,10 +96,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   void dispose() {
     _scrollController.dispose();
     _controller.dispose();
+    super.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    super.dispose();
   }
 
   void _selectOption(int index) async {
@@ -115,7 +124,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
         leading: InkWell(
           onTap: () {
-            print("pop 1");
+            print("pop 1111");
             context.pop();
           },
           child: const Icon(
@@ -166,7 +175,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     Colors.white.withOpacity(0.6),
                     BlendMode.srcATop,
                   ),
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 ),
               ),
               child: (questionsModel?.questions?.data.isEmpty ?? true)
@@ -201,7 +210,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                                   ? "assets/images/musical.png"
                                                                   : AppImages
                                                                       .existential),
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fill,
                             ),
                           ),
                         ),
@@ -224,9 +233,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       },
                       itemBuilder: (ctx, position) {
                         return SingleChildScrollView(
+                            child: SafeArea(
                           child: Column(
                             children: [
-                              const SizedBox(height: 120),
+                              const SizedBox(height: 20),
                               Container(
                                 height: deviceheight * 0.173,
                                 width: devicewidth,
@@ -258,7 +268,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                                         ? "assets/images/musical.png"
                                                                         : AppImages
                                                                             .existential),
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
@@ -475,7 +485,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               const SizedBox(height: 20),
                             ],
                           ),
-                        );
+                        ));
                       }),
             ),
     );
@@ -536,7 +546,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       border: Border.all(
-                          color: (data?.isPurposeExpanded ?? false)
+                          color: ((data?.isPurposeExpanded ?? false) &&
+                                  data?.questionDescription != "")
                               ? AppColors.greyTextColor
                               : Colors.transparent)),
                   child: Column(
@@ -581,7 +592,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               // Question text and description..
               Text(
                 //data?.quotient ?? "",
-                "Question:",
+                "Acitivity:",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -735,51 +746,65 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 ),
               ),
             ),
-          for (int i = 0; i < (data?.options.length ?? 0); i++)
-            if ((data?.options[i].image.isNotEmpty ?? false) &&
-                (data?.options[i].text.isEmpty ?? false))
-              ValueListenableBuilder(
-                  valueListenable: answerNotifier,
-                  builder: (ctx, value, child) {
-                    return GestureDetector(
-                      onTap: () => isDisable ? null : _selectOption(i),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: selectedOptionIndex == i
-                                ? ((selectedOptionIndex == i) &&
-                                        (isCorrect != null) &&
-                                        (isCorrect ?? false))
-                                    ? Colors.green
-                                    : ((selectedOptionIndex == i) &&
-                                            ((isCorrect != null) &&
-                                                !(isCorrect ?? false)))
-                                        ? Colors.red
-                                        : Colors.blue
-                                : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: (data?.options[i].image.isNotEmpty ?? false)
-                              ? Image.network(
-                                  "http://dreambaby.pro/storage/${data?.options[i].image}")
-                              : Text(
-                                  '${i + 1}. ${data?.options[i].text}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: selectedOptionIndex == i
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                        ),
+          ValueListenableBuilder(
+            valueListenable: answerNotifier,
+            builder: (ctx, value, child) {
+              // Filter the options to get only those with images and no text
+              var imageOnlyOptions = data?.options
+                  .where((option) =>
+                      option.image.isNotEmpty && option.text.isEmpty)
+                  .toList();
+
+              // If there are no options that match the criteria, return an empty container
+              if (imageOnlyOptions == null || imageOnlyOptions.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              // Display the filtered options in a grid view
+              return GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Number of columns in the grid
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1.5, // Adjust the aspect ratio as needed
+                ),
+                itemCount:
+                    imageOnlyOptions.length, // Number of filtered options
+                itemBuilder: (context, index) {
+                  // Use the correct index from the filtered list
+                  final option = imageOnlyOptions[index];
+
+                  return GestureDetector(
+                    onTap: () => isDisable ? null : _selectOption(index),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: selectedOptionIndex == index
+                            ? ((selectedOptionIndex == index) &&
+                                    (isCorrect != null) &&
+                                    (isCorrect ?? false))
+                                ? Colors.green
+                                : ((selectedOptionIndex == index) &&
+                                        ((isCorrect != null) &&
+                                            !(isCorrect ?? false)))
+                                    ? Colors.red
+                                    : Colors.blue
+                            : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    );
-                  }),
+                      child: Image.network(
+                        "http://dreambaby.pro/storage/${option.image}",
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
           for (int i = 0; i < (data?.options.length ?? 0); i++)
             if ((data?.options[i].image.isEmpty ?? false) &&
                 (data?.options[i].text.isNotEmpty ?? false))
@@ -866,7 +891,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   image: DecorationImage(
                                     image: NetworkImage(
                                         "http://dreambaby.pro/storage/${data?.options[index].image}"),
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
@@ -1215,8 +1240,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   int.parse(
                                       data?.correctAnswer.first.toString() ??
                                           "0"))
-                              ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
-                              : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
+                              ? "Below is the Correct Answer"
+                              : "Below is the Correct Answer",
+                          // ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
+                          // : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               fontSize: 24,
@@ -1372,8 +1399,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     backgroundColor: WidgetStateProperty.all(
                                         AppColors.whiteColor)),
                                 onPressed: () {
-                                  Navigator.of(ctx1).pop();
-                                  Navigator.of(ctx).pop();
+                                  widget.onExit();
+                                  fetchQuotientStatuses();
+                                  //Navigator.of(ctx1).pop();
+                                  context.pop();
+                                  context.pop();
+                                  // Navigator.of(ctx).pop();
+
+                                  ;
                                 },
                                 child: const Text(
                                   'Exit',
@@ -1409,6 +1442,11 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                           quotientStatuses:
                                               widget.quotientStatuses,
                                           index: nextIndex,
+                                          onExit: () async {
+                                            // Add the logic you want to execute when exiting the ExistentialScreen
+                                            // For example, you might want to refresh the quotient statuses
+                                            fetchQuotientStatuses();
+                                          },
                                         ),
                                       ),
                                     );
@@ -1461,6 +1499,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 from: quotients[nextIndex],
                 quotientStatuses: widget.quotientStatuses,
                 index: nextIndex,
+                onExit: () async {
+                  // Add the logic you want to execute when exiting the ExistentialScreen
+                  // For example, you might want to refresh the quotient statuses
+                  fetchQuotientStatuses();
+                  setState(() {});
+                },
               ),
             ),
           );
@@ -1497,8 +1541,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     backgroundColor: WidgetStateProperty.all(
                                         AppColors.whiteColor)),
                                 onPressed: () {
+                                  widget.onExit();
+                                  fetchQuotientStatuses();
                                   Navigator.of(ctx1).pop();
-                                  Navigator.of(ctx).pop();
+                                  context.pop();
+                                  setState(() {});
+                                  //Navigator.of(ctx).pop();
                                 },
                                 child: const Text(
                                   'Exit',
@@ -1534,6 +1582,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                           quotientStatuses:
                                               widget.quotientStatuses,
                                           index: nextIndex,
+                                          onExit: () async {
+                                            // Add the logic you want to execute when exiting the ExistentialScreen
+                                            // For example, you might want to refresh the quotient statuses
+                                            fetchQuotientStatuses();
+                                            setState(() {});
+                                          },
                                         ),
                                       ),
                                     );
@@ -1544,7 +1598,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   }
                                 },
                                 child: const Text(
-                                  'Continue',
+                                  'Continues',
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,

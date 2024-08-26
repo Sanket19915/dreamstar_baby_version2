@@ -38,7 +38,7 @@ class ContactUsScreen extends StatelessWidget {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/bg.png'), // Your background image
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
         ),
         child: SingleChildScrollView(
@@ -101,8 +101,8 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.web,
                           text: 'https://garbhasanskar.sonaljainjayaswal.com/',
                           onTap: () async {
-                            final websiteUrl =
-                                Uri.parse('https://garbhasanskar.sonaljainjayaswal.com/');
+                            final websiteUrl = Uri.parse(
+                                'https://garbhasanskar.sonaljainjayaswal.com/');
                             if (await canLaunchUrl(websiteUrl)) {
                               await launchUrl(websiteUrl);
                             } else {
@@ -117,10 +117,10 @@ class ContactUsScreen extends StatelessWidget {
                         const Divider(),
                         ContactItem(
                           icon: Icons.email,
-                          text: 'contact@sonalijainjayaswal.com',
+                          text: 'contact@sonaljainjayaswal.com',
                           onTap: () async {
                             final emailUrl = Uri.parse(
-                                'mailto:contact@sonalijainjayaswal.com');
+                                'mailto:contact@sonaljainjayaswal.com');
                             if (await canLaunchUrl(emailUrl)) {
                               await launchUrl(emailUrl);
                             } else {

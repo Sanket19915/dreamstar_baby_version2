@@ -24,7 +24,7 @@ class AboutUsScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Color(0xffF7F3FD),
+        backgroundColor: const Color(0xffF7F3FD),
         elevation: 0,
         centerTitle: true,
       ),
@@ -34,16 +34,16 @@ class AboutUsScreen extends StatelessWidget {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/bg.png'), // Your background image
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
         ),
         child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
               Container(
@@ -62,11 +62,11 @@ class AboutUsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor.withOpacity(.9),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20)),
                   boxShadow: [
-                    BoxShadow(
+                    const BoxShadow(
                       color: Colors.black26,
                       offset: Offset(0, 2),
                       blurRadius: 3.0,
@@ -95,7 +95,7 @@ class AboutUsScreen extends StatelessWidget {
                             image: DecorationImage(
                               image: AssetImage(
                                   'assets/images/profile.webp'), // Your creator's image
-                              fit: BoxFit.cover,
+                              fit: BoxFit.fill,
                             ),
                           ),
                         ),

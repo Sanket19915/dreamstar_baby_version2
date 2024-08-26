@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dream_baby/features/auth/screens/login.dart';
 import 'package:dream_baby/features/auth/screens/onboarding.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
@@ -65,16 +67,21 @@ final appRoutes = <RouteBase>[
   GoRoute(
     path: Routes.moreDetails,
     builder: (context, state) {
-        final userId = state.extra as String;
-    return  MoreDetailsScreen(userId: userId ,);
+      final userId = state.extra as String;
+      return MoreDetailsScreen(
+        userId: userId,
+      );
     },
   ),
   GoRoute(
     path: Routes.EditProfileScreen,
     pageBuilder: (context, state) {
       final userProfile = state.extra as Map<String, dynamic>;
+
       return CustomSlideTransitionPage(
-        child: EditProfileScreen(userProfile: userProfile),
+        child: EditProfileScreen(
+          userProfile: userProfile,
+        ),
       );
     },
   ),

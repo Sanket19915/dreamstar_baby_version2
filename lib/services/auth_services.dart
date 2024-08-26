@@ -42,7 +42,7 @@ class AuthService {
   static Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
-    print('Retrieved token: $token'); // Add this line for debugging
+    //print('Retrieved token: $token'); // Add this line for debugging
     return token;
   }
 

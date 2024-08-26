@@ -35,32 +35,36 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     "Naturalistic",
     "Existential",
   ];
+
   String todayQuestionStatus = "";
   Map<String, bool> quotientStatuses = {};
-  final ScrollController _scrollController = ScrollController();
+  //final ScrollController _scrollController = ScrollController();
   bool _isAppBarTransparent = true;
   bool isRefresh = false;
   @override
   void initState() {
     super.initState();
+
     fetchQuotientStatuses();
     getTodaysQuestionStatus();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels > 0) {
-        setState(() {
-          _isAppBarTransparent = false;
-        });
-      } else {
-        setState(() {
-          _isAppBarTransparent = true;
-        });
-      }
-    });
+    // _scrollController.addListener(() {
+    //   if (_scrollController.position.pixels > 0) {
+    //     setState(() {
+    //       _isAppBarTransparent = false;
+    //     });
+    //   } else {
+    //     setState(() {
+    //       _isAppBarTransparent = true;
+    //     });
+    //   }
+    // });
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    //_scrollController.dispose();
+    fetchQuotientStatuses();
+    getTodaysQuestionStatus();
     super.dispose();
   }
 
@@ -118,7 +122,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       body: RefreshIndicator(
         onRefresh: () => onRefresh(),
         child: SingleChildScrollView(
-          controller: _scrollController,
+          //controller: _scrollController,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           physics: const BouncingScrollPhysics(),
           child: Container(
@@ -166,12 +170,20 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                             from: quotients[nextIndex],
                             quotientStatuses: quotientStatuses,
                             index: nextIndex,
+                            onExit: () {
+                              fetchQuotientStatuses();
+                              getTodaysQuestionStatus();
+                              setState(() {});
+                            },
                           ),
                         ),
                       )
-                          .then((e) {
-                        fetchQuotientStatuses();
-                        getTodaysQuestionStatus();
+                          .then((shouldRefresh) async {
+                        if (shouldRefresh == true) {
+                          await fetchQuotientStatuses();
+                          await getTodaysQuestionStatus();
+                          setState(() {});
+                        }
                       });
                     }
                   },
@@ -220,12 +232,20 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                               from: quotients[nextIndex],
                               quotientStatuses: quotientStatuses,
                               index: nextIndex,
+                              onExit: () {
+                                fetchQuotientStatuses();
+                                getTodaysQuestionStatus();
+                                setState(() {});
+                              },
                             ),
                           ),
                         )
-                            .then((e) {
-                          fetchQuotientStatuses();
-                          getTodaysQuestionStatus();
+                            .then((shouldRefresh) async {
+                          if (shouldRefresh == true) {
+                            await fetchQuotientStatuses();
+                            await getTodaysQuestionStatus();
+                            setState(() {});
+                          }
                         });
                       }
                     },
@@ -245,9 +265,28 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 SizedBox(
                   height: height * 0.01,
                 ),
-                FourQuotients(
-                  notifyWidget: () {
-                    getTodaysQuestionStatus();
+                FutureBuilder<void>(
+                  future: fetchQuotientStatuses(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      );
+                    } else {
+                      return FourQuotients(
+                        notifyWidget: () {
+                          fetchQuotientStatuses();
+                          getTodaysQuestionStatus();
+                        },
+                      );
+                    }
                   },
                 ),
                 const SizedBox(
@@ -286,33 +325,43 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     setState(() {
       isRefresh = true;
     });
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      isRefresh = false;
-    });
+    try {
+      await Future.wait([
+        fetchQuotientStatuses(),
+        getTodaysQuestionStatus(),
+      ]);
+    } catch (e) {
+      print('Error refreshing data: $e');
+    } finally {
+      setState(() {
+        isRefresh = false;
+      });
+    }
   }
 
   Future<void> fetchQuotientStatuses() async {
-    var token = await AuthService.getToken();
-    var headers = {'Authorization': 'Bearer $token'};
-    var request = http.Request(
-        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
+    try {
+      var token = await AuthService.getToken();
+      //print("Token: $token"); // Check if token is received correctly
 
-    request.headers.addAll(headers);
+      var response = await http.get(
+        Uri.parse('http://dreambaby.pro/api/user-question-status'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
-    http.StreamedResponse response = await request.send();
+      print("Response status: ${response.statusCode}");
+      //print("Response body: ${response.body}");
 
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final data = json.decode(responseData);
-      final statuses = data['statuses'] as Map<String, dynamic>;
-
-      setState(() {
-        quotientStatuses =
-            statuses.map((key, value) => MapEntry(key, value as bool));
-      });
-    } else {
-      print(response.reasonPhrase);
+      if (response.statusCode == 200) {
+        // if (mounted) {
+        //   setState(() {});
+        // }
+        // Process the data
+      } else {
+        print("Error: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
     }
   }
 
@@ -333,15 +382,17 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
 
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
-        print(responseData);
+        //print(responseData);
 
         int? flagged = jsonDecode(responseData)['flagged'];
 
         todayQuestionStatus = "Today's $flagged Flagged Activities";
 
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
 
-        print(todayQuestionStatus);
+        //print(todayQuestionStatus);
       } else {
         print(response.reasonPhrase);
       }

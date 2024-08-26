@@ -67,7 +67,7 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                 image: DecorationImage(
                   image: AssetImage(
                       'assets/images/bg.png'), // Your background image
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 ),
               ),
               child: isLoading
@@ -234,7 +234,7 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                 direction: Axis.horizontal,
                 allowHalfRating: false,
                 itemCount: 5,
-                itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                itemPadding: const EdgeInsets.symmetric(horizontal: 2.0),
                 itemBuilder: (context, _) => const Icon(
                   Icons.star,
                   color: Colors.amber,

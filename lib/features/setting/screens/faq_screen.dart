@@ -54,7 +54,7 @@ class FAQScreen extends StatelessWidget {
                 'The course is designed very scientifically and so its bound to give results , however the extent of result depends upon the commitment, focus and dedication of the mother.'),
             _buildFAQItem('Does my partner also need to actively participate?',
                 'As a part of the curriculum it is not required , however in order to create life long bond with the baby it is strongly advised that the fathers should also actively participate particularly in the Garbha Samvad activities.'),
-            _buildFAQItem('Does my partner also need to actively participate?',
+            _buildFAQItem('How is the course structured?',
                 "In order to holistically achieve the PQ,IQ, EQ and SQ the expectant mothers will be provided with 9 activities everyday, one from each intelligence as outlines in the 'Sonal’s Intelligence Model for Holistic Development© ' This  will ensure proper neural formation of the brain. Apart from that there is rich repository of activities available in the knowledge hub which the mothers can focus upon for more results."),
             // Add more FAQ items as needed
           ],

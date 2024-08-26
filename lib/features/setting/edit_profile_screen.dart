@@ -24,7 +24,10 @@ import '../auth/screens/more_details.dart';
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> userProfile;
 
-  const EditProfileScreen({super.key, required this.userProfile});
+  const EditProfileScreen({
+    super.key,
+    required this.userProfile,
+  });
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -225,6 +228,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
 
         Fluttertoast.showToast(msg: finalResponse["message"]);
+
+        //Navigator.pop(context, finalResponse["user_profile"]);
+        //Navigator.pop(context, updatedData);
         context.go(Routes.home);
       } else {
         Fluttertoast.showToast(msg: "Something went wrong: ${jsonData.body}");
@@ -272,6 +278,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
 
         Fluttertoast.showToast(msg: finalResponse["message"]);
+
+        //Navigator.pop(context, finalResponse["user_profile"]);
         context.go(Routes.home);
       } else {
         Fluttertoast.showToast(msg: "Something went wrong: ${jsonData.body}");

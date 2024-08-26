@@ -16,34 +16,40 @@ class SplashScreen1 extends StatefulWidget {
 class _SplashScreen1State extends State<SplashScreen1> {
   late VideoPlayerController _videoController;
   bool _isCallOngoing = false; // Flag to determine if a call is ongoing
+  bool _isVideoInitialized =
+      false; // Flag to determine if the video is initialized
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize the video player controller
-    _videoController = VideoPlayerController.asset('assets/images/splash.mp4')
-      ..initialize().then((_) {
-        if (!_isCallOngoing) {
-          setState(() {});
+    checkCallStatus(); // Check call status as soon as possible
+
+    // Initialize the video player controller only if no call is ongoing
+    if (!_isCallOngoing) {
+      _videoController = VideoPlayerController.asset('assets/images/splash.mp4')
+        ..initialize().then((_) {
+          setState(() {
+            _isVideoInitialized = true;
+          });
           _videoController.play();
+        });
+
+      _videoController.addListener(() {
+        if (!_isCallOngoing &&
+            _videoController.value.position ==
+                _videoController.value.duration) {
+          navigateAfterDelay();
         }
       });
-
-    _videoController.addListener(() {
-      if (!_isCallOngoing &&
-          _videoController.value.position == _videoController.value.duration) {
-        navigateAfterDelay();
-      }
-    });
-
-    // Placeholder: Update _isCallOngoing based on your call status mechanism
-    checkCallStatus();
+    }
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
+    if (_isVideoInitialized) {
+      _videoController.dispose();
+    }
     super.dispose();
   }
 
@@ -55,6 +61,11 @@ class _SplashScreen1State extends State<SplashScreen1> {
     setState(() {
       _isCallOngoing = callInProgress;
     });
+
+    if (_isCallOngoing) {
+      // Navigate after a delay or handle as needed
+      navigateAfterDelay();
+    }
   }
 
   Future<bool> isCallInProgress() async {
@@ -64,6 +75,8 @@ class _SplashScreen1State extends State<SplashScreen1> {
   }
 
   void navigateAfterDelay() async {
+    await Future.delayed(
+        const Duration(seconds: 1)); // Delay to ensure proper navigation
     var box = Hive.box('userBox');
     bool isLoggedIn = SessionManager().isLoggedIn();
 
@@ -91,7 +104,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
                 ),
               ),
             )
-          else if (_videoController.value.isInitialized)
+          else if (_isVideoInitialized)
             SizedBox.expand(
               child: FittedBox(
                 fit: BoxFit.fill,

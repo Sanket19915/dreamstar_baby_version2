@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dream_baby/features/setting/setting_screen.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,6 +25,7 @@ class BabyCard extends StatefulWidget {
 }
 
 class _BabyCardState extends State<BabyCard> {
+  Map<String, dynamic> userProfile = {};
   String firstName = '';
   String profilePicture = '';
   bool isLoading = false;
@@ -134,6 +137,7 @@ class _BabyCardState extends State<BabyCard> {
   @override
   Widget build(BuildContext context) {
     double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceWidth = MediaQuery.of(context).size.width;
     print(total_day);
     double percent =
         (double.tryParse(total_day) ?? 0) / 281; // Compute the percentage here
@@ -143,7 +147,16 @@ class _BabyCardState extends State<BabyCard> {
         : Column(
             children: [
               InkWell(
-                onTap: () => GoRouter.of(context).push(Routes.settingsScreen),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+
+                //=> GoRouter.of(context).push(Routes.settingsScreen),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -410,14 +423,14 @@ class _BabyCardState extends State<BabyCard> {
                               padding: const EdgeInsets.only(left: 25),
                               alignment: Alignment.center,
                               child: CircularPercentIndicator(
-                                center: const SizedBox(
-                                  height: 124,
+                                center: SizedBox(
+                                  width: deviceWidth / 3,
                                   child: Image(
                                     image: AssetImage(AppImages.baby),
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
-                                radius: 70.0,
+                                radius: deviceWidth / 5.5,
                                 lineWidth: 8.0,
                                 animation: true,
                                 percent: percent,

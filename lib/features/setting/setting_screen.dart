@@ -103,7 +103,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         elevation: 0,
         leading: InkWell(
           onTap: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context, true); // Pass true when navigating back
+            //Navigator.of(context).pop();
           },
           child: const Icon(
             Icons.arrow_back,
