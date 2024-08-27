@@ -40,7 +40,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   String todayQuestionStatus = "";
   Map<String, bool> quotientStatuses = {};
   //final ScrollController _scrollController = ScrollController();
-  bool _isAppBarTransparent = true;
+  final bool _isAppBarTransparent = true;
   bool isRefresh = false;
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Color(0xffF0F1FC),
+        backgroundColor: const Color(0xffF0F1FC),
         leadingWidth: double.infinity,
         leading: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -265,7 +265,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   height: height * 0.01,
                 ),
                 FutureBuilder<void>(
-                  future: fetchQuotientStatuses(),
+                  future: fetchQuotientStatuses1(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Shimmer.fromColors(
@@ -273,7 +273,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         highlightColor: Colors.grey[100]!,
                         child: Container(
                           height: 420,
-                          margin: EdgeInsets.only(right: 20),
+                          margin: const EdgeInsets.only(right: 20),
                           child: Column(
                             children: [
                               Row(
@@ -290,9 +290,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Container(
-                                    margin: EdgeInsets.only(right: 10),
+                                    margin: const EdgeInsets.only(right: 10),
                                     height: 190.0,
                                     width:
                                         MediaQuery.of(context).size.width / 2 -
@@ -306,7 +306,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               Row(
                                 children: [
                                   Container(
@@ -321,9 +321,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Container(
-                                    margin: EdgeInsets.only(right: 10),
+                                    margin: const EdgeInsets.only(right: 10),
                                     width:
                                         MediaQuery.of(context).size.width / 2 -
                                             20,
@@ -345,11 +345,12 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       return Center(
                         child: Text(
                           'Error: ${snapshot.error}',
-                          style: TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Colors.red),
                         ),
                       );
                     } else {
                       return FourQuotients(
+                        quotientStatuses: quotientStatuses,
                         notifyWidget: () {
                           fetchQuotientStatuses();
                           getTodaysQuestionStatus();
@@ -411,8 +412,35 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   Future<void> fetchQuotientStatuses() async {
     try {
       var token = await AuthService.getToken();
-      //print("Token: $token"); // Check if token is received correctly
+      var response = await http.get(
+        Uri.parse('http://dreambaby.pro/api/user-question-status'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      print("Response status: ${response.statusCode}");
 
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final statuses = data['statuses'] as Map<String, dynamic>;
+
+        setState(() {
+          quotientStatuses =
+              statuses.map((key, value) => MapEntry(key, value as bool));
+        });
+        print(quotientStatuses);
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        print("Error: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+    }
+  }
+
+    Future<void> fetchQuotientStatuses1() async {
+    try {
+      var token = await AuthService.getToken();
       var response = await http.get(
         Uri.parse('http://dreambaby.pro/api/user-question-status'),
         headers: {'Authorization': 'Bearer $token'},

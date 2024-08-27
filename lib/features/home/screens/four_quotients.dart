@@ -12,8 +12,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class FourQuotients extends StatefulWidget {
+  final Map<String, bool> quotientStatuses;
   final void Function() notifyWidget;
-  const FourQuotients({super.key, required this.notifyWidget});
+  const FourQuotients(
+      {super.key, required this.notifyWidget, required this.quotientStatuses});
 
   @override
   State<FourQuotients> createState() => _FourQuotientsState();
@@ -38,43 +40,48 @@ class _FourQuotientsState extends State<FourQuotients> {
   @override
   void initState() {
     super.initState();
-    fetchQuotientStatuses();
-  }
+    // // fetchQuotientStatuses();
+    quotientStatuses = widget.quotientStatuses;
+    List<bool> quotientStatusesList =
+        quotientStatuses.entries.map((e) => e.value).toList();
 
-  Future<void> fetchQuotientStatuses() async {
-    var token = await AuthService.getToken();
-    var headers = {'Authorization': 'Bearer $token'};
-    var request = http.Request(
-        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
-
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final data = json.decode(responseData);
-      final statuses = data['statuses'] as Map<String, dynamic>;
-
-      setState(() {
-        quotientStatuses =
-            statuses.map((key, value) => MapEntry(key, value as bool));
-      });
-      print(quotientStatuses);
-
-      List<bool> quotientStatusesList =
-          quotientStatuses.entries.map((e) => e.value).toList();
-
-      if (quotientStatusesList.isNotEmpty) {
-        allQuotientStatuses =
-            quotientStatusesList.every((element) => element == true);
-
-        setState(() {});
-      }
-    } else {
-      print(response.reasonPhrase);
+    if (quotientStatusesList.isNotEmpty) {
+      allQuotientStatuses =
+          quotientStatusesList.every((element) => element == true);
     }
   }
+
+  // Future<void> fetchQuotientStatuses() async {
+  //   var token = await AuthService.getToken();
+  //   var response = await http.get(
+  //     Uri.parse('http://dreambaby.pro/api/user-question-status'),
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+  //   print("Response status: ${response.statusCode}");
+
+  //   if (response.statusCode == 200) {
+  //     final data = json.decode(response.body);
+  //     final statuses = data['statuses'] as Map<String, dynamic>;
+
+  //     // setState(() {
+  //     quotientStatuses =
+  //         statuses.map((key, value) => MapEntry(key, value as bool));
+  //     // });
+  //     print(quotientStatuses);
+
+  //     List<bool> quotientStatusesList =
+  //         quotientStatuses.entries.map((e) => e.value).toList();
+
+  //     if (quotientStatusesList.isNotEmpty) {
+  //       allQuotientStatuses =
+  //           quotientStatusesList.every((element) => element == true);
+
+  //       // setState(() {});
+  //     }
+  //   } else {
+  //     print(response.reasonPhrase);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -177,14 +184,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                               onExit: () {
                                 // Add the logic you want to execute when exiting the ExistentialScreen
                                 // For example, you might want to refresh the quotient statuses
-                                fetchQuotientStatuses();
+                                // fetchQuotientStatuses();
                                 widget.notifyWidget();
                               },
                             ),
                           ),
                         )
                             .then((e) {
-                          fetchQuotientStatuses();
+                          // fetchQuotientStatuses();
                           widget.notifyWidget();
                         });
                       },
@@ -238,14 +245,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                               onExit: () {
                                 // Add the logic you want to execute when exiting the ExistentialScreen
                                 // For example, you might want to refresh the quotient statuses
-                                fetchQuotientStatuses();
+                                // fetchQuotientStatuses();
                                 widget.notifyWidget();
                               },
                             ),
                           ),
                         )
                             .then((e) {
-                          fetchQuotientStatuses();
+                          // fetchQuotientStatuses();
                           widget.notifyWidget();
                         });
                       },
@@ -323,14 +330,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 onExit: () {
                                                   // Add the logic you want to execute when exiting the ExistentialScreen
                                                   // For example, you might want to refresh the quotient statuses
-                                                  fetchQuotientStatuses();
+                                                  // fetchQuotientStatuses();
                                                   widget.notifyWidget();
                                                 },
                                               ),
                                             ),
                                           )
                                               .then((e) {
-                                            fetchQuotientStatuses();
+                                            // fetchQuotientStatuses();
                                             widget.notifyWidget();
                                           });
                                         },
@@ -389,14 +396,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 onExit: () {
                                                   // Add the logic you want to execute when exiting the ExistentialScreen
                                                   // For example, you might want to refresh the quotient statuses
-                                                  fetchQuotientStatuses();
+                                                  // fetchQuotientStatuses();
                                                   widget.notifyWidget();
                                                 },
                                               ),
                                             ),
                                           )
                                               .then((e) {
-                                            fetchQuotientStatuses();
+                                            // fetchQuotientStatuses();
                                             widget.notifyWidget();
                                           });
                                         },
@@ -456,14 +463,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                             onExit: () {
                                               // Add the logic you want to execute when exiting the ExistentialScreen
                                               // For example, you might want to refresh the quotient statuses
-                                              fetchQuotientStatuses();
+                                              // fetchQuotientStatuses();
                                               widget.notifyWidget();
                                             },
                                           ),
                                         ),
                                       )
                                           .then((e) {
-                                        fetchQuotientStatuses();
+                                        // fetchQuotientStatuses();
                                         widget.notifyWidget();
                                       });
                                     },
@@ -555,14 +562,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 onExit: () {
                                                   // Add the logic you want to execute when exiting the ExistentialScreen
                                                   // For example, you might want to refresh the quotient statuses
-                                                  fetchQuotientStatuses();
+                                                  // fetchQuotientStatuses();
                                                   widget.notifyWidget();
                                                 },
                                               ),
                                             ),
                                           )
                                               .then((e) {
-                                            fetchQuotientStatuses();
+                                            // fetchQuotientStatuses();
                                             widget.notifyWidget();
                                           });
                                         },
@@ -622,14 +629,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 onExit: () {
                                                   // Add the logic you want to execute when exiting the ExistentialScreen
                                                   // For example, you might want to refresh the quotient statuses
-                                                  fetchQuotientStatuses();
+                                                  // fetchQuotientStatuses();
                                                   widget.notifyWidget();
                                                 },
                                               ),
                                             ),
                                           )
                                               .then((e) {
-                                            fetchQuotientStatuses();
+                                            // fetchQuotientStatuses();
                                             widget.notifyWidget();
                                           });
                                         },
@@ -696,14 +703,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                 onExit: () {
                                                   // Add the logic you want to execute when exiting the ExistentialScreen
                                                   // For example, you might want to refresh the quotient statuses
-                                                  fetchQuotientStatuses();
+                                                  // fetchQuotientStatuses();
                                                   widget.notifyWidget();
                                                 },
                                               ),
                                             ),
                                           )
                                               .then((e) {
-                                            fetchQuotientStatuses();
+                                            // fetchQuotientStatuses();
                                             widget.notifyWidget();
                                           });
                                         },
@@ -760,14 +767,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                                     quotientStatuses,
                                                 index: 8,
                                                 onExit: () {
-                                                  fetchQuotientStatuses();
+                                                  // fetchQuotientStatuses();
                                                   widget.notifyWidget();
                                                 },
                                               ),
                                             ),
                                           )
                                               .then((e) {
-                                            fetchQuotientStatuses();
+                                            // fetchQuotientStatuses();
                                             widget.notifyWidget();
                                           });
                                         },
