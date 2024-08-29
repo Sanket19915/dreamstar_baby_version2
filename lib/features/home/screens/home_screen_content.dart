@@ -354,6 +354,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         notifyWidget: () {
                           fetchQuotientStatuses();
                           getTodaysQuestionStatus();
+                          print("refresh screen");
                         },
                       );
                     }
@@ -422,11 +423,10 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
         final data = json.decode(response.body);
         final statuses = data['statuses'] as Map<String, dynamic>;
 
-        setState(() {
+     
           quotientStatuses =
               statuses.map((key, value) => MapEntry(key, value as bool));
-        });
-        print(quotientStatuses);
+
         if (mounted) {
           setState(() {});
         }
@@ -438,7 +438,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     }
   }
 
-    Future<void> fetchQuotientStatuses1() async {
+  Future<void> fetchQuotientStatuses1() async {
     try {
       var token = await AuthService.getToken();
       var response = await http.get(

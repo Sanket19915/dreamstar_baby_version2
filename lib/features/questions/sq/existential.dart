@@ -124,7 +124,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
         leading: InkWell(
           onTap: () {
-            print("pop 1111");
             context.pop();
           },
           child: const Icon(
@@ -1252,7 +1251,25 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          data?.answerKeyInput ?? "",
+                          ((data?.options.length ?? 0) <=
+                                  int.parse(
+                                      data?.correctAnswer.first.toString() ??
+                                          "0"))
+                              ? data
+                                      ?.options[(int.parse(data
+                                                  .correctAnswer.first
+                                                  .toString() ??
+                                              "0")) -
+                                          1]
+                                      .text ??
+                                  ""
+                              : data
+                                      ?.options[int.parse(
+                                          data.correctAnswer.first.toString() ??
+                                              "0")]
+                                      .text ??
+                                  "",
+                          // data?.answerKeyInput ?? "",
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
@@ -1405,8 +1422,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   context.pop();
                                   context.pop();
                                   // Navigator.of(ctx).pop();
-
-                                  ;
                                 },
                                 child: const Text(
                                   'Exit',
@@ -1425,7 +1440,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         AppColors.mainColor)),
                                 onPressed: () async {
                                   Navigator.of(ctx1).pop();
+
                                   await getQuestions();
+                                  await fetchQuotientStatuses();
+                                  print("current index == $nextIndex");
+                                  while (nextIndex < quotients.length - 1) {
+                                    nextIndex++;
+                                    print("updated index == $nextIndex");
+                                    if (widget.quotientStatuses[
+                                            quotients[nextIndex]] ==
+                                        false) {
+                                      break;
+                                    }
+                                  }
                                   if (nextIndex < quotients.length &&
                                       widget.quotientStatuses[
                                               quotients[nextIndex]] ==
@@ -1435,7 +1462,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         "questions == ${quotients[nextIndex]}");
                                     print("questions next index $nextIndex");
 
-                                    Navigator.of(ctx).push(
+                                    Navigator.of(ctx)
+                                        .push(
                                       MaterialPageRoute(
                                         builder: (context) => ExistentialScreen(
                                           from: quotients[nextIndex],
@@ -1449,6 +1477,11 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                           },
                                         ),
                                       ),
+                                    )
+                                        .then(
+                                      (value) {
+                                        widget.onExit();
+                                      },
                                     );
                                   } else {
                                     // Handle case where no incomplete screen was found
@@ -1493,20 +1526,27 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           print("questions == ${quotients[nextIndex]}");
           print("questions next index $nextIndex");
 
-          Navigator.of(ctx).push(
+          Navigator.of(ctx)
+              .push(
             MaterialPageRoute(
               builder: (context) => ExistentialScreen(
                 from: quotients[nextIndex],
                 quotientStatuses: widget.quotientStatuses,
                 index: nextIndex,
                 onExit: () async {
+                  widget.onExit();
                   // Add the logic you want to execute when exiting the ExistentialScreen
                   // For example, you might want to refresh the quotient statuses
-                  fetchQuotientStatuses();
-                  setState(() {});
+                  // fetchQuotientStatuses();
+                  // setState(() {});
                 },
               ),
             ),
+          )
+              .then(
+            (value) {
+              widget.onExit();
+            },
           );
         } else {
           showDialog(
@@ -1575,7 +1615,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         "questions == ${quotients[nextIndex]}");
                                     print("questions next index $nextIndex");
 
-                                    Navigator.of(ctx).push(
+                                    Navigator.of(ctx)
+                                        .push(
                                       MaterialPageRoute(
                                         builder: (context) => ExistentialScreen(
                                           from: quotients[nextIndex],
@@ -1583,13 +1624,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                               widget.quotientStatuses,
                                           index: nextIndex,
                                           onExit: () async {
+                                            widget.onExit();
                                             // Add the logic you want to execute when exiting the ExistentialScreen
                                             // For example, you might want to refresh the quotient statuses
-                                            fetchQuotientStatuses();
-                                            setState(() {});
+                                            // fetchQuotientStatuses();
+                                            // setState(() {});
                                           },
                                         ),
                                       ),
+                                    )
+                                        .then(
+                                      (value) {
+                                        widget.onExit();
+                                      },
                                     );
                                   } else {
                                     // Handle case where no incomplete screen was found
@@ -1652,6 +1699,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         widget.quotientStatuses =
             statuses.map((key, value) => MapEntry(key, value as bool));
       });
+      print(widget.quotientStatuses);
     } else {
       print(response.reasonPhrase);
     }
