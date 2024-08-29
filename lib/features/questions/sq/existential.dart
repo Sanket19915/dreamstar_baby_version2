@@ -57,8 +57,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     "Spatial Visual",
     "Musical",
     "Intrapersonal",
-    "Interpersonal",
     "Naturalistic",
+    "Interpersonal",
     "Existential",
   ];
   @override
@@ -1405,8 +1405,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   context.pop();
                                   context.pop();
                                   // Navigator.of(ctx).pop();
-
-                                  ;
                                 },
                                 child: const Text(
                                   'Exit',

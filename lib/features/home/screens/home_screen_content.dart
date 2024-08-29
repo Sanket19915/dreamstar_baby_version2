@@ -26,14 +26,14 @@ class HomeContentScreen extends StatefulWidget {
 
 class _HomeContentScreenState extends State<HomeContentScreen> {
   List<String> quotients = [
-    "Kinesthetic",
+     "Kinesthetic",
     "Logical",
     "Linguistic",
     "Spatial Visual",
     "Musical",
     "Intrapersonal",
-    "Interpersonal",
     "Naturalistic",
+    "Interpersonal",
     "Existential",
   ];
 
