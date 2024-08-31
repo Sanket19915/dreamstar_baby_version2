@@ -115,7 +115,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   Widget build(BuildContext context) {
     double deviceheight = MediaQuery.of(context).size.height;
     double devicewidth = MediaQuery.of(context).size.width;
-    int nextIndex = _selectedIndex + 1;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -929,6 +928,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     try {
       if (mounted) {
         setState(() {
+          isDisable = false;
           isLoading = true;
         });
       }
@@ -1000,6 +1000,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
   Future<void> getQuestions() async {
     try {
+      isDisable = false;
       if (mounted) {
         setState(() {
           isLoading = true;
@@ -1250,28 +1251,54 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               color: AppColors.mainColor),
                         ),
                         const SizedBox(height: 20),
-                        Text(
-                          ((data?.options.length ?? 0) <=
-                                  int.parse(
-                                      data?.correctAnswer.first.toString() ??
-                                          "0"))
-                              ? data
-                                      ?.options[(int.parse(data
-                                                  .correctAnswer.first
-                                                  .toString() ??
-                                              "0")) -
-                                          1]
-                                      .text ??
-                                  ""
-                              : data
-                                      ?.options[int.parse(
-                                          data.correctAnswer.first.toString() ??
-                                              "0")]
-                                      .text ??
-                                  "",
-                          // data?.answerKeyInput ?? "",
-                          textAlign: TextAlign.center,
-                        ),
+                        (((data?.options.length ?? 0) <=
+                                        int.parse(data?.correctAnswer.first
+                                                .toString() ??
+                                            "0"))
+                                    ? (data
+                                            ?.options[(int.parse(data
+                                                        .correctAnswer.first
+                                                        .toString() ??
+                                                    "0")) -
+                                                1]
+                                            .image ??
+                                        "")
+                                    : (data
+                                            ?.options[int.parse(data
+                                                    .correctAnswer.first
+                                                    .toString() ??
+                                                "0")]
+                                            .image ??
+                                        ""))
+                                .isNotEmpty
+                            ? Image.network(
+                                "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                height: 50,
+                                width: 60,
+                              )
+                            : Text(
+                                ((data?.options.length ?? 0) <=
+                                        int.parse(data?.correctAnswer.first
+                                                .toString() ??
+                                            "0"))
+                                    ? (data
+                                            ?.options[(int.parse(data
+                                                        .correctAnswer.first
+                                                        .toString() ??
+                                                    "0")) -
+                                                1]
+                                            .text ??
+                                        "")
+                                    : (data
+                                            ?.options[int.parse(data
+                                                    .correctAnswer.first
+                                                    .toString() ??
+                                                "0")]
+                                            .text ??
+                                        ""),
+                                // data?.answerKeyInput ?? "",
+                                textAlign: TextAlign.center,
+                              ),
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
@@ -1321,6 +1348,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       if (mounted) {
         setState(() {
           isLoading = false;
+          isDisable = false;
         });
       }
     } catch (e) {
@@ -1372,296 +1400,30 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         print(todayQuestionStatus);
 
         await fetchQuotientStatuses();
-        // if (questionsModel?.questions?.data.isEmpty ?? true) {
-        // Find the next incomplete quotient index (status is false)
-        print("current index == $nextIndex");
+
+        // Find the next incomplete quotient index
         while (nextIndex < quotients.length - 1) {
           nextIndex++;
-          print("updated index == $nextIndex");
           if (widget.quotientStatuses[quotients[nextIndex]] == false) {
             break;
           }
         }
 
-        if (nextIndex == quotients.length - 1) {
-          showDialog(
-              barrierDismissible: false,
-              context: ctx,
-              builder: (BuildContext ctx1) {
-                return Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          todayQuestionStatus,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.mainColor),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                        AppColors.whiteColor)),
-                                onPressed: () {
-                                  widget.onExit();
-                                  fetchQuotientStatuses();
-                                  //Navigator.of(ctx1).pop();
-                                  context.pop();
-                                  context.pop();
-                                  // Navigator.of(ctx).pop();
-                                },
-                                child: const Text(
-                                  'Exit',
-                                  style: TextStyle(
-                                      color: AppColors.mainColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                        AppColors.mainColor)),
-                                onPressed: () async {
-                                  Navigator.of(ctx1).pop();
-
-                                  await getQuestions();
-                                  await fetchQuotientStatuses();
-                                  print("current index == $nextIndex");
-                                  while (nextIndex < quotients.length - 1) {
-                                    nextIndex++;
-                                    print("updated index == $nextIndex");
-                                    if (widget.quotientStatuses[
-                                            quotients[nextIndex]] ==
-                                        false) {
-                                      break;
-                                    }
-                                  }
-                                  if (nextIndex < quotients.length &&
-                                      widget.quotientStatuses[
-                                              quotients[nextIndex]] ==
-                                          false) {
-                                    Navigator.of(ctx).pop();
-                                    print(
-                                        "questions == ${quotients[nextIndex]}");
-                                    print("questions next index $nextIndex");
-
-                                    Navigator.of(ctx)
-                                        .push(
-                                      MaterialPageRoute(
-                                        builder: (context) => ExistentialScreen(
-                                          from: quotients[nextIndex],
-                                          quotientStatuses:
-                                              widget.quotientStatuses,
-                                          index: nextIndex,
-                                          onExit: () async {
-                                            // Add the logic you want to execute when exiting the ExistentialScreen
-                                            // For example, you might want to refresh the quotient statuses
-                                            fetchQuotientStatuses();
-                                          },
-                                        ),
-                                      ),
-                                    )
-                                        .then(
-                                      (value) {
-                                        widget.onExit();
-                                      },
-                                    );
-                                  } else {
-                                    // Handle case where no incomplete screen was found
-                                    Navigator.of(context)
-                                        .popUntil((e) => e.isFirst);
-                                  }
-                                },
-                                child: const Text(
-                                  'Continue',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              });
-          return;
-        }
-        // If no incomplete quotient was found and nextIndex is at the end, check from the start
+        // Check if we've reached the end of the list
         if (nextIndex == quotients.length - 1 &&
             widget.quotientStatuses[quotients[nextIndex]] == true) {
-          //!-- find last questions...
-          for (int i = 0; i < quotients.length; i++) {
-            if (widget.quotientStatuses[quotients[i]] == false) {
-              nextIndex = i;
-              break;
-            }
-          }
-        }
-        print("quotients.length ${quotients.length}");
-        // Ensure the index is within bounds and valid (incomplete status)
-        if (nextIndex < quotients.length &&
-            widget.quotientStatuses[quotients[nextIndex]] == false) {
-          Navigator.of(ctx).pop();
-          print("questions == ${quotients[nextIndex]}");
-          print("questions next index $nextIndex");
+          // All quotients are complete, show final popup
+          showFinalPopup(ctx, todayQuestionStatus, nextIndex);
+        } else if (nextIndex < quotients.length &&
+            widget.quotientStatuses[quotients[nextIndex]] == false &&
+            widget.index != 8) {
+          // There's another incomplete quotient, navigate to it
 
-          Navigator.of(ctx)
-              .push(
-            MaterialPageRoute(
-              builder: (context) => ExistentialScreen(
-                from: quotients[nextIndex],
-                quotientStatuses: widget.quotientStatuses,
-                index: nextIndex,
-                onExit: () async {
-                  widget.onExit();
-                  // Add the logic you want to execute when exiting the ExistentialScreen
-                  // For example, you might want to refresh the quotient statuses
-                  // fetchQuotientStatuses();
-                  // setState(() {});
-                },
-              ),
-            ),
-          )
-              .then(
-            (value) {
-              widget.onExit();
-            },
-          );
+          navigateToNextQuotient(ctx, nextIndex);
         } else {
-          showDialog(
-              barrierDismissible: false,
-              context: ctx,
-              builder: (BuildContext ctx1) {
-                return Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          todayQuestionStatus,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.mainColor),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                        AppColors.whiteColor)),
-                                onPressed: () {
-                                  widget.onExit();
-                                  fetchQuotientStatuses();
-                                  Navigator.of(ctx1).pop();
-                                  context.pop();
-                                  setState(() {});
-                                  //Navigator.of(ctx).pop();
-                                },
-                                child: const Text(
-                                  'Exit',
-                                  style: TextStyle(
-                                      color: AppColors.mainColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                        AppColors.mainColor)),
-                                onPressed: () async {
-                                  Navigator.of(ctx1).pop();
-                                  await getQuestions();
-                                  if (nextIndex < quotients.length &&
-                                      widget.quotientStatuses[
-                                              quotients[nextIndex]] ==
-                                          false) {
-                                    Navigator.of(ctx).pop();
-                                    print(
-                                        "questions == ${quotients[nextIndex]}");
-                                    print("questions next index $nextIndex");
-
-                                    Navigator.of(ctx)
-                                        .push(
-                                      MaterialPageRoute(
-                                        builder: (context) => ExistentialScreen(
-                                          from: quotients[nextIndex],
-                                          quotientStatuses:
-                                              widget.quotientStatuses,
-                                          index: nextIndex,
-                                          onExit: () async {
-                                            widget.onExit();
-                                            // Add the logic you want to execute when exiting the ExistentialScreen
-                                            // For example, you might want to refresh the quotient statuses
-                                            // fetchQuotientStatuses();
-                                            // setState(() {});
-                                          },
-                                        ),
-                                      ),
-                                    )
-                                        .then(
-                                      (value) {
-                                        widget.onExit();
-                                      },
-                                    );
-                                  } else {
-                                    // Handle case where no incomplete screen was found
-                                    Navigator.of(context)
-                                        .popUntil((e) => e.isFirst);
-                                  }
-                                },
-                                child: const Text(
-                                  'Continues',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              });
+          // This shouldn't happen, but just in case
+          showFinalPopup(ctx, todayQuestionStatus, nextIndex);
         }
-        // }
       } else {
         print(response.reasonPhrase);
       }
@@ -1678,6 +1440,120 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         });
       }
     }
+  }
+
+  void showFinalPopup(
+      BuildContext ctx, String todayQuestionStatus, int nextIndex) {
+    showDialog(
+      barrierDismissible: false,
+      context: ctx,
+      builder: (BuildContext ctx1) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  todayQuestionStatus,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.mainColor),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.whiteColor)),
+                        onPressed: () {
+                          widget.onExit();
+                          fetchQuotientStatuses();
+                          Navigator.of(ctx1).pop();
+                          Navigator.of(ctx).popUntil((route) => route.isFirst);
+                        },
+                        child: const Text(
+                          'Exit',
+                          style: TextStyle(
+                              color: AppColors.mainColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.mainColor)),
+                        onPressed: () async {
+                          Navigator.of(ctx1).pop();
+                          await fetchQuotientStatuses();
+                          await getQuestions();
+                          int localIndex = -1;
+                          // Find the next incomplete quotient index
+                          while (localIndex < quotients.length - 1) {
+                            localIndex++;
+                            if (widget
+                                    .quotientStatuses[quotients[localIndex]] ==
+                                false) {
+                              break;
+                            }
+                          }
+                          if (localIndex < quotients.length &&
+                              widget.quotientStatuses[quotients[localIndex]] ==
+                                  false) {
+                            navigateToNextQuotient(ctx, localIndex);
+                          } else {
+                            // If no more incomplete quotients, exit
+                            widget.onExit();
+                            Navigator.of(ctx)
+                                .popUntil((route) => route.isFirst);
+                          }
+                        },
+                        child: const Text(
+                          'Continue',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void navigateToNextQuotient(BuildContext ctx, int nextIndex) {
+    Navigator.of(ctx).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => ExistentialScreen(
+          from: quotients[nextIndex],
+          quotientStatuses: widget.quotientStatuses,
+          index: nextIndex,
+          onExit: () async {
+            widget.onExit();
+            await fetchQuotientStatuses();
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> fetchQuotientStatuses() async {
