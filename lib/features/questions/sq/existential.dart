@@ -1251,24 +1251,24 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          ((data?.options.length ?? 0) <=
-                                  int.parse(
-                                      data?.correctAnswer.first.toString() ??
-                                          "0"))
-                              ? data
-                                      ?.options[(int.parse(data
-                                                  .correctAnswer.first
-                                                  .toString() ??
-                                              "0")) -
-                                          1]
-                                      .text ??
-                                  ""
-                              : data
-                                      ?.options[int.parse(
-                                          data.correctAnswer.first.toString() ??
-                                              "0")]
-                                      .text ??
-                                  "",
+                          // ((data?.options.length ?? 0) <
+                          //         int.parse(
+                          //             data?.correctAnswer.first.toString() ??
+                          //                 "0"))
+                          //     ? data
+                          //             ?.options[(int.parse(data
+                          //                         .correctAnswer.first
+                          //                         .toString() ??
+                          //                     "0")) -
+                          //                 1]
+                          //             .text ??
+                          //         ""
+                          //     :
+                          data
+                                  ?.options[int.parse(
+                                          data.correctAnswer.first.toString())-1]
+                                  .text ??
+                              "",
                           // data?.answerKeyInput ?? "",
                           textAlign: TextAlign.center,
                         ),
