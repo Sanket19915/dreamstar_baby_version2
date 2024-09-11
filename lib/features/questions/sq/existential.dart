@@ -1167,7 +1167,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     try {
       if ((data?.correctAnswer.isNotEmpty ?? false) &&
           ((selectedOptionIndex != null
-                  ? (selectedOptionIndex ?? 0) + 1
+                  ? (selectedOptionIndex ?? 0)
                   : 0)) ==
               int.parse(data?.correctAnswer.first.toString() ?? "0")) {
         isCorrect = true;
