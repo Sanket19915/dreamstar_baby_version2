@@ -1165,15 +1165,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       Datum? data,
       BuildContext? ctx}) async {
     try {
-      if ((data?.correctAnswer.isNotEmpty ?? false) &&
-          ((selectedOptionIndex != null
-                  ? (selectedOptionIndex ?? 0)
-                  : 0)) ==
-              int.parse(data?.correctAnswer.first.toString() ?? "0")) {
-        isCorrect = true;
-        isDisable = true;
-        answerNotifier.notifyListeners();
-
+      print("enter new conditions. image = ${data?.options.map((e) => e.image).toList().join(",")}");
+      print("enter new conditions. text = ${data?.options.map((e) => e.text).toList().join(",")}");
+      print("enter new conditions. answerKeyInput = ${data?.answerKeyInput}");
+      if ((data?.options.every((element) => element.image.isEmpty) ?? true) &&
+          (data?.options.every((element) => element.text.isEmpty) ?? true) &&
+          (data?.answerKeyInput.isNotEmpty ?? false)) {
+        print("enter new conditions.");
         await showDialog(
             barrierDismissible: false,
             context: ctx!,
@@ -1190,7 +1188,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text(
-                        'Congratulations your answer is correct.',
+                        'Below is the Correct Answer.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 24,
@@ -1216,10 +1214,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               );
             });
       } else {
-        isCorrect = false;
-        isDisable = true;
-        answerNotifier.notifyListeners();
-        if (data?.correctAnswer.isNotEmpty ?? false) {
+        if ((data?.correctAnswer.isNotEmpty ?? false) &&
+            ((selectedOptionIndex != null ? (selectedOptionIndex ?? 0) : 0)) ==
+                int.parse(data?.correctAnswer.first.toString() ?? "0")) {
+          isCorrect = true;
+          isDisable = true;
+          answerNotifier.notifyListeners();
+
           await showDialog(
               barrierDismissible: false,
               context: ctx!,
@@ -1235,71 +1236,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          ((data?.options.length ?? 0) <=
-                                  int.parse(
-                                      data?.correctAnswer.first.toString() ??
-                                          "0"))
-                              ? "Below is the Correct Answer"
-                              : "Below is the Correct Answer",
-                          // ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
-                          // : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
+                        const Text(
+                          'Congratulations your answer is correct.',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: AppColors.mainColor),
                         ),
                         const SizedBox(height: 20),
-                        (((data?.options.length ?? 0) <=
-                                        int.parse(data?.correctAnswer.first
-                                                .toString() ??
-                                            "0"))
-                                    ? (data
-                                            ?.options[(int.parse(data
-                                                        .correctAnswer.first
-                                                        .toString() ??
-                                                    "0")) -
-                                                1]
-                                            .image ??
-                                        "")
-                                    : (data
-                                            ?.options[int.parse(data
-                                                    .correctAnswer.first
-                                                    .toString() ??
-                                                "0")]
-                                            .image ??
-                                        ""))
-                                .isNotEmpty
-                            ? Image.network(
-                                "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
-                                height: 50,
-                                width: 60,
-                              )
-                            : Text(
-                                ((data?.options.length ?? 0) <=
-                                        int.parse(data?.correctAnswer.first
-                                                .toString() ??
-                                            "0"))
-                                    ? (data
-                                            ?.options[(int.parse(data
-                                                        .correctAnswer.first
-                                                        .toString() ??
-                                                    "0")) -
-                                                1]
-                                            .text ??
-                                        "")
-                                    : (data
-                                            ?.options[int.parse(data
-                                                    .correctAnswer.first
-                                                    .toString() ??
-                                                "0")]
-                                            .text ??
-                                        ""),
-                                        
-                                // data?.answerKeyInput ?? "",
-                                textAlign: TextAlign.center,
-                              ),
+                        Text(
+                          data?.answerKeyInput ?? "",
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
@@ -1313,6 +1262,105 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   ),
                 );
               });
+        } else {
+          isCorrect = false;
+          isDisable = true;
+          answerNotifier.notifyListeners();
+          if (data?.correctAnswer.isNotEmpty ?? false) {
+            await showDialog(
+                barrierDismissible: false,
+                context: ctx!,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            ((data?.options.length ?? 0) <=
+                                    int.parse(
+                                        data?.correctAnswer.first.toString() ??
+                                            "0"))
+                                ? "Below is the Correct Answer"
+                                : "Below is the Correct Answer",
+                            // ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
+                            // : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.mainColor),
+                          ),
+                          const SizedBox(height: 20),
+                          (((data?.options.length ?? 0) <=
+                                          int.parse(data?.correctAnswer.first
+                                                  .toString() ??
+                                              "0"))
+                                      ? (data
+                                              ?.options[(int.parse(data
+                                                          .correctAnswer.first
+                                                          .toString() ??
+                                                      "0")) -
+                                                  1]
+                                              .image ??
+                                          "")
+                                      : (data
+                                              ?.options[int.parse(data
+                                                      .correctAnswer.first
+                                                      .toString() ??
+                                                  "0")]
+                                              .image ??
+                                          ""))
+                                  .isNotEmpty
+                              ? Image.network(
+                                  "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                  height: 50,
+                                  width: 60,
+                                )
+                              : Text(
+                                  ((data?.options.length ?? 0) <=
+                                          int.parse(data?.correctAnswer.first
+                                                  .toString() ??
+                                              "0"))
+                                      ? (data
+                                              ?.options[(int.parse(data
+                                                          .correctAnswer.first
+                                                          .toString() ??
+                                                      "0")) -
+                                                  1]
+                                              .text ??
+                                          "")
+                                      : (data
+                                              ?.options[int.parse(data
+                                                      .correctAnswer.first
+                                                      .toString() ??
+                                                  "0")]
+                                              .text ??
+                                          ""),
+
+                                  // data?.answerKeyInput ?? "",
+                                  textAlign: TextAlign.center,
+                                ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              print("pop 3");
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Close'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                });
+          }
         }
       }
 
