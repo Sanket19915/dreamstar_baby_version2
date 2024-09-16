@@ -97,14 +97,14 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               onTap: () async {
                                 DateTime? pickedDate = await showDatePicker(
                                   context: context,
-                                  initialDate: DateTime.now(),
+                                  initialDate: DateTime(2005, 12, 1),
                                   firstDate: DateTime(1900),
-                                  lastDate: DateTime(2100),
+                                  lastDate: DateTime(2005,12,31),
                                 );
                                 if (pickedDate != null) {
                                   dobController.text =
                                       "${pickedDate.toLocal()}".split(' ')[0];
-                                     buttonNotifier.notifyListeners();
+                                  buttonNotifier.notifyListeners();
                                 }
                               },
                               child: const Icon(
@@ -206,9 +206,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                 if (pickedDate != null) {
                                   eddController.text =
                                       "${pickedDate.toLocal()}".split(' ')[0];
-                                     buttonNotifier.notifyListeners();
+                                  buttonNotifier.notifyListeners();
                                 }
-                              
                               },
                               child: const Icon(
                                 Icons.calendar_today_outlined,
