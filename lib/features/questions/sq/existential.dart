@@ -1165,8 +1165,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       Datum? data,
       BuildContext? ctx}) async {
     try {
-      print("enter new conditions. image = ${data?.options.map((e) => e.image).toList().join(",")}");
-      print("enter new conditions. text = ${data?.options.map((e) => e.text).toList().join(",")}");
+      print(
+          "enter new conditions. image = ${data?.options.map((e) => e.image).toList().join(",")}");
+      print(
+          "enter new conditions. text = ${data?.options.map((e) => e.text).toList().join(",")}");
       print("enter new conditions. answerKeyInput = ${data?.answerKeyInput}");
       if ((data?.options.every((element) => element.image.isEmpty) ?? true) &&
           (data?.options.every((element) => element.text.isEmpty) ?? true) &&
@@ -1237,7 +1239,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          'Congratulations your answer is correct.',
+                          'Congratulations! Your answer is correct',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 24,
@@ -1282,22 +1284,29 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            ((data?.options.length ?? 0) <=
-                                    int.parse(
-                                        data?.correctAnswer.first.toString() ??
-                                            "0"))
-                                ? "Below is the Correct Answer"
-                                : "Below is the Correct Answer",
-                            // ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
-                            // : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
+                          const Text(
+                            "Wrong Answer",
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.mainColor),
                           ),
                           const SizedBox(height: 20),
+                          const Text(
+                            // ((data?.options.length ?? 0) <=
+                            //         int.parse(
+                            //             data?.correctAnswer.first.toString() ??
+                            //                 "0"))
+                            "The correct answer is ",
+                            // ? 'The Correct Answer is ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text}.'
+                            // : 'The Correct Answer is ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text}.',
+                            textAlign: TextAlign.center,
+                            // style: TextStyle(
+                            //     fontSize: 24,
+                            //     fontWeight: FontWeight.bold,
+                            //     color: AppColors.mainColor),
+                          ),
                           (((data?.options.length ?? 0) <=
                                           int.parse(data?.correctAnswer.first
                                                   .toString() ??
@@ -1347,6 +1356,11 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   // data?.answerKeyInput ?? "",
                                   textAlign: TextAlign.center,
                                 ),
+                          const SizedBox(height: 20),
+                          Text(
+                            data?.answerKeyInput ?? "",
+                            textAlign: TextAlign.center,
+                          ),
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
