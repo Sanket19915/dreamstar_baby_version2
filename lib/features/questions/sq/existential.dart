@@ -590,7 +590,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               // Question text and description..
               Text(
                 //data?.quotient ?? "",
-                "Acitivity:",
+                "Activity:",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
