@@ -15,6 +15,7 @@ class AppImages {
   static const bellPepper = "assets/images/bellpepper.png";
   static const book = "assets/images/book.webp";
   static const productPic = "assets/images/product_pic.jpeg";
+  static const productPicPng = "assets/images/product_pic.png";
   static const know = "assets/images/know.webp";
   static const exist = "assets/images/exist.png";
   static const check = "assets/images/Check.png";

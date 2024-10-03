@@ -590,7 +590,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               // Question text and description..
               Text(
                 //data?.quotient ?? "",
-                "Activity:",
+                "Activity",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -1247,8 +1247,54 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               color: AppColors.mainColor),
                         ),
                         const SizedBox(height: 20),
+                        (((data?.options.length ?? 0) <=
+                                        int.parse(data?.correctAnswer.first
+                                                .toString() ??
+                                            "0"))
+                                    ? (data
+                                            ?.options[(int.parse(data
+                                                    .correctAnswer.first
+                                                    .toString())) -
+                                                1]
+                                            .image ??
+                                        "")
+                                    : (data
+                                            ?.options[int.parse(data
+                                                .correctAnswer.first
+                                                .toString())]
+                                            .image ??
+                                        ""))
+                                .isNotEmpty
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ",
+                                    // data?.answerKeyInput ?? "",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Image.network(
+                                    "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                    height: 50,
+                                    width: 60,
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                ((data?.options.length ?? 0) <=
+                                        int.parse(data?.correctAnswer.first
+                                                .toString() ??
+                                            "0"))
+                                    ? "${(int.parse(data?.correctAnswer.first.toString() ?? "0"))}) ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text ?? ""}"
+                                    : "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text ?? ""}",
+
+                                // data?.answerKeyInput ?? "",
+                                textAlign: TextAlign.center,
+                              ),
+                        const SizedBox(height: 20),
                         Text(
-                          data?.answerKeyInput ?? "",
+                          (data?.answerKeyInput ?? ""),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
@@ -1307,51 +1353,49 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             //     fontWeight: FontWeight.bold,
                             //     color: AppColors.mainColor),
                           ),
+
+                          const SizedBox(height: 10),
                           (((data?.options.length ?? 0) <=
                                           int.parse(data?.correctAnswer.first
                                                   .toString() ??
                                               "0"))
                                       ? (data
                                               ?.options[(int.parse(data
-                                                          .correctAnswer.first
-                                                          .toString() ??
-                                                      "0")) -
+                                                      .correctAnswer.first
+                                                      .toString())) -
                                                   1]
                                               .image ??
                                           "")
                                       : (data
                                               ?.options[int.parse(data
-                                                      .correctAnswer.first
-                                                      .toString() ??
-                                                  "0")]
+                                                  .correctAnswer.first
+                                                  .toString())]
                                               .image ??
                                           ""))
                                   .isNotEmpty
-                              ? Image.network(
-                                  "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
-                                  height: 50,
-                                  width: 60,
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ",
+                                      // data?.answerKeyInput ?? "",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    Image.network(
+                                      "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                      height: 50,
+                                      width: 60,
+                                    ),
+                                  ],
                                 )
                               : Text(
                                   ((data?.options.length ?? 0) <=
                                           int.parse(data?.correctAnswer.first
                                                   .toString() ??
                                               "0"))
-                                      ? (data
-                                              ?.options[(int.parse(data
-                                                          .correctAnswer.first
-                                                          .toString() ??
-                                                      "0")) -
-                                                  1]
-                                              .text ??
-                                          "")
-                                      : (data
-                                              ?.options[int.parse(data
-                                                      .correctAnswer.first
-                                                      .toString() ??
-                                                  "0")]
-                                              .text ??
-                                          ""),
+                                      ? "${(int.parse(data?.correctAnswer.first.toString() ?? "0"))}) ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text ?? ""}"
+                                      : "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text ?? ""}",
 
                                   // data?.answerKeyInput ?? "",
                                   textAlign: TextAlign.center,
@@ -1453,6 +1497,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         String responseData = await response.stream.bytesToString();
         print(responseData);
 
+        await Future.delayed(const Duration(seconds: 2));
         int? skipped = jsonDecode(responseData)['skipped'] ?? 0;
         int? flagged = jsonDecode(responseData)['flagged'] ?? 0;
         int? submitted = jsonDecode(responseData)['submitted'] ?? 0;

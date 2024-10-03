@@ -8,6 +8,7 @@ import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -26,7 +27,7 @@ class HomeContentScreen extends StatefulWidget {
 
 class _HomeContentScreenState extends State<HomeContentScreen> {
   List<String> quotients = [
-     "Kinesthetic",
+    "Kinesthetic",
     "Logical",
     "Linguistic",
     "Spatial Visual",
@@ -384,6 +385,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
               ],
             ),
           ),
@@ -423,9 +427,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
         final data = json.decode(response.body);
         final statuses = data['statuses'] as Map<String, dynamic>;
 
-     
-          quotientStatuses =
-              statuses.map((key, value) => MapEntry(key, value as bool));
+        quotientStatuses =
+            statuses.map((key, value) => MapEntry(key, value as bool));
 
         if (mounted) {
           setState(() {});
@@ -480,7 +483,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
         //print(responseData);
-
+        await Future.delayed(const Duration(seconds: 2));
+        // await Future.delayed(const Duration(milliseconds: 2500));
         int? flagged = jsonDecode(responseData)['flagged'];
 
         todayQuestionStatus = "Today's $flagged Flagged Activities";
@@ -494,11 +498,12 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
         print(response.reasonPhrase);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-        ),
-      );
+      Fluttertoast.showToast(msg: e.toString());
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text(e.toString()),
+      //   ),
+      // );
     }
   }
 }

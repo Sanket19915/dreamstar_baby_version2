@@ -13,9 +13,9 @@ import 'package:provider/provider.dart';
 
 import 'shared/helper/app_color.dart';
 
-import 'package:dream_baby/viewmodels/login_viewmodel.dart';
-import 'package:provider/provider.dart';
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+BuildContext get getContext => navigatorKey.currentState!.context;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -66,6 +66,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
+        key: navigatorKey,
         routerConfig: GoRouter(
           routes: appRoutes,
           initialLocation: initialRoute,

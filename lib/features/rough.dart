@@ -10,8 +10,10 @@ class AmazonLinkWidget extends StatelessWidget {
       {super.key, required this.height, required this.width});
 
   Future<void> _launchAmazon() async {
-    const amazonAppUrl = 'https://www.amazon.in/Sanskar-Manifestation-through-Garbha-Secrets/dp/9361561375/re[…]ooks&sprefix=dr+sonal+jayaswal%2Cstripbooks%2C279&sr=1-1-fkmr0';
-    const amazonWebUrl = 'https://www.amazon.in/Sanskar-Manifestation-through-Garbha-Secrets/dp/9361561375/re[…]ooks&sprefix=dr+sonal+jayaswal%2Cstripbooks%2C279&sr=1-1-fkmr0';
+    const amazonAppUrl =
+        'https://www.amazon.in/Sanskar-Manifestation-through-Garbha-Secrets/dp/9361561375/re[…]ooks&sprefix=dr+sonal+jayaswal%2Cstripbooks%2C279&sr=1-1-fkmr0';
+    const amazonWebUrl =
+        'https://www.amazon.in/Sanskar-Manifestation-through-Garbha-Secrets/dp/9361561375/re[…]ooks&sprefix=dr+sonal+jayaswal%2Cstripbooks%2C279&sr=1-1-fkmr0';
 
     if (await canLaunchUrl(Uri.parse(amazonAppUrl))) {
       await launchUrl(Uri.parse(amazonAppUrl));
@@ -31,7 +33,7 @@ class AmazonLinkWidget extends StatelessWidget {
         width: width,
         decoration: const BoxDecoration(
           image: DecorationImage(
-              image: AssetImage(AppImages.productPic), fit: BoxFit.cover),
+              image: AssetImage(AppImages.productPicPng), fit: BoxFit.cover),
           borderRadius: BorderRadius.all(
             Radius.circular(15),
           ),
