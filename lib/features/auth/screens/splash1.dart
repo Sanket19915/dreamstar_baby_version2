@@ -18,7 +18,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
   @override
   void initState() {
     super.initState();
-    checkCallStatus(); // Check call status as soon as possible
+    // checkCallStatus(); // Check call status as soon as possible
 
     // Delay navigation after showing the GIF
     Future.delayed(const Duration(seconds: 3), () {
@@ -26,23 +26,21 @@ class _SplashScreen1State extends State<SplashScreen1> {
     });
   }
 
-  void checkCallStatus() async {
-    bool callInProgress = await isCallInProgress(); // Replace with your method
+  // void checkCallStatus() async {
+  //   bool callInProgress = await isCallInProgress(); // Replace with your method
+  //   setState(() {
+  //     _isCallOngoing = callInProgress;
+  //   });
+  //   if (_isCallOngoing) {
+  //     // Navigate immediately if a call is ongoing
+  //     navigateAfterDelay();
+  //   }
+  // }
 
-    setState(() {
-      _isCallOngoing = callInProgress;
-    });
-
-    if (_isCallOngoing) {
-      // Navigate immediately if a call is ongoing
-      navigateAfterDelay();
-    }
-  }
-
-  Future<bool> isCallInProgress() async {
-    // Replace this with actual implementation
-    return false; // Default to no call ongoing
-  }
+  // Future<bool> isCallInProgress() async {
+  //   // Replace this with actual implementation
+  //   return false; // Default to no call ongoing
+  // }
 
   void navigateAfterDelay() async {
     var box = Hive.box('userBox');
