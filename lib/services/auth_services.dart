@@ -1,10 +1,15 @@
-import 'package:dream_baby/models/user_model.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:dream_baby/models/user_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String _loginUrl = 'http://dreambaby.pro/api/auth/login';
+  static const String _sendOtpUrl = 'https://dreambaby.pro/api/auth/send-otp';
+  static const String _verifyOtpUrl =
+      'https://dreambaby.pro/api/auth/verify-otp';
 
   static Future<UserModel?> login(String phone, String password) async {
     var headers = {
@@ -65,6 +70,52 @@ class AuthService {
       return UserModel.fromJson(json.decode(responseData));
     } else {
       print('Token-based login failed: ${response.reasonPhrase}');
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> sendOtp(String phone) async {
+    var response = await http.post(
+      Uri.parse(_sendOtpUrl),
+      body: {'mobile_number': phone},
+    );
+    if (response.statusCode == 200) {
+      var responseData = response.body;
+      Map<String, dynamic> userModel = json.decode(responseData);
+      // Save token to SharedPreferences
+      // await saveToken(userModel["user_id"].toString());
+      print('Token saved: ${userModel["user_id"].toString()}');
+
+        Fluttertoast.showToast(msg: userModel['message']);
+      return userModel;
+    } else {
+      print('Login failed: ${response.body}');
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> verifyOtp(String phone, String otp, String userId) async {
+    var response = await http.post(
+      Uri.parse(_verifyOtpUrl),
+      body: {
+        'mobile_number': phone,
+        'otp': otp,
+        'user_id': userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var responseData = response.body;
+
+      Map<String, dynamic> userModel = json.decode(responseData);
+      // Save token to SharedPreferences
+      await saveToken(userModel["user_id"].toString());
+      print('Token saved: ${userModel["user_id"].toString()}');
+      Fluttertoast.showToast(msg: userModel['message']);
+      return userModel;
+    } else {
+      
+      Fluttertoast.showToast(msg:'Login failed: ${json.decode(response.body)["error"]}');
       return null;
     }
   }

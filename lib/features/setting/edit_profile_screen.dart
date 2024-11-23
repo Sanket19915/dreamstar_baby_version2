@@ -98,12 +98,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: widget.userProfile["eed"] != null
-          ? DateTime.now()
-          : DateTime.now().subtract(const Duration(days: 280)),
-      lastDate: widget.userProfile["lmp"] != null
-          ? DateTime.now()
-          : DateTime.now().add(const Duration(days: 280)),
+      firstDate:
+          // widget.userProfile["eed"] != null
+          //     ? DateTime.now()
+          //     :
+          DateTime.now().subtract(const Duration(days: 280)),
+      lastDate:
+          // widget.userProfile["lmp"] != null
+          //     ? DateTime.now()
+          //     :
+          DateTime.now().add(const Duration(days: 280)),
     );
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -366,7 +370,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               )),
                     const SizedBox(height: 20),
                     Container(
-                      padding: EdgeInsets.only(left: 5),
+                      padding: const EdgeInsets.only(left: 5),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'First Name',
@@ -388,7 +392,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: EdgeInsets.only(left: 5),
+                      padding: const EdgeInsets.only(left: 5),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Last Name',
@@ -410,7 +414,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: EdgeInsets.only(left: 5),
+                      padding: const EdgeInsets.only(left: 5),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Phone No',
@@ -435,7 +439,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: EdgeInsets.only(left: 5),
+                      padding: const EdgeInsets.only(left: 5),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Email ID',
@@ -457,7 +461,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 10),
                     Container(
-                      padding: EdgeInsets.only(left: 5),
+                      padding: const EdgeInsets.only(left: 5),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'EDD or LMP',

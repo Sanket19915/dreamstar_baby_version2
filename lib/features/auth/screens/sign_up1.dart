@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dream_baby/features/auth/screens/new_otp_screen.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
@@ -10,7 +11,6 @@ import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -20,7 +20,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import 'otp_screen.dart';
+import '../../../viewmodels/login_viewmodel.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -38,6 +38,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  LoginViewModel get viewModel =>
+      Provider.of<LoginViewModel>(context, listen: false);
   File? _profileImage;
 
   bool isLoading = false;
@@ -135,63 +137,85 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _sendOTP() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    String phoneNumber = phoneController.text.trim();
-
-    // Ensure the phone number is in the correct format
-    if (!phoneNumber.startsWith('+')) {
-      phoneNumber = '+91$phoneNumber'; // Replace '+1' with your country code
-    }
-
-    setState(() {
-      isLoading = true;
-    });
-
     try {
-      await auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await auth.signInWithCredential(credential).then(
-                (value) => print('Logged In Successfully'),
-              );
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          setState(() {
-            isLoading = false;
-          });
-          Fluttertoast.showToast(msg: e.code);
-          if (e.code == 'invalid-phone-number') {
-            print('The provided phone number is not valid.');
-          } else {
-            print(
-                'Phone number verification failed. Code: ${e.code}. Message: ${e.message}');
-          }
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          setState(() {
-            isLoading = false;
-          });
-          print('Verification ID: $verificationId'); // Log the verification ID
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OTPScreen(
-                resendToken: resendToken,
-                phoneNumber: phoneNumber,
-                verificationId: verificationId,
-                onVerified: () async {
-                  (_profileImage?.path.isEmpty ?? true)
-                      ? await _signUpWithoutImage()
-                      : await _signUp(); // Callback to sign up after verification
-                },
-              ),
+      // final FirebaseAuth auth = FirebaseAuth.instance;
+      String phoneNumber = phoneController.text.trim();
+
+      // Ensure the phone number is in the correct format
+      if (!phoneNumber.startsWith('+')) {
+        phoneNumber = '+91$phoneNumber'; // Replace '+1' with your country code
+      }
+
+      setState(() {
+        isLoading = true;
+      });
+
+      Map<String, dynamic>? response = await viewModel.sendOtp(phoneNumber);
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (response != null) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (ctx) => NewOTPScreen(
+              phoneNumber: phoneNumber,
+              userModel: response,
+              verifyComplete: (value) async {
+                (_profileImage?.path.isEmpty ?? true)
+                    ? await _signUpWithoutImage(value)
+                    : await _signUp(
+                        value); // Callback to sign up after verification
+              },
             ),
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          print('Code auto-retrieval timeout');
-        },
-      );
+          ),
+        );
+      }
+      // await auth.verifyPhoneNumber(
+      //   phoneNumber: phoneNumber,
+      //   verificationCompleted: (PhoneAuthCredential credential) async {
+      //     await auth.signInWithCredential(credential).then(
+      //           (value) => print('Logged In Successfully'),
+      //         );
+      //   },
+      //   verificationFailed: (FirebaseAuthException e) {
+      //     setState(() {
+      //       isLoading = false;
+      //     });
+      //     Fluttertoast.showToast(msg: e.code);
+      //     if (e.code == 'invalid-phone-number') {
+      //       print('The provided phone number is not valid.');
+      //     } else {
+      //       print(
+      //           'Phone number verification failed. Code: ${e.code}. Message: ${e.message}');
+      //     }
+      //   },
+      //   codeSent: (String verificationId, int? resendToken) {
+      //     setState(() {
+      //       isLoading = false;
+      //     });
+      //     print('Verification ID: $verificationId'); // Log the verification ID
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => OTPScreen(
+      //           resendToken: resendToken,
+      //           phoneNumber: phoneNumber,
+      //           verificationId: verificationId,
+      //           onVerified: () async {
+      //             (_profileImage?.path.isEmpty ?? true)
+      //                 ? await _signUpWithoutImage()
+      //                 : await _signUp(); // Callback to sign up after verification
+      //           },
+      //         ),
+      //       ),
+      //     );
+      //   },
+      //   codeAutoRetrievalTimeout: (String verificationId) {
+      //     print('Code auto-retrieval timeout');
+      //   },
+      // );
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -200,7 +224,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  Future<void> _signUpWithoutImage() async {
+  Future<void> _signUpWithoutImage(Map<String, dynamic>? userModel) async {
     try {
       setState(() {
         isLoading = true;
@@ -208,13 +232,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       await Provider.of<SignUpViewModel>(context, listen: false)
           .signUpWithotProfile(
-        firstName: firstNameController.text,
-        lastName: lastNameController.text,
-        phone: phoneController.text,
-        email: emailController.text,
-        password: passwordController.text,
-        confirmPassword: confirmPasswordController.text,
-      )
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              phone: phoneController.text,
+              email: emailController.text,
+              password: passwordController.text,
+              confirmPassword: confirmPasswordController.text,
+              userId: userModel?["user_id"]??"")
           .then(
         (value) {
           if (!value.containsKey("errors")) {
@@ -238,7 +262,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  Future<void> _signUp() async {
+  Future<void> _signUp(Map<String, dynamic>? userModel) async {
     try {
       setState(() {
         isLoading = true;
@@ -246,13 +270,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       await Provider.of<SignUpViewModel>(context, listen: false)
           .signUpWithProfile(
-              firstName: firstNameController.text,
-              lastName: lastNameController.text,
-              phone: phoneController.text,
-              email: emailController.text,
-              password: passwordController.text,
-              confirmPassword: confirmPasswordController.text,
-              profileImage: _profileImage?.path ?? "")
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
+        phone: phoneController.text,
+        email: emailController.text,
+        password: passwordController.text,
+        confirmPassword: confirmPasswordController.text,
+        profileImage: _profileImage?.path ?? "",
+        userId: userModel?["user_id"] ?? "",
+      )
           .then(
         (value) {
           if (!value.containsKey("errors")) {
@@ -503,6 +529,7 @@ class SignUpViewModel with ChangeNotifier {
     required String password,
     required String confirmPassword,
     required String profileImage,
+    required String userId,
   }) async {
     final request = http.MultipartRequest(
       'POST',
@@ -515,6 +542,7 @@ class SignUpViewModel with ChangeNotifier {
         'email': email,
         'password': password,
         'confirm_password': confirmPassword,
+        "user_id": userId
       })
       ..headers.addAll({
         'Content-Type': 'application/json',
@@ -546,6 +574,7 @@ class SignUpViewModel with ChangeNotifier {
     required String email,
     required String password,
     required String confirmPassword,
+    required String userId,
   }) async {
     final response = await http.post(
         Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
@@ -556,6 +585,7 @@ class SignUpViewModel with ChangeNotifier {
           'email': email,
           'password': password,
           'confirm_password': confirmPassword,
+          "user_id": userId
         });
 
     Map<String, dynamic>? finalResponse;

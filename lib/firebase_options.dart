@@ -58,11 +58,18 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBq9miiWr_zcNL9Vo0a2Om6aZDvCNcy9TY',
-    appId: '1:432287109522:ios:4e20d812e024874a72b14b',
-    messagingSenderId: '432287109522',
-    projectId: 'dream-baby-3f01e',
-    storageBucket: 'dream-baby-3f01e.appspot.com',
+    apiKey: 'AIzaSyCuRMlZaOOPDJucfjPWCC_2N6my5uipu9o',
+    appId: '1:304693604721:ios:85c0c433885fc0346906d0',
+    messagingSenderId: '304693604721',
+    projectId: 'dreamstarbaby-e5f83',
+    storageBucket: 'dreamstarbaby-e5f83.firebasestorage.app',
     iosBundleId: 'com.dreamstarbaby',
   );
 }
+
+//  apiKey: 'AIzaSyBq9miiWr_zcNL9Vo0a2Om6aZDvCNcy9TY',
+//     appId: '1:432287109522:ios:4e20d812e024874a72b14b',
+// messagingSenderId: '432287109522'
+// projectId: 'dream-baby-3f01e'
+//storageBucket: 'dream-baby-3f01e.appspot.com',
+  //  iosBundleId: 'com.dreamstarbaby',

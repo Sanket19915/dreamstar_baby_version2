@@ -4,6 +4,8 @@ import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactUsScreen extends StatelessWidget {
+  const ContactUsScreen({super.key});
+
   Future<bool> launchUrl(Uri uri) async {
     if (await canLaunch(uri.toString())) {
       await launch(uri.toString());
@@ -150,6 +152,7 @@ class ContactItem extends StatelessWidget {
   final Function() onTap;
 
   const ContactItem({
+    super.key,
     required this.icon,
     required this.text,
     required this.onTap,
