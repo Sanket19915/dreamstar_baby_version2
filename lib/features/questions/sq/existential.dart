@@ -1169,7 +1169,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           "enter new conditions. image = ${data?.options.map((e) => e.image).toList().join(",")}");
       print(
           "enter new conditions. text = ${data?.options.map((e) => e.text).toList().join(",")}");
-      print("enter new conditions. answerKeyInput = ${data?.answerKeyInput}");
       if ((data?.options.every((element) => element.image.isEmpty) ?? true) &&
           (data?.options.every((element) => element.text.isEmpty) ?? true) &&
           (data?.answerKeyInput.isNotEmpty ?? false)) {
@@ -1202,6 +1201,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         data?.answerKeyInput ?? "",
                         textAlign: TextAlign.center,
                       ),
+                      if (data?.answerImage != null) const SizedBox(height: 15),
+                      if (data?.answerImage != null)
+                        Image.network(
+                          "http://dreambaby.pro/storage/${data?.answerImage}",
+                          height: 80,
+                          width: 80,
+                        ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
@@ -1297,6 +1303,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           (data?.answerKeyInput ?? ""),
                           textAlign: TextAlign.center,
                         ),
+                        if (data?.answerImage != null)
+                          const SizedBox(height: 15),
+                        if (data?.answerImage != null)
+                          Image.network(
+                            "http://dreambaby.pro/storage/${data?.answerImage}",
+                            height: 80,
+                            width: 80,
+                          ),
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
@@ -1353,7 +1367,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             //     fontWeight: FontWeight.bold,
                             //     color: AppColors.mainColor),
                           ),
-
                           const SizedBox(height: 10),
                           (((data?.options.length ?? 0) <=
                                           int.parse(data?.correctAnswer.first
@@ -1405,6 +1418,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             data?.answerKeyInput ?? "",
                             textAlign: TextAlign.center,
                           ),
+                          if (data?.answerImage != null)
+                            const SizedBox(height: 15),
+                          if (data?.answerImage != null)
+                            Image.network(
+                              "http://dreambaby.pro/storage/${data?.answerImage}",
+                              height: 80,
+                              width: 80,
+                            ),
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
