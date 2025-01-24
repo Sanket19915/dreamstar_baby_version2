@@ -7,6 +7,9 @@ import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-tab-controller.dart';
+import 'package:provider/provider.dart';
+
+import '../../../viewmodels/home_viewModel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +20,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late MotionTabBarController _motionTabBarController;
-
+  bool isLoading = false;
+  HomeViewmodel get homeViewModel => Provider.of<HomeViewmodel>(context, listen: false);
   @override
   void initState() {
     super.initState();
@@ -26,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       length: 5,
       vsync: this,
     );
+    getActiveUser();
   }
 
   @override
@@ -43,8 +48,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           const TestimonialScreen(),
           AboutUsScreen(),
           const HomeContentScreen(),
-          FAQScreen(),
-          ContactUsScreen(),
+          const FAQScreen(),
+          const ContactUsScreen(),
         ],
       ),
       bottomNavigationBar: MotionTabBar(
@@ -52,13 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         labels: const ["Testimonials", "About Us", "Home", "FAQ", "Contact Us"],
-        icons: const [
-          Icons.reviews,
-          Icons.info,
-          Icons.home,
-          Icons.question_answer,
-          Icons.follow_the_signs
-        ],
+        icons: const [Icons.reviews, Icons.info, Icons.home, Icons.question_answer, Icons.follow_the_signs],
         badges: const [
           null,
           null,
@@ -94,6 +93,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
+
+  Future<void> getActiveUser() async {
+    setState(() {
+      isLoading = true;
+    });
+    await homeViewModel.activeUser();
+    setState(() {
+      isLoading = false;
+    });
+  }
 }
 
 class TestimonialsScreen extends StatelessWidget {
@@ -110,7 +119,7 @@ class CommunityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FAQScreen();
+    return const FAQScreen();
   }
 }
 
