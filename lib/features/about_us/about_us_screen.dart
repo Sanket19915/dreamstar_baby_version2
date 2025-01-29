@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsScreen extends StatelessWidget {
+  const AboutUsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -62,11 +64,9 @@ class AboutUsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor.withOpacity(.9),
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
-                  boxShadow: [
-                    const BoxShadow(
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  boxShadow: const [
+                    BoxShadow(
                       color: Colors.black26,
                       offset: Offset(0, 2),
                       blurRadius: 3.0,
@@ -93,8 +93,7 @@ class AboutUsScreen extends StatelessWidget {
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: AssetImage(
-                                  'assets/images/profile.webp'), // Your creator's image
+                              image: AssetImage('assets/images/profile.webp'), // Your creator's image
                               fit: BoxFit.fill,
                             ),
                           ),
@@ -125,7 +124,7 @@ class AboutUsScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       "Driven by her desire for motherhood, Dr. Sonal Jain Jayaswal, armed with formal degrees in Engineering as well as Management, embarked on an extraordinary journey to master Garbhasanskar. As an accomplished mother of two and a doctorate in prenatal education, she has positively impacted and empowered lives of countless aspiring mothers with her transformative approach. Her groundbreaking book and online app on GarbhaSanskar holistically blends ancient wisdom with modern science, igniting a revolution in nurturing divinity in the womb —a vital cornerstone for the achievement of empowered future.",
-                      textAlign: TextAlign.left,
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         color: AppColors.blackColor,
                         fontSize: 14,
@@ -157,8 +156,7 @@ class AboutUsScreen extends StatelessWidget {
                   IconButton(
                     icon: SvgPicture.asset('assets/images/instagram.svg'),
                     onPressed: () {
-                      _launchURL(
-                          'https://www.instagram.com/drsonaljainjayaswal/');
+                      _launchURL('https://www.instagram.com/drsonaljainjayaswal/');
                     },
                   ),
                   IconButton(

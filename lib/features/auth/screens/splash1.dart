@@ -21,8 +21,8 @@ class _SplashScreen1State extends State<SplashScreen1> {
     // checkCallStatus(); // Check call status as soon as possible
 
     // Delay navigation after showing the GIF
-    Future.delayed(const Duration(seconds: 3), () {
-      navigateAfterDelay(); // Navigate after 3 seconds
+    Future.delayed(const Duration(seconds: 6), () {
+      navigateAfterDelay(); // Navigate after 6 seconds
     });
   }
 

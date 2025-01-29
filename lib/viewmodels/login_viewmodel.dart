@@ -18,6 +18,31 @@ class LoginViewModel extends ChangeNotifier {
     return user;
   }
 
+  Future<int?> forgotPassWord(String phone) async {
+    _loading = true;
+    notifyListeners();
+
+    final user = await AuthService.forgotPassword(phone);
+
+    _loading = false;
+    notifyListeners();
+
+    return user;
+  }
+
+  Future<int?> forgotPassWordVerifyOTPAndPassword(
+      String newPassword, String confirmPassword, int? userId, String otp) async {
+    _loading = true;
+    notifyListeners();
+
+    final user = await AuthService.forgotPassWordVerifyOTPAndPassword(newPassword, confirmPassword, userId, otp);
+
+    _loading = false;
+    notifyListeners();
+
+    return user;
+  }
+
   Future<Map<String, dynamic>?> sendOtp(String phone) async {
     _loading = true;
     notifyListeners();
@@ -30,7 +55,7 @@ class LoginViewModel extends ChangeNotifier {
     return user;
   }
 
-  Future<Map<String,dynamic>?> verifyOtp(String phone, String otp, String userId) async {
+  Future<Map<String, dynamic>?> verifyOtp(String phone, String otp, String userId) async {
     _loading = true;
     notifyListeners();
 

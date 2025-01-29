@@ -4,6 +4,7 @@ import 'package:dream_baby/router/app_router.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/services/token_services.dart';
+import 'package:dream_baby/viewmodels/home_viewModel.dart';
 import 'package:dream_baby/viewmodels/login_viewmodel.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
+        ChangeNotifierProvider(create: (_) => HomeViewmodel()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -71,7 +73,7 @@ class MyApp extends StatelessWidget {
           routes: appRoutes,
           initialLocation: initialRoute,
         ),
-        title: 'Dream Star Baby',
+        title: 'DreamStar Baby Garbha Sanskar',
         theme: ThemeData(
           radioTheme: const RadioThemeData(
               fillColor: WidgetStatePropertyAll(AppColors.mainColor)),

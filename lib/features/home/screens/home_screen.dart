@@ -1,9 +1,14 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dream_baby/features/about_us/about_us_screen.dart';
 import 'package:dream_baby/features/contact_us/contact_us_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen_content.dart';
 import 'package:dream_baby/features/setting/screens/faq_screen.dart';
 import 'package:dream_baby/features/testimonials_screen/testimonials_screen.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-tab-controller.dart';
@@ -12,7 +17,9 @@ import 'package:provider/provider.dart';
 import '../../../viewmodels/home_viewModel.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -44,12 +51,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: TabBarView(
         controller: _motionTabBarController,
-        children: <Widget>[
-          const TestimonialScreen(),
+        children: const <Widget>[
+          TestimonialScreen(),
           AboutUsScreen(),
-          const HomeContentScreen(),
-          const FAQScreen(),
-          const ContactUsScreen(),
+          HomeContentScreen(),
+          FAQScreen(),
+          ContactUsScreen(),
         ],
       ),
       bottomNavigationBar: MotionTabBar(
@@ -94,14 +101,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Get Device Info... (Device Unique Id(UUID))
+  Future<String> _fetchDeviceInfo() async {
+    try {
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        return androidInfo.id;
+      } else {
+        final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.identifierForVendor ?? "";
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching device info");
+      }
+      return "";
+    }
+  }
+
   Future<void> getActiveUser() async {
-    setState(() {
-      isLoading = true;
-    });
-    await homeViewModel.activeUser();
-    setState(() {
-      isLoading = false;
-    });
+    try {
+      String? deviceId = await _fetchDeviceInfo();
+      FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance; // Change here
+      String? token = await firebaseMessaging.getToken();
+
+      await homeViewModel.activeUser(
+        deviceId: deviceId,
+        fcmToken: token,
+      );
+    } catch (e) {}
   }
 }
 
