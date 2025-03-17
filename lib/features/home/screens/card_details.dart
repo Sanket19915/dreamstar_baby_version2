@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dream_baby/features/setting/setting_screen.dart';
-import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -124,8 +122,7 @@ class _BabyCardState extends State<BabyCard> {
           });
         }
 
-        print(
-            'total_days: $total_day, Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
+        print('total_days: $total_day, Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
       } else {
         throw Exception('Unexpected response format');
       }
@@ -140,8 +137,7 @@ class _BabyCardState extends State<BabyCard> {
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
     print(total_day);
-    double percent =
-        (double.tryParse(total_day) ?? 0) / 281; // Compute the percentage here
+    double percent = (double.tryParse(total_day) ?? 0) / 281; // Compute the percentage here
     // print('Percent: $percent'); // Debug print to check the value of percent
     return isLoading
         ? Shimmer.fromColors(
@@ -202,18 +198,15 @@ class _BabyCardState extends State<BabyCard> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(
-                          "http://dreambaby.pro/storage/$profilePicture"),
+                      backgroundImage: NetworkImage("http://dreambaby.pro/storage/$profilePicture"),
                     ),
                     const SizedBox(
                       width: 10,
                     ),
                     Text(
-                      'Hi $firstName,',
+                      'Hi ${firstName.toString()[0].toUpperCase()}${firstName.toString().substring(1).toLowerCase()},',
                       style: GoogleFonts.lobsterTwo(
-                          color: AppColors.blackColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500),
+                          color: AppColors.blackColor, fontSize: 20, fontWeight: FontWeight.w500),
                     )
                   ],
                 ),
@@ -224,9 +217,7 @@ class _BabyCardState extends State<BabyCard> {
               babyData == null
                   ? SvgPicture.asset(AppImages.noEddImg)
                   : ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxHeight: math.max(deviceHeight * .059, 170),
-                          minHeight: 170),
+                      constraints: BoxConstraints(maxHeight: math.max(deviceHeight * .059, 170), minHeight: 170),
                       child: Container(
                         height: deviceHeight * 0.201,
                         decoration: BoxDecoration(
@@ -243,13 +234,10 @@ class _BabyCardState extends State<BabyCard> {
                                 Expanded(
                                   flex: 4,
                                   child: Container(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, top: 20, right: 5, bottom: 8),
+                                    padding: const EdgeInsets.only(left: 10, top: 20, right: 5, bottom: 8),
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         AutoSizeText(
                                           'Baby’s milestone today',
@@ -274,18 +262,15 @@ class _BabyCardState extends State<BabyCard> {
                                                   style: GoogleFonts.poppins(
                                                       fontSize: 11,
                                                       height: 1,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: AppColors
-                                                          .greyTextColor)),
+                                                      fontWeight: FontWeight.w500,
+                                                      color: AppColors.greyTextColor)),
                                               TextSpan(
                                                 text: '  $weight',
                                                 style: GoogleFonts.poppins(
                                                     fontSize: 11,
                                                     height: 1,
                                                     fontWeight: FontWeight.w600,
-                                                    color:
-                                                        AppColors.blackColor),
+                                                    color: AppColors.blackColor),
                                               ),
                                               TextSpan(
                                                 text: '*',
@@ -293,8 +278,7 @@ class _BabyCardState extends State<BabyCard> {
                                                     fontSize: 11,
                                                     height: 1,
                                                     fontWeight: FontWeight.w500,
-                                                    color: AppColors
-                                                        .greyTextColor),
+                                                    color: AppColors.greyTextColor),
                                               ),
                                             ],
                                           ),
@@ -311,18 +295,15 @@ class _BabyCardState extends State<BabyCard> {
                                                   style: GoogleFonts.poppins(
                                                       fontSize: 11,
                                                       height: 1,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: AppColors
-                                                          .greyTextColor)),
+                                                      fontWeight: FontWeight.w500,
+                                                      color: AppColors.greyTextColor)),
                                               TextSpan(
                                                 text: '       $sizes',
                                                 style: GoogleFonts.poppins(
                                                     fontSize: 11,
                                                     height: 1,
                                                     fontWeight: FontWeight.w600,
-                                                    color:
-                                                        AppColors.blackColor),
+                                                    color: AppColors.blackColor),
                                               ),
                                               TextSpan(
                                                 text: '*',
@@ -330,8 +311,7 @@ class _BabyCardState extends State<BabyCard> {
                                                     fontSize: 11,
                                                     height: 1,
                                                     fontWeight: FontWeight.w500,
-                                                    color: AppColors
-                                                        .greyTextColor),
+                                                    color: AppColors.greyTextColor),
                                               ),
                                             ],
                                           ),
@@ -348,19 +328,15 @@ class _BabyCardState extends State<BabyCard> {
                                                   style: GoogleFonts.poppins(
                                                       fontSize: 11,
                                                       height: 1,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: AppColors
-                                                          .greyTextColor)),
+                                                      fontWeight: FontWeight.w500,
+                                                      color: AppColors.greyTextColor)),
                                               TextSpan(
-                                                text:
-                                                    '      $weeks Weeks \n               $days Days',
+                                                text: '      $weeks Weeks \n               $days Days',
                                                 style: GoogleFonts.poppins(
                                                     fontSize: 11,
                                                     height: 1.5,
                                                     fontWeight: FontWeight.w600,
-                                                    color:
-                                                        AppColors.blackColor),
+                                                    color: AppColors.blackColor),
                                               ),
                                               TextSpan(
                                                 text: '*',
@@ -368,8 +344,7 @@ class _BabyCardState extends State<BabyCard> {
                                                     fontSize: 11,
                                                     height: 1,
                                                     fontWeight: FontWeight.w500,
-                                                    color: AppColors
-                                                        .greyTextColor),
+                                                    color: AppColors.greyTextColor),
                                               ),
                                             ],
                                           ),
@@ -398,13 +373,10 @@ class _BabyCardState extends State<BabyCard> {
                                   flex: 3,
                                   child: Container(
                                     alignment: Alignment.centerRight,
-                                    padding: const EdgeInsets.only(
-                                        top: 20, right: 15),
+                                    padding: const EdgeInsets.only(top: 20, right: 15),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         AutoSizeText(
                                           'Your baby is the size of a',
@@ -423,8 +395,7 @@ class _BabyCardState extends State<BabyCard> {
                                         ),
                                         Container(
                                           alignment: Alignment.center,
-                                          padding:
-                                              const EdgeInsets.only(left: 20),
+                                          padding: const EdgeInsets.only(left: 20),
                                           child: images.isEmpty
                                               ? Image.asset(
                                                   AppImages.bellPepper,
@@ -439,7 +410,7 @@ class _BabyCardState extends State<BabyCard> {
                                           height: 10,
                                         ),
                                         Container(
-                                          margin: EdgeInsets.only(left: 10),
+                                          margin: const EdgeInsets.only(left: 10),
                                           alignment: Alignment.center,
                                           child: AutoSizeText(
                                             height,
@@ -448,8 +419,7 @@ class _BabyCardState extends State<BabyCard> {
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.lobsterTwo(
-                                                color: AppColors.babySizeColor,
-                                                fontWeight: FontWeight.w700),
+                                                color: AppColors.babySizeColor, fontWeight: FontWeight.w700),
                                           ),
                                         )
                                       ],
@@ -464,7 +434,7 @@ class _BabyCardState extends State<BabyCard> {
                               child: CircularPercentIndicator(
                                 center: SizedBox(
                                   width: deviceWidth / 3,
-                                  child: Image(
+                                  child: const Image(
                                     image: AssetImage(AppImages.baby),
                                     fit: BoxFit.fill,
                                   ),
@@ -474,8 +444,7 @@ class _BabyCardState extends State<BabyCard> {
                                 animation: true,
                                 percent: percent,
                                 circularStrokeCap: CircularStrokeCap.round,
-                                backgroundColor:
-                                    AppColors.whiteColor.withOpacity(.85),
+                                backgroundColor: AppColors.whiteColor.withOpacity(.85),
                                 progressColor: AppColors.mainColor,
                                 rotateLinearGradient: true,
                               ),

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Dreamstar Baby</string>
+	<string>DreamStar Baby Garbha Sanskar</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,7 +23,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>5</string>
 	<key>LSApplicationCategoryType</key>
 	<array>
 		<dict>
@@ -75,5 +75,7 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSUserTrackingUsageDescription</key>
+    <string>This identifier will be used to deliver personalized experience to you.</string>
 </dict>
 </plist>

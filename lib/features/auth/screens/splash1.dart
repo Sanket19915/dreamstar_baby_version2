@@ -1,3 +1,4 @@
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:dream_baby/features/auth/screens/login.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
@@ -21,9 +22,10 @@ class _SplashScreen1State extends State<SplashScreen1> {
     // checkCallStatus(); // Check call status as soon as possible
 
     // Delay navigation after showing the GIF
-    Future.delayed(const Duration(seconds: 3), () {
-      navigateAfterDelay(); // Navigate after 3 seconds
+    Future.delayed(const Duration(seconds: 6), () {
+      navigateAfterDelay(); // Navigate after 6 seconds
     });
+    initPlugin();
   }
 
   // void checkCallStatus() async {
@@ -85,5 +87,25 @@ class _SplashScreen1State extends State<SplashScreen1> {
         ],
       ),
     );
+  }
+
+  String _authStatus = 'Unknown';
+  Future<void> initPlugin() async {
+    final TrackingStatus status =
+        await AppTrackingTransparency.trackingAuthorizationStatus;
+    setState(() => _authStatus = '$status');
+    // If the system can show an authorization request dialog
+    if (status == TrackingStatus.notDetermined) {
+      // Wait for dialog popping animation
+
+      // Wait for dialog popping animation
+      await Future.delayed(const Duration(milliseconds: 200));
+      // Request system's tracking authorization dialog
+      final TrackingStatus status =
+          await AppTrackingTransparency.requestTrackingAuthorization();
+      setState(() => _authStatus = '$status');
+    }
+
+    final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
   }
 }

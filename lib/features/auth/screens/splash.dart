@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
         child: Center(
           child: AnimatedOpacity(
             opacity: showImage ? 1.0 : 0.0,
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 5),
             child: showImage
                 ? Hero(
                     tag: 'Logo',

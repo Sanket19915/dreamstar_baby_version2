@@ -51,6 +51,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   ValueNotifier answerNotifier = ValueNotifier(true);
   String todayQuestionStatus = "";
   List<String> quotients = [
+   "Existential",
     "Kinesthetic",
     "Logical",
     "Linguistic",
@@ -59,7 +60,6 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     "Intrapersonal",
     "Naturalistic",
     "Interpersonal",
-    "Existential",
   ];
   @override
   void initState() {
@@ -1205,8 +1205,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       if (data?.answerImage != null)
                         Image.network(
                           "http://dreambaby.pro/storage/${data?.answerImage}",
-                          height: 80,
-                          width: 80,
+                          height: 120,
+                          width: 120,
                         ),
                       const SizedBox(height: 20),
                       ElevatedButton(
@@ -1282,8 +1282,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   ),
                                   Image.network(
                                     "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
-                                    height: 50,
-                                    width: 60,
+                                    height: 90,
+                                    width: 100,
                                   ),
                                 ],
                               )
@@ -1308,8 +1308,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         if (data?.answerImage != null)
                           Image.network(
                             "http://dreambaby.pro/storage/${data?.answerImage}",
-                            height: 80,
-                            width: 80,
+                            height: 120,
+                            width: 120,
                           ),
                         const SizedBox(height: 20),
                         ElevatedButton(
@@ -1397,8 +1397,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     ),
                                     Image.network(
                                       "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
-                                      height: 50,
-                                      width: 60,
+                                      height: 90,
+                                      width: 100,
                                     ),
                                   ],
                                 )
@@ -1423,8 +1423,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           if (data?.answerImage != null)
                             Image.network(
                               "http://dreambaby.pro/storage/${data?.answerImage}",
-                              height: 80,
-                              width: 80,
+                              height: 120,
+                              width: 120,
                             ),
                           const SizedBox(height: 20),
                           ElevatedButton(
@@ -1466,7 +1466,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
       http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200|| response.statusCode == 201) {
         String responseData = await response.stream.bytesToString();
         print(responseData);
         print(questionsModel);
@@ -1511,14 +1511,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           'GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
 
       request.headers.addAll(headers);
-
+      await Future.delayed(const Duration(milliseconds: 500));
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
         print(responseData);
 
-        await Future.delayed(const Duration(seconds: 2));
+      
         int? skipped = jsonDecode(responseData)['skipped'] ?? 0;
         int? flagged = jsonDecode(responseData)['flagged'] ?? 0;
         int? submitted = jsonDecode(responseData)['submitted'] ?? 0;

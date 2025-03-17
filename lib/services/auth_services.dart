@@ -7,9 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String _loginUrl = 'http://dreambaby.pro/api/auth/login';
+  static const String _resetPasswordUrl = 'http://dreambaby.pro/api/auth/reset-password';
+  static const String _forgotPasswordUrl = 'http://dreambaby.pro/api/auth/forgot-password';
   static const String _sendOtpUrl = 'https://dreambaby.pro/api/auth/send-otp';
-  static const String _verifyOtpUrl =
-      'https://dreambaby.pro/api/auth/verify-otp';
+  static const String _verifyOtpUrl = 'https://dreambaby.pro/api/auth/verify-otp';
 
   static Future<UserModel?> login(String phone, String password) async {
     var headers = {
@@ -35,6 +36,44 @@ class AuthService {
       return userModel;
     } else {
       print('Login failed: ${response.reasonPhrase}');
+      return null;
+    }
+  }
+
+  static Future<int?> forgotPassword(String phone) async {
+    var request = http.MultipartRequest('POST', Uri.parse(_forgotPasswordUrl));
+    request.fields.addAll({
+      'phone_no': phone,
+    });
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var responseData = await response.stream.bytesToString();
+      return jsonDecode(responseData)['user_id'];
+    } else {
+      print('Forgot password failed: ${response.reasonPhrase}');
+      return null;
+    }
+  }
+
+  static Future<int?> forgotPassWordVerifyOTPAndPassword(
+      String newPassword, String confirmPassword, int? userId, String otp) async {
+    var request = http.MultipartRequest('POST', Uri.parse(_resetPasswordUrl));
+    request.fields.addAll({
+      "user_id": userId.toString(),
+      "otp": otp,
+      "new_password": newPassword,
+      "new_password_confirmation": confirmPassword
+    });
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      var responseData = await response.stream.bytesToString();
+      return jsonDecode(responseData)['user_id'];
+    } else {
+      print('Forgot password failed: ${response.reasonPhrase}');
       return null;
     }
   }
@@ -86,7 +125,7 @@ class AuthService {
       // await saveToken(userModel["user_id"].toString());
       print('Token saved: ${userModel["user_id"].toString()}');
 
-        Fluttertoast.showToast(msg: userModel['message']);
+      Fluttertoast.showToast(msg: userModel['message']);
       return userModel;
     } else {
       print('Login failed: ${response.body}');
@@ -114,8 +153,7 @@ class AuthService {
       Fluttertoast.showToast(msg: userModel['message']);
       return userModel;
     } else {
-      
-      Fluttertoast.showToast(msg:'Login failed: ${json.decode(response.body)["error"]}');
+      Fluttertoast.showToast(msg: 'Login failed: ${json.decode(response.body)["error"]}');
       return null;
     }
   }

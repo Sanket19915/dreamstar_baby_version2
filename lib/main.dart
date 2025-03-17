@@ -1,9 +1,11 @@
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
 import 'package:dream_baby/firebase_options.dart';
 import 'package:dream_baby/router/app_router.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/services/token_services.dart';
+import 'package:dream_baby/viewmodels/home_viewModel.dart';
 import 'package:dream_baby/viewmodels/login_viewmodel.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -52,10 +54,27 @@ void main() async {
   runApp(const MyApp(initialRoute: Routes.splash));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.initialRoute});
 
   final String initialRoute;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    // Show tracking authorization dialog and ask for permission
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
+  
+          await AppTrackingTransparency.requestTrackingAuthorization();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,15 +82,16 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
+        ChangeNotifierProvider(create: (_) => HomeViewmodel()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         key: navigatorKey,
         routerConfig: GoRouter(
           routes: appRoutes,
-          initialLocation: initialRoute,
+          initialLocation: widget.initialRoute,
         ),
-        title: 'Dream Star Baby',
+        title: 'DreamStar Baby Garbha Sanskar',
         theme: ThemeData(
           radioTheme: const RadioThemeData(
               fillColor: WidgetStatePropertyAll(AppColors.mainColor)),

@@ -1,4 +1,5 @@
 import 'package:dream_baby/features/auth/bloc/form_validate.dart';
+import 'package:dream_baby/features/auth/screens/forgot_password_screen.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
@@ -200,25 +201,34 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                               height:
                                   MediaQuery.of(context).size.height * 0.01),
-                          const SizedBox(
-                            height: 30,
-                            width: double.infinity,
-                            child: Text(
-                              'Forgot Your Password?',
-                              style: TextStyle(
-                                color: Colors.transparent,
-                                decorationColor: AppColors.secondaryTextColor,
-                                fontSize: 13,
-                                fontWeight: CustomLabels.largeFontWeight,
-                                fontFamily: CustomLabels.secondaryFont,
-                                shadows: [
-                                  Shadow(
-                                    color: AppColors.secondaryTextColor,
-                                    offset: Offset(0, -1.8),
-                                  ),
-                                ],
-                                decoration: TextDecoration.underline,
-                                decorationThickness: 1.51,
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => ForgotPasswordScreen(),
+                                ),
+                              );
+                            },
+                            child: const SizedBox(
+                              height: 30,
+                              width: double.infinity,
+                              child: Text(
+                                'Forgot Your Password?',
+                                style: TextStyle(
+                                  color: Colors.transparent,
+                                  decorationColor: AppColors.secondaryTextColor,
+                                  fontSize: 13,
+                                  fontWeight: CustomLabels.largeFontWeight,
+                                  fontFamily: CustomLabels.secondaryFont,
+                                  shadows: [
+                                    Shadow(
+                                      color: AppColors.secondaryTextColor,
+                                      offset: Offset(0, -1.8),
+                                    ),
+                                  ],
+                                  decoration: TextDecoration.underline,
+                                  decorationThickness: 1.51,
+                                ),
                               ),
                             ),
                           ),
@@ -255,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     print(user);
                                     if (user != null) {
                                       sessionManager.setLoggedIn(true);
-                                      context.go(Routes.home);
+                                      context.go(Routes.home ,extra: user.token);
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
