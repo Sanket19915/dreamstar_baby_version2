@@ -44,15 +44,21 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<Map<String, dynamic>?> sendOtp(String phone) async {
-    _loading = true;
-    notifyListeners();
+    try {
+      _loading = true;
+      notifyListeners();
 
-    final user = await AuthService.sendOtp(phone);
+      final user = await AuthService.sendOtp(phone);
 
-    _loading = false;
-    notifyListeners();
+      _loading = false;
+      notifyListeners();
 
-    return user;
+      return user;
+    } catch (e) {
+      _loading = false;
+      notifyListeners();
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>?> verifyOtp(String phone, String otp, String userId) async {

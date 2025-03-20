@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
 import 'package:dream_baby/firebase_options.dart';
 import 'package:dream_baby/router/app_router.dart';
@@ -19,7 +21,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext get getContext => navigatorKey.currentState!.context;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+HttpOverrides.global = MyHttpOverrides();
   await Hive.initFlutter();
   await Hive.openBox('userBox');
   await Firebase.initializeApp(
@@ -85,5 +87,13 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
