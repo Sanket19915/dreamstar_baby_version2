@@ -5,6 +5,7 @@ class Routes {
   static const registration = '/registration';
   static const home = '/home';
   static const moreDetails = '/moreDetails';
+  static const acknowledgement = '/acknowledgement';
   static const knowEntry = '/knowEntry';
   static const notification = '/NotificationScreen';
   static const settingsScreen = '/SettingsScreen';

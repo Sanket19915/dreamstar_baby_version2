@@ -51,7 +51,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
 
   void validatePassword(String value) {
     setState(() {
-      isPasswordValid = value.length >= 6;
+      isPasswordValid = value.length >= 8;
     });
   }
 
@@ -63,7 +63,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
 
   String? passwordValidator(String? value, BuildContext? context) {
     validatePassword(value ?? '');
-    return isPasswordValid ? null : 'Password must be at least 6 characters';
+    return isPasswordValid ? null : 'Password must be at least 8 characters';
   }
 
   String? confirmPasswordValidator(String? value, BuildContext? context) {
@@ -292,8 +292,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
           passwordController.text, confirmPasswordController.text, widget.userId, otpController.text);
       Navigator.of(context).popUntil((route) => route.isFirst);
 
-            Fluttertoast.showToast(msg: "Password has been reset successfully!!");
-
+      Fluttertoast.showToast(msg: "Password has been reset successfully!!");
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     } finally {

@@ -1,7 +1,7 @@
+import 'package:dream_baby/features/auth/screens/acknowledgement_screen.dart';
 import 'package:dream_baby/features/auth/screens/login.dart';
 import 'package:dream_baby/features/auth/screens/onboarding.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
-import 'package:dream_baby/features/auth/screens/splash1.dart';
 import 'package:dream_baby/features/home/screens/home_screen.dart';
 import 'package:dream_baby/features/konwledge_hub/know_entry.dart';
 import 'package:dream_baby/features/notifications/screen/notification_screen.dart';
@@ -13,11 +13,12 @@ import 'package:dream_baby/shared/widget/bottom_navbar.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/screens/more_details.dart';
+import '../features/auth/screens/splash1.dart';
 
 final appRoutes = <RouteBase>[
   GoRoute(
     path: Routes.splash,
-    builder: (context, state) => const SplashScreen1(),
+    builder: (context, state) =>  const SplashScreen1(),
   ),
   GoRoute(
     path: Routes.onboard,
@@ -68,6 +69,13 @@ final appRoutes = <RouteBase>[
       return MoreDetailsScreen(
         userId: userId,
       );
+    },
+  ),
+
+  GoRoute(
+    path: Routes.acknowledgement,
+    builder: (context, state) {
+      return const AcknowledgementScreen();
     },
   ),
   GoRoute(

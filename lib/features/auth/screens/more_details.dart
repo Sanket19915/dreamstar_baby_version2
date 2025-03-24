@@ -368,7 +368,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         Map<String, dynamic> data =
             jsonDecode(response.body) as Map<String, dynamic>;
         Fluttertoast.showToast(msg: data["message"]);
-        context.go(Routes.home);
+        // context.go(Routes.home);
+        context.go(Routes.acknowledgement);
       } else {
         Fluttertoast.showToast(msg: "skip faild");
       }
@@ -398,7 +399,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       );
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Registration completed successfully");
-        context.go(Routes.home);
+        context.go(Routes.acknowledgement);
       } else {
         Fluttertoast.showToast(msg: "Something went wrong");
       }

@@ -67,3 +67,9 @@ flutter:
   assets:
     - assets/images/
     - assets/pdf/
+  fonts:  
+    - family: Aristotelica  
+      fonts:  
+        # - asset: assets/fonts/Zetafonts - Aristotelica Display Extralight.ttf
+        - asset: assets/fonts/Aristotelica Display DemiBold Trial.ttf  
+          # weight: 900
