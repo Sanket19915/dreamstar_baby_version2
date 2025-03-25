@@ -112,7 +112,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
               ],
             ),
             InkWell(
-                onTap: () => GoRouter.of(context).push(Routes.notification),
+                onTap: () => GoRouter.of(context).push(Routes.notification).then(
+                      (value) async => await fetchNotificationCount(),
+                    ),
                 child: Stack(
                   alignment: Alignment.topRight,
                   children: [

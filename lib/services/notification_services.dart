@@ -5,6 +5,7 @@ import 'auth_services.dart';
 import 'package:http/http.dart' as http;
 
 class NotificationServices {
+ 
   static Future<Map<String, dynamic>> singleNotificationRead({required int notificationId}) async {
     String? token = await AuthService.getToken();
     var uri = Uri.parse('https://dreambaby.pro/api/notifications/$notificationId/read');
@@ -19,15 +20,16 @@ class NotificationServices {
     }
   }
 
-  static Future<NotificationData> getAllNotification() async {
+  static Future<NotificationData> getAllNotification({required int page  }) async {
     String? token = await AuthService.getToken();
-    var uri = Uri.parse('https://dreambaby.pro/api/notifications');
+    var uri = Uri.parse('https://dreambaby.pro/api/notifications?page=${page}');
     var response = await http.get(uri, headers: {
       'Authorization': 'Bearer $token',
     });
 
     if (response.statusCode == 200) {
-  NotificationData  notificationData =  notificationDataFromJson(response.body);
+      NotificationData notificationData = notificationDataFromJson(response.body);
+      
       return notificationData;
     } else {
       throw Exception('Failed to load notification');

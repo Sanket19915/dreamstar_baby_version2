@@ -7,6 +7,7 @@ import '../services/notification_services.dart';
 class NotificationViewModel extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
+  NotificationData? notificationData;
   Future<Map<String, dynamic>?> singleNotificationRead({required int notificationId}) async {
     try {
       final notification = await NotificationServices.singleNotificationRead(notificationId: notificationId);
@@ -18,11 +19,20 @@ class NotificationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<NotificationData> getAllNotification() async {
+  Future<NotificationData?> getAllNotification({required int page}) async {
     try {
-      final notification = await NotificationServices.getAllNotification();
+      if (page == 1) {
+        notificationData = null;
+        notificationData?.data?.data = [];
+      }
+      final newnotification = await NotificationServices.getAllNotification(page: page);
+      if (notificationData == null) {
+        notificationData = newnotification;
+      } else {
+        notificationData?.data?.data?.addAll(newnotification.data?.data ?? []);
+      }
 
-      return notification;
+      return notificationData;
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
       rethrow;
