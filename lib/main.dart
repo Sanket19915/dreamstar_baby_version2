@@ -15,13 +15,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'shared/helper/app_color.dart';
+import 'viewmodels/notification_view_model.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 BuildContext get getContext => navigatorKey.currentState!.context;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-HttpOverrides.global = MyHttpOverrides();
+  HttpOverrides.global = MyHttpOverrides();
   await Hive.initFlutter();
   await Hive.openBox('userBox');
   await Firebase.initializeApp(
@@ -46,8 +47,7 @@ HttpOverrides.global = MyHttpOverrides();
       return;
     } else {
       // If login fails, continue with the regular login flow
-      print(
-          'Failed to login with saved token. Proceeding with regular login flow.');
+      print('Failed to login with saved token. Proceeding with regular login flow.');
     }
   }
 
@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => HomeViewmodel()),
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -77,8 +78,7 @@ class MyApp extends StatelessWidget {
         ),
         title: 'DreamStar Baby Garbha Sanskar',
         theme: ThemeData(
-          radioTheme: const RadioThemeData(
-              fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
+          radioTheme: const RadioThemeData(fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
           checkboxTheme: const CheckboxThemeData(
               side: BorderSide(color: AppColors.mainColor),
               checkColor: WidgetStatePropertyAll(AppColors.whiteColor),
