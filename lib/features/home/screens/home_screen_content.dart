@@ -17,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../services/auth_services.dart';
+
 import '../../../viewmodels/notification_view_model.dart';
 import '../../questions/sq/existential.dart';
 
@@ -51,6 +52,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   @override
   void initState() {
     super.initState();
+    
     fetchNotificationCount();
     fetchQuotientStatuses();
     getTodaysQuestionStatus();
@@ -67,13 +69,13 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     // });
   }
 
-  @override
-  void dispose() {
-    //_scrollController.dispose();
-    fetchQuotientStatuses();
-    getTodaysQuestionStatus();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   //_scrollController.dispose();
+  //   // fetchQuotientStatuses();
+  //   // getTodaysQuestionStatus();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {

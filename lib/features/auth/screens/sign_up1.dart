@@ -84,7 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void validatePassword(String value) {
     setState(() {
-      isPasswordValid = value.length >= 6;
+      isPasswordValid = value.length >= 8;
     });
   }
 
@@ -116,7 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   String? passwordValidator(String? value, BuildContext? context) {
     validatePassword(value ?? '');
-    return isPasswordValid ? null : 'Password must be at least 6 characters';
+    return isPasswordValid ? null : 'Password must be at least 8 characters';
   }
 
   String? confirmPasswordValidator(String? value, BuildContext? context) {

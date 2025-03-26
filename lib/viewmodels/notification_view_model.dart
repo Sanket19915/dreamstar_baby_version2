@@ -8,6 +8,7 @@ class NotificationViewModel extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
   NotificationData? notificationData;
+  int currentPage = 1;
   Future<Map<String, dynamic>?> singleNotificationRead({required int notificationId}) async {
     try {
       final notification = await NotificationServices.singleNotificationRead(notificationId: notificationId);
@@ -19,17 +20,19 @@ class NotificationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<NotificationData?> getAllNotification({required int page}) async {
+  Future<NotificationData?> getAllNotification() async {
     try {
-      if (page == 1) {
+      if (currentPage == 1) {
         notificationData = null;
         notificationData?.data?.data = [];
       }
-      final newnotification = await NotificationServices.getAllNotification(page: page);
+      final newnotification = await NotificationServices.getAllNotification(page: currentPage);
       if (notificationData == null) {
         notificationData = newnotification;
+        currentPage = notificationData?.data?.currentPage ??1 ;
       } else {
         notificationData?.data?.data?.addAll(newnotification.data?.data ?? []);
+       currentPage = notificationData?.data?.currentPage ?? 1;
       }
 
       return notificationData;

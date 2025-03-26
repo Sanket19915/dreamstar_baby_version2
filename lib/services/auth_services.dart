@@ -129,6 +129,7 @@ class AuthService {
         Fluttertoast.showToast(msg: userModel['message']);
         return userModel;
       } else {
+        Fluttertoast.showToast(msg: jsonDecode(response.body)["errors"].toString());
         print('Login failed: ${response.body}');
         return null;
       }

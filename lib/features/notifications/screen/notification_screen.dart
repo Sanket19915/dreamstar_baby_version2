@@ -1,3 +1,7 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+
+import 'package:dream_baby/features/notifications/widgets/lazy_loaded_scrollbar.dart';
+import 'package:dream_baby/features/notifications/widgets/loading_indicator_widget.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -22,35 +26,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
   //------------------------ variable ------------------------------//
   NotificationViewModel get notificationViewModel => Provider.of<NotificationViewModel>(context, listen: false);
   NotificationData? notification;
-  late final ScrollController _scrollController;
-  bool isLoading = false;
+  final LoadingIndicatorNotifier _loadingStatusNotifier = LoadingIndicatorNotifier();
+
   bool isNotificationLoading = false;
-  int page = 1;
+  final ValueNotifier _valueNotifier = ValueNotifier(true);
+  final ValueNotifier notificationReadNotifier = ValueNotifier(true);
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_loadMoreListener);
-
-    getAllNotification(page);
+  getAllNotification();
   }
 
-  Future<void> _loadMoreListener() async {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-      if (notification != null && notification?.data?.lastPage != page) {
-        page++;
-        await getAllNotification(page);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_loadMoreListener);
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,36 +54,39 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
         actions: [
-          Visibility(
-            visible: notification?.data?.data?.isNotEmpty ?? false,
-            child: GestureDetector(
-              onTap: () => markAsAllread(),
-              child: Row(
-                children: [
-                  Text(
-                    "Mark as all Read",
-                    style: Theme.of(context).textTheme.labelSmall,
+          ValueListenableBuilder(
+              valueListenable: _valueNotifier,
+              builder: (context, value, child) {
+                return Visibility(
+                  visible: notification?.data?.data?.isNotEmpty ?? false,
+                  child: GestureDetector(
+                    onTap: () => markAsAllread(),
+                    child: Row(
+                      children: [
+                        Text(
+                          "Mark as all Read",
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        const SizedBox(width: 5),
+                        ValueListenableBuilder(
+                            valueListenable: notificationReadNotifier,
+                            builder: (context, value, child) {
+                              return isNotificationLoading
+                                  ? const Padding(
+                                      padding: EdgeInsets.only(right: 5),
+                                      child: SizedBox(
+                                        height: 10,
+                                        width: 10,
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    )
+                                  : Container();
+                            })
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 5),
-                  isNotificationLoading
-                      ? const Padding(
-                          padding: EdgeInsets.only(right: 5),
-                          child: SizedBox(
-                            height: 10,
-                            width: 10,
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      : Container()
-                  // const Icon(
-                  //   Icons.circle_notifications,
-                  //   color: AppColors.mainColor,
-                  // ),
-                  // const SizedBox(width: 5),
-                ],
-              ),
-            ),
-          ),
+                );
+              }),
         ],
         centerTitle: true,
         title: Text(
@@ -108,198 +98,191 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : SafeArea(
-              child: (notification?.data?.data?.isNotEmpty ?? false)
-                  ? RefreshIndicator(
-                      backgroundColor: Colors.white,
-                      onRefresh: () async {
-                        await getAllNotification(page);
-                      },
-                      child: ListView.separated(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: (notification?.data?.data?.length ?? 0),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                        ),
-                        itemBuilder: (context, index) {
-                          if (index == notification?.data?.data?.length) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
+      body: LoadingIndicator(
+        loadingStatusNotifier: _loadingStatusNotifier,
+        child: ValueListenableBuilder(
+            valueListenable: _valueNotifier,
+            builder: (context, value, child) {
+              return SafeArea(
+                child: (notification?.data?.data?.isNotEmpty ?? false)
+                    ? LazyLoadScrollView(
+                        onEndOfPage: () async {
+                          if (notification != null && notification?.data?.total != notification?.data?.data?.length) {
+                            notificationViewModel.currentPage++;
+                            notification = await notificationViewModel.getAllNotification();
+                            _valueNotifier.notifyListeners();
+                          } else {
+                            return;
                           }
-                          return Slidable(
-                            endActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                SlidableAction(
-                                  // An action can be bigger than the others.
-                                  flex: 1,
-                                  onPressed: (context) async => await singleMakeAsReadAction(
-                                      notificationId: notification?.data?.data?[index].id ?? 0),
-                                  backgroundColor: AppColors.mainColor,
-                                  foregroundColor: Colors.white,
+                        },
+                        child: RefreshIndicator(
+                            backgroundColor: Colors.white,
+                            onRefresh: () async {
+                              notification = await notificationViewModel.getAllNotification();
+                              _valueNotifier.notifyListeners();
+                            },
+                            child: ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: (notification?.data?.data?.length ?? 0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              itemBuilder: (context, index) {
+                                return Slidable(
+                                  endActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        // An action can be bigger than the others.
+                                        flex: 1,
+                                        onPressed: (context) async => await singleMakeAsReadAction(
+                                            notificationId: notification?.data?.data?[index].id ?? 0),
+                                        backgroundColor: AppColors.mainColor,
+                                        foregroundColor: Colors.white,
 
-                                  icon: (notification?.data?.data?[index].isRead ?? false)
-                                      ? Icons.notifications_none_outlined
-                                      : Icons.notification_add_sharp,
-                                  label: 'Mark as read',
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 20,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: (notification?.data?.data?[index].isRead ?? false)
-                                          ? const Icon(
-                                              Icons.notifications_none_outlined,
-                                              color: Colors.grey,
-                                            )
-                                          : Image.asset(
-                                              AppImages.bell,
-                                              height: 24,
-                                            ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      child: Column(
+                                        icon: (notification?.data?.data?[index].isRead ?? false)
+                                            ? Icons.notifications_none_outlined
+                                            : Icons.notification_add_sharp,
+                                        label: 'Mark as read',
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 20,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Column(
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 5),
+                                            child: (notification?.data?.data?[index].isRead ?? false)
+                                                ? const Icon(
+                                                    Icons.notifications_none_outlined,
+                                                    color: Colors.grey,
+                                                  )
+                                                : Image.asset(
+                                                    AppImages.bell,
+                                                    height: 24,
+                                                  ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            notification?.data?.data?[index].title ?? "",
+                                                            // formatType(notifications: notification),
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .labelMedium
+                                                                ?.copyWith(fontWeight: FontWeight.bold),
+                                                          ),
+                                                          const SizedBox(height: 5),
+                                                          Text(
+                                                            notification?.data?.data?[index].body ?? "",
+                                                            // formatDescription(notifications: notification),
+                                                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                                                  color: Colors.black87,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                     Text(
-                                                      notification?.data?.data?[index].title ?? "",
-                                                      // formatType(notifications: notification),
+                                                      DateFormat('hh:mm a').format(
+                                                          notification?.data?.data?[index].createdAt ?? DateTime.now()),
                                                       style: Theme.of(context)
                                                           .textTheme
-                                                          .labelMedium
-                                                          ?.copyWith(fontWeight: FontWeight.bold),
-                                                    ),
-                                                    const SizedBox(height: 5),
-                                                    Text(
-                                                      notification?.data?.data?[index].body ?? "",
-                                                      // formatDescription(notifications: notification),
-                                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                                            color: Colors.black87,
-                                                          ),
+                                                          .labelSmall
+                                                          ?.copyWith(fontWeight: FontWeight.w500),
                                                     ),
                                                   ],
                                                 ),
-                                              ),
-                                              Text(
-                                                DateFormat('hh:mm a').format(
-                                                    notification?.data?.data?[index].createdAt ?? DateTime.now()),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .labelSmall
-                                                    ?.copyWith(fontWeight: FontWeight.w500),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ],
-                                      ),
-                                    ),
-                                  ],
-                                )),
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(
-                            height: 10,
-                          );
-                        },
-                      ))
-                  : Center(
-                      child: Text(
-                        "All notifications are upto date",
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                                      )),
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(
+                                  height: 10,
+                                );
+                              },
+                            )),
+                      )
+                    : Center(
+                        child: Text(
+                          "All notifications are upto date",
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-            ),
+              );
+            }),
+      ),
     );
   }
 
   //------------------ function ----------------------//
-  Future<void> getAllNotification(int pageCount) async {
+  Future<void> getAllNotification() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
-      notification = await notificationViewModel.getAllNotification(page: pageCount);
+      _loadingStatusNotifier.show();
+      notification = await notificationViewModel.getAllNotification();
+      _valueNotifier.notifyListeners();
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      Fluttertoast.showToast(msg: e.toString());
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      _loadingStatusNotifier.hide();
     }
   }
 
   Future<void> singleMakeAsReadAction({required int notificationId}) async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      _valueNotifier.notifyListeners();
 
       await notificationViewModel.singleNotificationRead(notificationId: notificationId);
-      notification = await notificationViewModel.getAllNotification(page: page);
-      if (mounted) {
-        setState(() {});
-      }
+      notification = await notificationViewModel.getAllNotification();
+      _valueNotifier.notifyListeners();
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      _valueNotifier.notifyListeners();
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      _valueNotifier.notifyListeners();
     }
   }
 
   Future<void> markAsAllread() async {
     try {
       isNotificationLoading = true;
-      setState(() {});
+      notificationReadNotifier.notifyListeners();
       final data = await notificationViewModel.readAllnotification();
-      notification = await notificationViewModel.getAllNotification(page: page);
-      if (mounted) {
-        setState(() {});
-      }
-
+      notification = await notificationViewModel.getAllNotification();
+      _valueNotifier.notifyListeners();
       Fluttertoast.showToast(msg: data?["message"] ?? "All notifications marked as read");
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
       isNotificationLoading = false;
-      setState(() {});
+      notificationReadNotifier.notifyListeners();
     } finally {
       isNotificationLoading = false;
-      setState(() {});
+      notificationReadNotifier.notifyListeners();
     }
   }
 }

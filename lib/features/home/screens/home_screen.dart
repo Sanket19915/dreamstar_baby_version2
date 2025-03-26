@@ -10,10 +10,12 @@ import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-tab-controller.dart';
 import 'package:provider/provider.dart';
 
+import '../../../services/notification_permission_handler_service.dart';
 import '../../../viewmodels/home_viewModel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       length: 5,
       vsync: this,
     );
+    getNotificationPermission();
     getActiveUser();
   }
 
@@ -130,7 +133,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         deviceId: deviceId,
         fcmToken: token,
       );
-    } catch (e) {}
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  Future<void> getNotificationPermission() async {
+    try {
+      await NotificationService.checkPermissions();
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    }
   }
 }
 
