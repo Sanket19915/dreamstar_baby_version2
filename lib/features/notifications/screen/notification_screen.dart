@@ -3,6 +3,7 @@
 import 'package:dream_baby/features/notifications/widgets/lazy_loaded_scrollbar.dart';
 import 'package:dream_baby/features/notifications/widgets/loading_indicator_widget.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
+import 'package:dream_baby/utils/extenstions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -35,9 +36,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-  getAllNotification();
+    getAllNotification();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +206,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      DateFormat('hh:mm a').format(
+                                                      formatTimeInNotification(
                                                           notification?.data?.data?[index].createdAt ?? DateTime.now()),
                                                       style: Theme.of(context)
                                                           .textTheme
@@ -242,6 +242,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   //------------------ function ----------------------//
+
+  String formatTimeInNotification(DateTime date) {
+    print("Testing : ${DateTime.now().day - DateTime.now().subtract(const Duration(days: 1)).day}");
+
+    // check if the date is today
+    switch (date.dateOnly.compareTo(DateTime.now().dateOnly)) {
+      case 0:
+        return DateFormat('hh:mm a').format(date.toLocal());
+      case -1:
+        return DateFormat('dd.MM.yyyy hh:mm a').format(date.toLocal());
+      default:
+        return DateFormat('hh:mm a').format(date.toLocal());
+    }
+  }
+
   Future<void> getAllNotification() async {
     try {
       _loadingStatusNotifier.show();
