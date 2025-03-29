@@ -53,6 +53,7 @@ dependencies:
   youtube_player_flutter: ^8.1.2
   webview_flutter: ^4.0.6
   chewie: ^1.8.3
+  app_tracking_transparency: ^2.0.6+1
   
 
 dev_dependencies:

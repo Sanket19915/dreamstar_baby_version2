@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
 import 'package:dream_baby/firebase_options.dart';
 import 'package:dream_baby/router/app_router.dart';
@@ -25,6 +26,9 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   await Hive.initFlutter();
   await Hive.openBox('userBox');
+   WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
+   await AppTrackingTransparency.requestTrackingAuthorization();
+  });  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ).then(
