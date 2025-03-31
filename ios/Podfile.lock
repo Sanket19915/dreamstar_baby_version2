@@ -1,4 +1,6 @@
 PODS:
+  - app_tracking_transparency (0.0.1):
+    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - Firebase/Auth (10.25.0):
@@ -127,6 +129,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_tracking_transparency (from `.symlinks/plugins/app_tracking_transparency/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -166,6 +169,8 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  app_tracking_transparency:
+    :path: ".symlinks/plugins/app_tracking_transparency/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_auth:
@@ -206,6 +211,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
+  app_tracking_transparency: e169b653478da7bb15a6c61209015378ca73e375
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
   firebase_auth: 5719ddc9f654b813405899480e84971bd8e61235

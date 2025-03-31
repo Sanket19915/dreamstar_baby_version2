@@ -1,7 +1,11 @@
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../router/routes.dart';
+import '../../shared/helper/app_images.dart';
 
 class ContactUsScreen extends StatelessWidget {
   const ContactUsScreen({super.key});
@@ -26,12 +30,18 @@ class ContactUsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Contact Us',
-          style: TextStyle(
-              fontWeight: FontWeight.w600, color: AppColors.mainColor),
+          style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.mainColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          GestureDetector(
+              onTap: () {
+                GoRouter.of(context).push(Routes.settingsScreen);
+              },
+              child: Image.asset(AppImages.propic))
+        ],
       ),
       body: Container(
         padding: const EdgeInsets.only(top: 110),
@@ -70,14 +80,12 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.chat,
                           text: 'Chat with Us',
                           onTap: () async {
-                            final whatsappUrl =
-                                Uri.parse('https://wa.me/917030962300');
+                            final whatsappUrl = Uri.parse('https://wa.me/917030962300');
                             if (await canLaunchUrl(whatsappUrl)) {
                               await launchUrl(whatsappUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Could not open WhatsApp')),
+                                const SnackBar(content: Text('Could not open WhatsApp')),
                               );
                             }
                           },
@@ -92,8 +100,7 @@ class ContactUsScreen extends StatelessWidget {
                               await launchUrl(phoneUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Could not make the call')),
+                                const SnackBar(content: Text('Could not make the call')),
                               );
                             }
                           },
@@ -103,15 +110,12 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.web,
                           text: 'https://garbhasanskar.sonaljainjayaswal.com/',
                           onTap: () async {
-                            final websiteUrl = Uri.parse(
-                                'https://garbhasanskar.sonaljainjayaswal.com/');
+                            final websiteUrl = Uri.parse('https://garbhasanskar.sonaljainjayaswal.com/');
                             if (await canLaunchUrl(websiteUrl)) {
                               await launchUrl(websiteUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Could not open the website')),
+                                const SnackBar(content: Text('Could not open the website')),
                               );
                             }
                           },
@@ -121,14 +125,12 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.email,
                           text: 'contact@sonaljainjayaswal.com',
                           onTap: () async {
-                            final emailUrl = Uri.parse(
-                                'mailto:contact@sonaljainjayaswal.com');
+                            final emailUrl = Uri.parse('mailto:contact@sonaljainjayaswal.com');
                             if (await canLaunchUrl(emailUrl)) {
                               await launchUrl(emailUrl);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Could not send the email')),
+                                const SnackBar(content: Text('Could not send the email')),
                               );
                             }
                           },

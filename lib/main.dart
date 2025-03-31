@@ -26,9 +26,6 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   await Hive.initFlutter();
   await Hive.openBox('userBox');
-   WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
-   await AppTrackingTransparency.requestTrackingAuthorization();
-  });  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ).then(
@@ -59,10 +56,24 @@ void main() async {
   runApp(const MyApp(initialRoute: Routes.splash));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.initialRoute});
 
   final String initialRoute;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
+      await AppTrackingTransparency.requestTrackingAuthorization();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +89,7 @@ class MyApp extends StatelessWidget {
         key: navigatorKey,
         routerConfig: GoRouter(
           routes: appRoutes,
-          initialLocation: initialRoute,
+          initialLocation: widget.initialRoute,
         ),
         title: 'DreamStar Baby Garbha Sanskar',
         theme: ThemeData(
