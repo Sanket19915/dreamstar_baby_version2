@@ -5,12 +5,14 @@ import 'package:dream_baby/models/knowledge_entry_model.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/auth_services.dart';
 
@@ -74,117 +76,199 @@ class _KnowEntryState extends State<KnowEntry> {
                       ),
                     )
                   : Column(
-                      children: List.generate(
-                        knowEntry.length,
-                        (index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: InkWell(
-                              onTap: () async {
-                                // if (knowEntry[index].filePath?.contains(".pdf") ??
-                                //     false) {
-                                //   var token = await AuthService.getToken();
-                                //   var url = Uri.parse(
-                                //       'http://dreambaby.pro/api/baby_data?week=1&day=1');
-                                //   var headers = {
-                                //     'Content-Type': 'application/json',
-                                //     'Authorization': 'Bearer $token',
-                                //     'Cookie':
-                                //         'XSRF-TOKEN=your-token; laravel_session=your-session'
-                                //   };
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.info, color: AppColors.mainColor),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () => showHtmlDialog(context),
+                              child: Text(
+                                "Important Notes for all these Sections",
+                                style: GoogleFonts.poppins(
+                                    color: AppColors.mainColor, fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        Column(
+                          children: List.generate(
+                            knowEntry.length,
+                            (index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: InkWell(
+                                  onTap: () async {
+                                    // if (knowEntry[index].filePath?.contains(".pdf") ??
+                                    //     false) {
+                                    //   var token = await AuthService.getToken();
+                                    //   var url = Uri.parse(
+                                    //       'http://dreambaby.pro/api/baby_data?week=1&day=1');
+                                    //   var headers = {
+                                    //     'Content-Type': 'application/json',
+                                    //     'Authorization': 'Bearer $token',
+                                    //     'Cookie':
+                                    //         'XSRF-TOKEN=your-token; laravel_session=your-session'
+                                    //   };
 
-                                //   try {
-                                //     var response =
-                                //         await http.get(url, headers: headers);
+                                    //   try {
+                                    //     var response =
+                                    //         await http.get(url, headers: headers);
 
-                                //     if (response.statusCode == 200) {
-                                //       var contentType =
-                                //           response.headers['content-type'];
-                                //       if (contentType != null &&
-                                //           contentType
-                                //               .contains('application/json')) {
-                                //         var data = json.decode(response.body);
+                                    //     if (response.statusCode == 200) {
+                                    //       var contentType =
+                                    //           response.headers['content-type'];
+                                    //       if (contentType != null &&
+                                    //           contentType
+                                    //               .contains('application/json')) {
+                                    //         var data = json.decode(response.body);
 
-                                //         setState(() {
-                                //           week = data[0]['week']?.toString() ?? '0';
-                                //         });
-                                //       } else {
-                                //          setState(() {
-                                //           isLoading = false;
-                                //         });
-                                //         throw Exception(
-                                //             'Unexpected response format');
-                                //       }
-                                //     } else {
-                                //         setState(() {
-                                //         isLoading = false;
-                                //       });
-                                //       throw Exception(
-                                //           'Failed to fetch baby data: ${response.reasonPhrase}');
-                                //     }
-                                //   } catch (e) {
-                                //       setState(() {
-                                //       isLoading = false;
-                                //     });
-                                //     print('Error fetching baby data: $e');
-                                //     throw Exception('Error fetching baby data: $e');
-                                //   }
+                                    //         setState(() {
+                                    //           week = data[0]['week']?.toString() ?? '0';
+                                    //         });
+                                    //       } else {
+                                    //          setState(() {
+                                    //           isLoading = false;
+                                    //         });
+                                    //         throw Exception(
+                                    //             'Unexpected response format');
+                                    //       }
+                                    //     } else {
+                                    //         setState(() {
+                                    //         isLoading = false;
+                                    //       });
+                                    //       throw Exception(
+                                    //           'Failed to fetch baby data: ${response.reasonPhrase}');
+                                    //     }
+                                    //   } catch (e) {
+                                    //       setState(() {
+                                    //       isLoading = false;
+                                    //     });
+                                    //     print('Error fetching baby data: $e');
+                                    //     throw Exception('Error fetching baby data: $e');
+                                    //   }
 
-                                try {
-                                  if (knowEntry[index]
-                                          .filePath
-                                          ?.contains(".pdf") ??
-                                      false) {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-                                    String pdfPath = await _loadPdfFromNetwork(
-                                      knowEntry[index].filePath,
-                                    );
+                                    try {
+                                      if (knowEntry[index].filePath?.contains(".pdf") ?? false) {
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+                                        String pdfPath = await _loadPdfFromNetwork(
+                                          knowEntry[index].filePath,
+                                        );
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => PDFViewerScreen(
-                                            pdfPath: pdfPath, week: week),
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => PDFViewerScreen(pdfPath: pdfPath, week: week),
+                                          ),
+                                        );
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
+                                    } catch (e) {
+                                      Fluttertoast.showToast(msg: e.toString());
+                                    }
+
+                                    // }
+                                  },
+                                  child: Container(
+                                    height: height * 0.13,
+                                    width: width,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                          image: NetworkImage(
+                                              "http://dreambaby.pro/storage/${knowEntry[index].backgroundImage}"),
+                                          fit: BoxFit.cover),
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(15),
                                       ),
-                                    );
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                  }
-                                } catch (e) {
-                                  Fluttertoast.showToast(msg: e.toString());
-                                }
-
-                                // }
-                              },
-                              child: Container(
-                                height: height * 0.13,
-                                width: width,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: NetworkImage(
-                                          "http://dreambaby.pro/storage/${knowEntry[index].backgroundImage}"),
-                                      fit: BoxFit.cover),
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(15),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     )),
         ),
       ),
     );
   }
 
+  void showHtmlDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => Dialog(
+              child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text("References",
+                            style: GoogleFonts.poppins(
+                                color: AppColors.mainColor, fontSize: 16, fontWeight: FontWeight.w600)),
+                      ),
+                      Html(
+                          data: '''
+            <p>
+              Information and content in this app is based on the bestselling book by Dr. Sonal Jayaswal and scientific research sources cited below:
+            </p>
+
+            <p>
+              We strongly recommend that our users seek a doctor's advice in addition to using this app and before making any medical decisions.
+            </p>
+
+            <h3>References:</h3>
+            <ol>
+              <li>
+                Ustun et al. (2022). 
+                <a href="https://doi.org/10.1177/09567976221105460">Link</a>
+              </li>
+              <li>
+                Varendi et al. (1994). 
+                <a href="https://doi.org/10.1016/s0140-6736(94)91645-4">Link</a>
+              </li>
+              <li>
+                Ackerman S. 
+                <a href="https://www.ncbi.nlm.nih.gov/books/NBK234146/">Link</a>
+              </li>
+              <li>
+                <a href="https://www.happiestbaby.com/blogs/pregnancy/baby-see-and-hear-inside-the-womb">Happiest Baby Article</a>
+              </li>
+              <li>
+                Fleming, A. (2014). 
+                <a href="https://www.theguardian.com/lifeandstyle/wordofmouth/2014/apr/08/child-food-preferences-womb-pregnancy-foetus-taste-flavours">Guardian Article</a>
+              </li>
+              <li>
+                <a href="https://www.amazon.in/dp/9361561375">Garbh Sanskar Book</a>
+              </li>
+            </ol>
+          ''',
+                          onAnchorTap: (url, attributes, element) async {
+                            if (url != null && await canLaunchUrl(Uri.parse(url))) {
+                              await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                            }
+                          }),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("Close", style: TextStyle(color: AppColors.mainColor))),
+                      )
+                    ],
+                  )),
+            ));
+  }
+
   Future<String> _loadPdfFromAssets() async {
-    final ByteData data = await rootBundle.load(
-        'assets/pdf/TheNineMonthJourney.pdf'); // Replace with your PDF asset path
+    final ByteData data =
+        await rootBundle.load('assets/pdf/TheNineMonthJourney.pdf'); // Replace with your PDF asset path
     final Directory tempDir = await getTemporaryDirectory();
     final File tempFile = File('${tempDir.path}/sample.pdf');
     await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
@@ -196,8 +280,7 @@ class _KnowEntryState extends State<KnowEntry> {
       Fluttertoast.showToast(msg: 'File is Empty');
     }
     try {
-      var data =
-          await http.get(Uri.parse("http://dreambaby.pro/storage/$filePath"));
+      var data = await http.get(Uri.parse("http://dreambaby.pro/storage/$filePath"));
       var bytes = data.bodyBytes;
       var dir = await getApplicationDocumentsDirectory();
       String? newFileName = filePath?.split("/").last;
@@ -211,8 +294,7 @@ class _KnowEntryState extends State<KnowEntry> {
   }
 
   Future<String> _affirmationloadPdfFromAssets() async {
-    final ByteData data = await rootBundle.load(
-        'assets/pdf/Affirmations.pdf'); // Replace with your PDF asset path
+    final ByteData data = await rootBundle.load('assets/pdf/Affirmations.pdf'); // Replace with your PDF asset path
     final Directory tempDir = await getTemporaryDirectory();
     final File tempFile = File('${tempDir.path}/sample.pdf');
     await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);

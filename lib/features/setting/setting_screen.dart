@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dream_baby/features/auth/screens/login.dart';
-import 'package:dream_baby/features/setting/screens/faq_screen.dart';
 import 'package:dream_baby/features/setting/screens/privacy_policy_screen.dart';
 import 'package:dream_baby/features/setting/screens/termsnconditions_screen.dart';
 import 'package:dream_baby/router/routes.dart';
@@ -43,9 +42,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Check if the token is empty
       if (token == null || token.isEmpty) {
         // Handle the case where token is blank
-        setState(() {
-          isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
         return;
       }
 
@@ -64,30 +65,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
         var contentType = response.headers['content-type'];
         if (contentType != null && contentType.contains('application/json')) {
           var data = json.decode(response.body);
-          setState(() {
-            userProfile = data;
-            userId = data['id']; // Store user ID for delete API
-            isLoading =
-                false; // Set loading state to false after data is fetched
-          });
+          if (mounted) {
+            setState(() {
+              userProfile = data;
+              userId = data['id']; // Store user ID for delete API
+              isLoading = false; // Set loading state to false after data is fetched
+            });
+          }
         } else {
           Fluttertoast.showToast(msg: "Something went wrong");
           // Handle non-JSON response
+          if (mounted) {
+            setState(() {
+              isLoading = false; // Set loading state to false
+            });
+          }
+        }
+      } else {
+        // Handle error
+        if (mounted) {
           setState(() {
             isLoading = false; // Set loading state to false
           });
         }
-      } else {
-        // Handle error
+      }
+    } catch (e) {
+      // Handle error
+      if (mounted) {
         setState(() {
           isLoading = false; // Set loading state to false
         });
       }
-    } catch (e) {
-      // Handle error
-      setState(() {
-        isLoading = false; // Set loading state to false
-      });
     }
   }
 
@@ -159,15 +167,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             color: Colors.white,
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.edit,
-                                color: AppColors.mainColor),
+                            icon: const Icon(Icons.edit, color: AppColors.mainColor),
                             onPressed: !(isLoading)
                                 ? () {
-                                    context.push(
-                                      Routes.EditProfileScreen,
-                                      extra:
-                                          userProfile, // Pass userProfile data
+                                    GoRouter.of(context).push(Routes.EditProfileScreen, extra: userProfile).then(
+                                      (value) {
+                                        fetchUserProfile();
+                                      },
                                     );
+                                    // context
+                                    //     .push(
+                                    //   Routes.EditProfileScreen,
+                                    //   extra: userProfile, // Pass userProfile data
+                                    // )
+                                    //     .then(
+                                    //   (value) {
+                                    //     fetchUserProfile();
+                                    //   },
+                                    // );
                                   }
                                 : () {},
                           ),
@@ -190,8 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     );
                   }),
-                  _buildSettingOption('Terms & Conditions', Icons.description,
-                      () async {
+                  _buildSettingOption('Terms & Conditions', Icons.description, () async {
                     String pdfPath = await _loadPdfFromAsset();
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -249,8 +265,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Colors.black,
             ),
           ),
-          trailing:
-              const Icon(Icons.arrow_forward_ios, color: AppColors.mainColor),
+          trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.mainColor),
         ),
       ),
     );
@@ -269,15 +284,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             actionsPadding: const EdgeInsets.only(right: 20),
             actions: <Widget>[
               TextButton(
-                child:
-                    const Text("Cancel", style: TextStyle(color: Colors.black)),
+                child: const Text("Cancel", style: TextStyle(color: Colors.black)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: const Text("Logout",
-                    style: TextStyle(color: AppColors.mainColor)),
+                child: const Text("Logout", style: TextStyle(color: AppColors.mainColor)),
                 onPressed: () {
                   logoutAction();
                   Navigator.of(context).pop(); // Close the dialog
@@ -332,8 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return;
       }
 
-      var url =
-          Uri.parse('http://dreambaby.pro/api/auth/delete-account/$userId');
+      var url = Uri.parse('http://dreambaby.pro/api/auth/delete-account/$userId');
       var response = await http.delete(
         url,
         headers: {
@@ -372,8 +384,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<String> _loadPdfFromAsset() async {
-    final ByteData data = await rootBundle
-        .load('assets/pdf/tnc.pdf'); // Replace with your PDF asset path
+    final ByteData data = await rootBundle.load('assets/pdf/tnc.pdf'); // Replace with your PDF asset path
     final Directory tempDir = await getTemporaryDirectory();
     final File tempFile = File('${tempDir.path}/sample.pdf');
     await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
