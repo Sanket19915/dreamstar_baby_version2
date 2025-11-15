@@ -72,7 +72,7 @@ class FAQScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: ExpansionTile(
-        backgroundColor: AppColors.mainColor.withOpacity(.7),
+        backgroundColor: AppColors.mainColor.withValues(alpha:.7),
         title: Text(
           question,
           style: GoogleFonts.poppins(

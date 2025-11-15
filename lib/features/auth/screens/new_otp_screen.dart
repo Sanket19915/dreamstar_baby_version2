@@ -9,10 +9,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../router/routes.dart';
 import '../../../viewmodels/login_viewmodel.dart';
 
 class NewOTPScreen extends StatefulWidget {
@@ -167,12 +165,12 @@ class _NewOTPScreenState extends State<NewOTPScreen> {
                                   borderColor: otpController.text.length == 6
                                       ? AppColors.primaryColor
                                       : AppColors.secondaryTextColor
-                                          .withOpacity(.5),
+                                          .withValues(alpha:.5),
                                   backgroundColor:
                                       otpController.text.length == 6
                                           ? AppColors.primaryColor
                                           : AppColors.secondaryTextColor
-                                              .withOpacity(.5),
+                                              .withValues(alpha:.5),
                                   textStyle: CustomLabels.body3GreyTextStyle(
                                     fontSize: 16,
                                     color: AppColors.whiteColor,
@@ -219,7 +217,7 @@ class _NewOTPScreenState extends State<NewOTPScreen> {
               if (isLoading)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     child: const Center(
                       child: SpinKitThreeInOut(
                         color: AppColors.primaryColor,

@@ -191,10 +191,10 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                                   isEnabled: otpController.text.length == 6 ? true : false,
                                   borderColor: otpController.text.length == 6
                                       ? AppColors.primaryColor
-                                      : AppColors.secondaryTextColor.withOpacity(.5),
+                                      : AppColors.secondaryTextColor.withValues(alpha: .5),
                                   backgroundColor: otpController.text.length == 6
                                       ? AppColors.primaryColor
-                                      : AppColors.secondaryTextColor.withOpacity(.5),
+                                      : AppColors.secondaryTextColor.withValues(alpha: .5),
                                   textStyle: CustomLabels.body3GreyTextStyle(
                                     fontSize: 16,
                                     color: AppColors.whiteColor,
@@ -214,7 +214,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
               if (isLoading)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     child: const Center(
                       child: SpinKitThreeInOut(
                         color: AppColors.primaryColor,
@@ -292,8 +292,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
           passwordController.text, confirmPasswordController.text, widget.userId, otpController.text);
       Navigator.of(context).popUntil((route) => route.isFirst);
 
-            Fluttertoast.showToast(msg: "Password has been reset successfully!!");
-
+      Fluttertoast.showToast(msg: "Password has been reset successfully!!");
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     } finally {

@@ -93,8 +93,7 @@ class _MyAppState extends State<MyApp> {
         ),
         title: 'DreamStar Baby Garbha Sanskar',
         theme: ThemeData(
-          radioTheme: const RadioThemeData(
-              fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
+          radioTheme: const RadioThemeData(fillColor: WidgetStatePropertyAll(AppColors.mainColor)),
           checkboxTheme: const CheckboxThemeData(
               side: BorderSide(color: AppColors.mainColor),
               checkColor: WidgetStatePropertyAll(AppColors.whiteColor),

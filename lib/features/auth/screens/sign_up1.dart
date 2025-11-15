@@ -464,10 +464,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             isEnabled: isFormValid,
                             borderColor: isFormValid
                                 ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withOpacity(.5),
+                                : AppColors.secondaryTextColor.withValues(alpha:.5),
                             backgroundColor: isFormValid
                                 ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withOpacity(.5),
+                                : AppColors.secondaryTextColor.withValues(alpha:.5),
                             textStyle: CustomLabels.body3GreyTextStyle(
                               fontSize: 16,
                               color: AppColors.whiteColor,
@@ -503,7 +503,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               if (isLoading)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     child: const Center(
                       child: SpinKitThreeInOut(
                         color: AppColors.primaryColor,

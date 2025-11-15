@@ -140,28 +140,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             autoFocus: true,
                             borderColor: AppColors.secondaryTextColor,
                             inputType: CustomTextInputType.number,
-                            scrollPhysics:
-                                const AlwaysScrollableScrollPhysics(),
+                            scrollPhysics: const AlwaysScrollableScrollPhysics(),
                             onChanged: (value) {
-                              bool valid = value.isNotEmpty &&
-                                  txtPassword.text.length >= 6;
-                              context
-                                  .read<IsFormValidBloc>()
-                                  .setFormValid(valid);
+                              bool valid = value.isNotEmpty && txtPassword.text.length >= 6;
+                              context.read<IsFormValidBloc>().setFormValid(valid);
                             },
                             validator: (value, cont) {
                               if (value!.isEmpty) {
                                 return 'Enter phone number';
-                              } else if (!ValidationsAll.isValidPhoneNumber(
-                                  value)) {
+                              } else if (!ValidationsAll.isValidPhoneNumber(value)) {
                                 return "Provide valid phone number";
                               }
                               return null;
                             },
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           SizedBox(
                             height: 30,
                             width: double.infinity,
@@ -183,11 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             onChanged: (value) {
                               bool valid = value.isNotEmpty &&
                                   value.length >= 6 &&
-                                  ValidationsAll.isValidPhoneNumber(
-                                      txtPhone.text);
-                              context
-                                  .read<IsFormValidBloc>()
-                                  .setFormValid(valid);
+                                  ValidationsAll.isValidPhoneNumber(txtPhone.text);
+                              context.read<IsFormValidBloc>().setFormValid(valid);
                             },
                             validator: (value, cont) {
                               if (value!.isEmpty) {
@@ -198,9 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return null;
                             },
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           InkWell(
                             onTap: () {
                               Navigator.of(context).push(
@@ -232,23 +220,17 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height *
-                                  0.0355450237),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.0355450237),
                           CustomButton(
                             text: 'Log In',
                             isEnabled: isValid && !isLoading,
-                            borderColor: isValid
-                                ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withOpacity(.5),
-                            backgroundColor: isValid
-                                ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withOpacity(.5),
+                            borderColor:
+                                isValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: .5),
+                            backgroundColor:
+                                isValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: .5),
                             textStyle: CustomLabels.body3GreyTextStyle(
                               fontSize: 16,
-                              color: isValid
-                                  ? AppColors.whiteColor
-                                  : AppColors.blackColor,
+                              color: isValid ? AppColors.whiteColor : AppColors.blackColor,
                             ),
                             onPressed: isValid && !isLoading
                                 ? () async {
@@ -265,13 +247,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     print(user);
                                     if (user != null) {
                                       sessionManager.setLoggedIn(true);
-                                      context.go(Routes.home ,extra: user.token);
+                                      context.go(Routes.home, extra: user.token);
                                     } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                          content:
-                                              Text('Incorrect Credentials'),
+                                          content: Text('Incorrect Credentials'),
                                         ),
                                       );
                                     }
@@ -309,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (isLoading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 height: MediaQuery.of(context).size.height,
                 child: const Center(
                   child: SpinKitCircle(

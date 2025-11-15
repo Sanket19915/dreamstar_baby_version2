@@ -154,9 +154,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             text: 'Forgot Your Password',
                             isEnabled: isValid && !isLoading,
                             borderColor:
-                                isValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withOpacity(.5),
+                                isValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: .5),
                             backgroundColor:
-                                isValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withOpacity(.5),
+                                isValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: .5),
                             textStyle: CustomLabels.body3GreyTextStyle(
                               fontSize: 16,
                               color: isValid ? AppColors.whiteColor : AppColors.blackColor,
@@ -198,7 +198,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           if (isLoading)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 height: MediaQuery.of(context).size.height,
                 child: const Center(
                   child: SpinKitCircle(

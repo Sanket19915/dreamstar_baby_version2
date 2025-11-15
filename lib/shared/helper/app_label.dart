@@ -138,7 +138,7 @@ class CustomLabels {
       fontFamily: fontFamily,
       fontSize: fontSize,
       fontWeight: fontWeight,
-      color: const Color(0xFF050505).withOpacity(.6),
+      color: const Color(0xFF050505).withValues(alpha: .6),
       letterSpacing: letterSpacing,
       height: height,
     );

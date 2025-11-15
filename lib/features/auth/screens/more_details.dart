@@ -275,14 +275,14 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                       // isFormValid
                                       ? AppColors.primaryColor
                                       : AppColors.secondaryTextColor
-                                          .withOpacity(.5),
+                                          .withValues(alpha:.5),
                                   backgroundColor:
                                       (dobController.text.isNotEmpty &&
                                               eddController.text.isNotEmpty)
                                           //  isFormValid
                                           ? AppColors.primaryColor
                                           : AppColors.secondaryTextColor
-                                              .withOpacity(.5),
+                                              .withValues(alpha:.5),
                                   textStyle: CustomLabels.body3GreyTextStyle(
                                     fontSize: 16,
                                     color: AppColors.whiteColor,
@@ -314,14 +314,14 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                       // isFormValid
                                       ? AppColors.primaryColor
                                       : AppColors.secondaryTextColor
-                                          .withOpacity(.5),
+                                          .withValues(alpha:.5),
                                   backgroundColor:
                                       (dobController.text.isEmpty &&
                                               eddController.text.isEmpty)
                                           // isFormValid
                                           ? AppColors.primaryColor
                                           : AppColors.secondaryTextColor
-                                              .withOpacity(.5),
+                                              .withValues(alpha:.5),
                                   textStyle: CustomLabels.body3GreyTextStyle(
                                     fontSize: 14,
                                     color: AppColors.whiteColor,
@@ -340,7 +340,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               if (isLoading)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     child: const Center(
                       child: SpinKitThreeInOut(
                         color: AppColors.primaryColor,

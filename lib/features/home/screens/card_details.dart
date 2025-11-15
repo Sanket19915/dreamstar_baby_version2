@@ -221,7 +221,7 @@ class _BabyCardState extends State<BabyCard> {
                       child: Container(
                         height: deviceHeight * 0.201,
                         decoration: BoxDecoration(
-                          color: AppColors.cardColor.withOpacity(.3),
+                          color: AppColors.cardColor.withValues(alpha: .3),
                           borderRadius: const BorderRadius.all(
                             Radius.circular(20),
                           ),
@@ -444,7 +444,7 @@ class _BabyCardState extends State<BabyCard> {
                                 animation: true,
                                 percent: percent,
                                 circularStrokeCap: CircularStrokeCap.round,
-                                backgroundColor: AppColors.whiteColor.withOpacity(.85),
+                                backgroundColor: AppColors.whiteColor.withValues(alpha: .85),
                                 progressColor: AppColors.mainColor,
                                 rotateLinearGradient: true,
                               ),

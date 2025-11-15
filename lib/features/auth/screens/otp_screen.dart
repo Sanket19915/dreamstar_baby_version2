@@ -17,11 +17,7 @@ class OTPScreen extends StatefulWidget {
   final VoidCallback onVerified;
 
   const OTPScreen(
-      {super.key,
-      required this.phoneNumber,
-      required this.verificationId,
-      required this.onVerified,
-      this.resendToken});
+      {super.key, required this.phoneNumber, required this.verificationId, required this.onVerified, this.resendToken});
 
   @override
   _OTPScreenState createState() => _OTPScreenState();
@@ -40,14 +36,11 @@ class _OTPScreenState extends State<OTPScreen> {
       });
 
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId:
-            verificationId.isEmpty ? widget.verificationId : verificationId,
+        verificationId: verificationId.isEmpty ? widget.verificationId : verificationId,
         smsCode: otpController.text,
       );
 
-      await _auth
-          .signInWithCredential(credential)
-          .then((value) => print('User Login In Successful'));
+      await _auth.signInWithCredential(credential).then((value) => print('User Login In Successful'));
 
       widget.onVerified();
 
@@ -100,8 +93,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: const BoxDecoration(
-                          color: AppColors.whiteColor,
-                          borderRadius: BorderRadius.all(Radius.circular(12))),
+                          color: AppColors.whiteColor, borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Column(
                         children: [
                           Row(
@@ -117,9 +109,7 @@ class _OTPScreenState extends State<OTPScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.025),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                           CustomTextField(
                             onChanged: (p0) {
                               buttonNotifier.notifyListeners();
@@ -131,26 +121,19 @@ class _OTPScreenState extends State<OTPScreen> {
                             borderColor: AppColors.secondaryTextColor,
                             inputType: CustomTextInputType.number,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.035),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.035),
                           ValueListenableBuilder(
                               valueListenable: buttonNotifier,
                               builder: (context, value, child) {
                                 return CustomButton(
                                   text: 'Verify',
-                                  isEnabled: otpController.text.length == 6
-                                      ? true
-                                      : false,
+                                  isEnabled: otpController.text.length == 6 ? true : false,
                                   borderColor: otpController.text.length == 6
                                       ? AppColors.primaryColor
-                                      : AppColors.secondaryTextColor
-                                          .withOpacity(.5),
-                                  backgroundColor:
-                                      otpController.text.length == 6
-                                          ? AppColors.primaryColor
-                                          : AppColors.secondaryTextColor
-                                              .withOpacity(.5),
+                                      : AppColors.secondaryTextColor.withValues(alpha: .5),
+                                  backgroundColor: otpController.text.length == 6
+                                      ? AppColors.primaryColor
+                                      : AppColors.secondaryTextColor.withValues(alpha: .5),
                                   textStyle: CustomLabels.body3GreyTextStyle(
                                     fontSize: 16,
                                     color: AppColors.whiteColor,
@@ -197,7 +180,7 @@ class _OTPScreenState extends State<OTPScreen> {
               if (isLoading)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     child: const Center(
                       child: SpinKitThreeInOut(
                         color: AppColors.primaryColor,

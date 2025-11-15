@@ -1,8 +1,6 @@
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 class AffirmationScreen extends StatefulWidget {
   final String pdfPath1;
@@ -82,7 +80,7 @@ class _AffirmationScreenState extends State<AffirmationScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.mainColor.withOpacity(.7),
+                  color: AppColors.mainColor.withValues(alpha:.7),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -109,7 +107,7 @@ class _AffirmationScreenState extends State<AffirmationScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.mainColor.withOpacity(.7),
+                  color: AppColors.mainColor.withValues(alpha:.7),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(

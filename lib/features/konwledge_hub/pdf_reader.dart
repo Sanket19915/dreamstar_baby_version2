@@ -57,8 +57,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                       setState(() {
                         _totalPages = pages!;
                         pdfReady = true;
-                        _pdfViewController
-                            .setPage(int.parse(widget.week ?? "1") - 1);
+                        _pdfViewController.setPage(int.parse(widget.week ?? "1") - 1);
                       });
                     },
                     onViewCreated: (PDFViewController vc) {
@@ -97,7 +96,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.mainColor.withOpacity(.7),
+                  color: AppColors.mainColor.withValues(alpha: .7),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: const [
                     BoxShadow(
@@ -124,7 +123,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.mainColor.withOpacity(.7),
+                  color: AppColors.mainColor.withValues(alpha: .7),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: const [
                     BoxShadow(
@@ -144,47 +143,42 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
           ],
         ),
       ),
-      floatingActionButton:
-          widget.pdfPath.contains("TheNineMonthJourney_compressed")
-              ? Container(
-                  width: 130,
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                      border: Border.all(color: Colors.red)),
-                  child: TextField(
-                    controller: _pageController,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      hintText: 'Go to Week',
-                      hintStyle: const TextStyle(
-                          color: AppColors.mainColor,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onSubmitted: (value) {
-                      int page = int.tryParse(value) ?? 0;
-                      if (page > 0 && page <= _totalPages) {
-                        _currentPage = page - 1;
-                        _pdfViewController.setPage(_currentPage);
-                      } else {
-                        // Handle invalid page number input
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Invalid page number'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                      _pageController.clear();
-                    },
+      floatingActionButton: widget.pdfPath.contains("TheNineMonthJourney_compressed")
+          ? Container(
+              width: 130,
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(12)), border: Border.all(color: Colors.red)),
+              child: TextField(
+                controller: _pageController,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: 'Go to Week',
+                  hintStyle: const TextStyle(color: AppColors.mainColor, fontWeight: FontWeight.w700, fontSize: 16),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                )
-              : null,
+                ),
+                onSubmitted: (value) {
+                  int page = int.tryParse(value) ?? 0;
+                  if (page > 0 && page <= _totalPages) {
+                    _currentPage = page - 1;
+                    _pdfViewController.setPage(_currentPage);
+                  } else {
+                    // Handle invalid page number input
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Invalid page number'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                  _pageController.clear();
+                },
+              ),
+            )
+          : null,
     );
   }
 

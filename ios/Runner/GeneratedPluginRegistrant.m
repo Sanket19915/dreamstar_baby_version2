@@ -36,10 +36,10 @@
 @import firebase_messaging;
 #endif
 
-#if __has_include(<flutter_inappwebview/InAppWebViewFlutterPlugin.h>)
-#import <flutter_inappwebview/InAppWebViewFlutterPlugin.h>
+#if __has_include(<flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>)
+#import <flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>
 #else
-@import flutter_inappwebview;
+@import flutter_inappwebview_ios;
 #endif
 
 #if __has_include(<flutter_pdfview/FLTPDFViewFlutterPlugin.h>)
@@ -108,8 +108,8 @@
 @import wakelock_plus;
 #endif
 
-#if __has_include(<webview_flutter_wkwebview/FLTWebViewFlutterPlugin.h>)
-#import <webview_flutter_wkwebview/FLTWebViewFlutterPlugin.h>
+#if __has_include(<webview_flutter_wkwebview/WebViewFlutterPlugin.h>)
+#import <webview_flutter_wkwebview/WebViewFlutterPlugin.h>
 #else
 @import webview_flutter_wkwebview;
 #endif
@@ -134,7 +134,7 @@
   [VibrationPlugin registerWithRegistrar:[registry registrarForPlugin:@"VibrationPlugin"]];
   [FVPVideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FVPVideoPlayerPlugin"]];
   [WakelockPlusPlugin registerWithRegistrar:[registry registrarForPlugin:@"WakelockPlusPlugin"]];
-  [FLTWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTWebViewFlutterPlugin"]];
+  [WebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"WebViewFlutterPlugin"]];
 }
 
 @end

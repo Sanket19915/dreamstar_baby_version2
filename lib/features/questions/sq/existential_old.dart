@@ -156,7 +156,7 @@
 //                                                       ? "assets/images/MUSICAL.webp"
 //                                                       : AppImages.sq),
 //                   colorFilter: ColorFilter.mode(
-//                     Colors.white.withOpacity(0.6),
+//                     Colors.white.withValues(alpha:0.6),
 //                     BlendMode.srcATop,
 //                   ),
 //                   fit: BoxFit.cover,
@@ -280,7 +280,7 @@
 //                                             const WidgetStatePropertyAll(0),
 //                                         backgroundColor: WidgetStatePropertyAll(
 //                                             const Color(0xFFC4C8D0)
-//                                                 .withOpacity(0.5)),
+//                                                 .withValues(alpha:0.5)),
 //                                       ),
 //                                       onPressed: () {
 //                                         skipQuestions(questionsModel?.questions
@@ -368,7 +368,7 @@
 //                                             const WidgetStatePropertyAll(0),
 //                                         backgroundColor: WidgetStatePropertyAll(
 //                                             const Color(0xFFC4C8D0)
-//                                                 .withOpacity(0.5)),
+//                                                 .withValues(alpha:0.5)),
 //                                       ),
 //                                       onPressed: () {
 //                                         flagQuestions(questionsModel?.questions
@@ -559,7 +559,7 @@
 //                                           backgroundColor:
 //                                               WidgetStatePropertyAll(
 //                                                   const Color(0xFFC4C8D0)
-//                                                       .withOpacity(0.5)),
+//                                                       .withValues(alpha:0.5)),
 //                                           elevation:
 //                                               const WidgetStatePropertyAll(0),
 //                                         ),
@@ -621,7 +621,7 @@
 //         borderRadius: BorderRadius.circular(15),
 //         boxShadow: [
 //           BoxShadow(
-//             color: Colors.black.withOpacity(0.1),
+//             color: Colors.black.withValues(alpha:0.1),
 //             blurRadius: 10,
 //             offset: const Offset(0, 5),
 //           ),
@@ -785,7 +785,7 @@
 //                 style: ButtonStyle(
 //                   elevation: const WidgetStatePropertyAll(0),
 //                   backgroundColor: WidgetStatePropertyAll(
-//                       const Color(0xFFC4C8D0).withOpacity(0.5)),
+//                       const Color(0xFFC4C8D0).withValues(alpha:0.5)),
 //                 ),
 //                 onPressed: () {
 //                   Navigator.of(context).push(
