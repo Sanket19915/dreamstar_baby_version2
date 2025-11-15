@@ -79,7 +79,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       }
     });
 
-    _controller = VideoPlayerController.network('https://www.w3schools.com/html/mov_bbb.mp4')
+    _controller = VideoPlayerController.networkUrl(Uri.parse('https://www.w3schools.com/html/mov_bbb.mp4'))
       ..initialize().then((_) {
         if (mounted) {
           setState(() {});

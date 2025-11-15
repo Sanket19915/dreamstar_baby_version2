@@ -35,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final viewModel = Provider.of<LoginViewModel>(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Container(
@@ -48,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             height: double.infinity,
             child: SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 15),
               physics: const ClampingScrollPhysics(),
               child: BlocProvider(
                 create: (_) => IsFormValidBloc(),

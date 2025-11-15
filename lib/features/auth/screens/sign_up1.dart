@@ -35,11 +35,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-
-  LoginViewModel get viewModel =>
-      Provider.of<LoginViewModel>(context, listen: false);
+  final TextEditingController confirmPasswordController = TextEditingController();
+  ValueNotifier lodingNotifier = ValueNotifier(true);
+  LoginViewModel get viewModel => Provider.of<LoginViewModel>(context, listen: false);
   File? _profileImage;
 
   bool isLoading = false;
@@ -85,7 +83,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void validatePassword(String value) {
     setState(() {
-      isPasswordValid = value.length >= 6;
+      isPasswordValid = value.length >= 8;
     });
   }
 
@@ -117,7 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   String? passwordValidator(String? value, BuildContext? context) {
     validatePassword(value ?? '');
-    return isPasswordValid ? null : 'Password must be at least 6 characters';
+    return isPasswordValid ? null : 'Password must be at least 8 characters';
   }
 
   String? confirmPasswordValidator(String? value, BuildContext? context) {
@@ -126,8 +124,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -146,15 +143,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         phoneNumber = '+91$phoneNumber'; // Replace '+1' with your country code
       }
 
-      setState(() {
-        isLoading = true;
-      });
+      // setState(() {
+      isLoading = true;
+      lodingNotifier.notifyListeners();
+      // });
 
       Map<String, dynamic>? response = await viewModel.sendOtp(phoneNumber);
 
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      lodingNotifier.notifyListeners();
+      // });
 
       if (response != null) {
         Navigator.of(context).push(
@@ -165,8 +164,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               verifyComplete: (value) async {
                 (_profileImage?.path.isEmpty ?? true)
                     ? await _signUpWithoutImage(value)
-                    : await _signUp(
-                        value); // Callback to sign up after verification
+                    : await _signUp(value); // Callback to sign up after verification
               },
             ),
           ),
@@ -217,18 +215,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
       //   },
       // );
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      lodingNotifier.notifyListeners();
+      // });
       print('Failed to Verify Phone Number: $e');
     }
   }
 
   Future<void> _signUpWithoutImage(Map<String, dynamic>? userModel) async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      // setState(() {
+      isLoading = true;
+      lodingNotifier.notifyListeners();
+      // });
 
       await Provider.of<SignUpViewModel>(context, listen: false)
           .signUpWithotProfile(
@@ -238,7 +238,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               email: emailController.text,
               password: passwordController.text,
               confirmPassword: confirmPasswordController.text,
-              userId: userModel?["user_id"]??"")
+              userId: userModel?["user_id"] ?? "")
           .then(
         (value) {
           if (!value.containsKey("errors")) {
@@ -251,22 +251,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
           }
         },
       );
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      lodingNotifier.notifyListeners();
+      // });
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      lodingNotifier.notifyListeners();
+      // });
       Fluttertoast.showToast(msg: e.toString());
     }
   }
 
   Future<void> _signUp(Map<String, dynamic>? userModel) async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      // setState(() {
+      isLoading = true;
+      lodingNotifier.notifyListeners();
+      // });
 
       await Provider.of<SignUpViewModel>(context, listen: false)
           .signUpWithProfile(
@@ -291,13 +294,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           }
         },
       );
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      lodingNotifier.notifyListeners();
+      // });
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      lodingNotifier.notifyListeners();
+      // });
       Fluttertoast.showToast(msg: "Please upload profile picture");
     }
   }
@@ -365,26 +370,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.025),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                           GestureDetector(
                             onTap: _pickImage,
                             child: CircleAvatar(
                               radius: 50,
                               backgroundColor: AppColors.secondaryTextColor,
-                              backgroundImage: _profileImage != null
-                                  ? FileImage(_profileImage!)
-                                  : null,
+                              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
                               child: _profileImage == null
-                                  ? const Icon(Icons.add_a_photo,
-                                      color: Colors.white, size: 50)
+                                  ? const Icon(Icons.add_a_photo, color: Colors.white, size: 50)
                                   : null,
                             ),
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.025),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                           CustomTextField(
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'First Name',
@@ -394,9 +392,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             inputType: CustomTextInputType.text,
                             validator: firstNameValidator,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           CustomTextField(
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'Last Name',
@@ -406,9 +402,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             inputType: CustomTextInputType.text,
                             validator: lastNameValidator,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           CustomTextField(
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'Phone Number',
@@ -418,9 +412,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             inputType: CustomTextInputType.number,
                             validator: phoneValidator,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           CustomTextField(
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'Email',
@@ -430,9 +422,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             inputType: CustomTextInputType.email,
                             validator: emailValidator,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           CustomTextField(
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'Password',
@@ -443,9 +433,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             inputType: CustomTextInputType.password,
                             validator: passwordValidator,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.01),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           CustomTextField(
                             autoValidate: AutovalidateMode.onUserInteraction,
                             hintText: 'Confirm Password',
@@ -456,18 +444,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             inputType: CustomTextInputType.password,
                             validator: confirmPasswordValidator,
                           ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.035),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.035),
                           CustomButton(
                             text: 'Continue',
                             isEnabled: isFormValid,
                             borderColor: isFormValid
                                 ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withValues(alpha:.5),
+                                : AppColors.secondaryTextColor.withValues(alpha: .5),
                             backgroundColor: isFormValid
                                 ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withValues(alpha:.5),
+                                : AppColors.secondaryTextColor.withValues(alpha: .5),
                             textStyle: CustomLabels.body3GreyTextStyle(
                               fontSize: 16,
                               color: AppColors.whiteColor,
@@ -500,18 +486,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
               ),
-              if (isLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withValues(alpha:0.5),
-                    child: const Center(
-                      child: SpinKitThreeInOut(
-                        color: AppColors.primaryColor,
-                        size: 40.0,
-                      ),
-                    ),
-                  ),
-                ),
+
+              ValueListenableBuilder(
+                valueListenable: lodingNotifier,
+                builder: (context, value, child) {
+                  return isLoading
+                      ? Positioned.fill(
+                          child: Container(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            child: const Center(
+                              child: SpinKitThreeInOut(
+                                color: AppColors.primaryColor,
+                                size: 40.0,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container();
+                },
+              )
+              // if (isLoading)
+              //   Positioned.fill(
+              //     child: Container(
+              //       color: Colors.black.withValues(alpha:0.5),
+              //       child: const Center(
+              //         child: SpinKitThreeInOut(
+              //           color: AppColors.primaryColor,
+              //           size: 40.0,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
             ],
           ),
         ),
@@ -548,8 +553,7 @@ class SignUpViewModel with ChangeNotifier {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       })
-      ..files
-          .add(await http.MultipartFile.fromPath('profile_pic', profileImage));
+      ..files.add(await http.MultipartFile.fromPath('profile_pic', profileImage));
     var response = await request.send();
     var jsonData = await http.Response.fromStream(response);
     Map<String, dynamic>? finalResponse;
@@ -576,17 +580,15 @@ class SignUpViewModel with ChangeNotifier {
     required String confirmPassword,
     required String userId,
   }) async {
-    final response = await http.post(
-        Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
-        body: {
-          'first_name': firstName,
-          'last_name': lastName,
-          'phone_no': phone,
-          'email': email,
-          'password': password,
-          'confirm_password': confirmPassword,
-          "user_id": userId
-        });
+    final response = await http.post(Uri.parse('http://dreambaby.pro/api/auth/register-initial'), body: {
+      'first_name': firstName,
+      'last_name': lastName,
+      'phone_no': phone,
+      'email': email,
+      'password': password,
+      'confirm_password': confirmPassword,
+      "user_id": userId
+    });
 
     Map<String, dynamic>? finalResponse;
     // if (response.statusCode == 200) {

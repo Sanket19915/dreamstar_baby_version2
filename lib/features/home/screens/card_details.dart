@@ -197,9 +197,7 @@ class _BabyCardState extends State<BabyCard> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage("http://dreambaby.pro/storage/$profilePicture"),
-                    ),
+                        radius: 20, backgroundImage: NetworkImage("http://dreambaby.pro/storage/$profilePicture")),
                     const SizedBox(
                       width: 10,
                     ),

@@ -25,8 +25,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void initState() {
-    videoPlayerController = VideoPlayerController.network(
-        'https://www.w3schools.com/html/mov_bbb.mp4')
+    videoPlayerController = VideoPlayerController.networkUrl(Uri.parse('https://www.w3schools.com/html/mov_bbb.mp4'))
       ..initialize().then((_) {
         setState(() {});
       }).then((value) {
@@ -38,7 +37,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
     if (widget.youtubeLink?.isNotEmpty ?? false) {
       String? videoId;
-      if (!(widget.youtubeLink?.contains("iframe")??false)) {
+      if (!(widget.youtubeLink?.contains("iframe") ?? false)) {
         videoId = YoutubePlayer.convertUrlToId(widget.youtubeLink ?? "");
       } else {
         videoId = extractYouTubeVideoId(widget.youtubeLink ?? "");
@@ -64,8 +63,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   String extractYouTubeVideoId(String iframe) {
-    final idRegExp =
-        RegExp(r'src="https:\/\/www\.youtube\.com\/embed\/([^"?]+)');
+    final idRegExp = RegExp(r'src="https:\/\/www\.youtube\.com\/embed\/([^"?]+)');
     final match = idRegExp.firstMatch(iframe);
 
     if (match != null && match.groupCount > 0) {
@@ -113,8 +111,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               if (!widget.isYoutube)
                 (videoPlayerController?.value.isInitialized ?? false)
                     ? AspectRatio(
-                        aspectRatio:
-                            videoPlayerController?.value.aspectRatio ?? 0.0,
+                        aspectRatio: videoPlayerController?.value.aspectRatio ?? 0.0,
                         child: Chewie(
                           controller: chewieController!,
                         ),
@@ -138,8 +135,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             child: GestureDetector(
               onTap: () {
                 if (!isPortrait) {
-                  SystemChrome.setPreferredOrientations(
-                      [DeviceOrientation.portraitUp]);
+                  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                 }
                 Navigator.of(context).pop();
               },

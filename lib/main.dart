@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
 import 'package:dream_baby/firebase_options.dart';
@@ -7,7 +9,9 @@ import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/services/token_services.dart';
 import 'package:dream_baby/viewmodels/home_viewModel.dart';
 import 'package:dream_baby/viewmodels/login_viewmodel.dart';
+import 'package:dream_baby/viewmodels/notification_view_model.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -20,7 +24,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 BuildContext get getContext => navigatorKey.currentState!.context;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  HttpOverrides.global = MyHttpOverrides();
   await Hive.initFlutter();
   await Hive.openBox('userBox');
   await Firebase.initializeApp(
@@ -28,11 +32,12 @@ void main() async {
   ).then(
     (value) {
       // Set up your error logging here
-      FlutterError.onError = (FlutterErrorDetails details) {
-        // Log to console
-        print("Firebase initializeApp error = ${details.exceptionAsString()}");
-        // Send to a remote logging service
-      };
+      if (!kDebugMode)
+        FlutterError.onError = (FlutterErrorDetails details) {
+          // Log to console
+          print("Firebase initializeApp error = ${details.exceptionAsString()}");
+          // Send to a remote logging service
+        };
     },
   );
   final token = await TokenService.getToken();
@@ -45,8 +50,7 @@ void main() async {
       return;
     } else {
       // If login fails, continue with the regular login flow
-      print(
-          'Failed to login with saved token. Proceeding with regular login flow.');
+      print('Failed to login with saved token. Proceeding with regular login flow.');
     }
   }
 
@@ -64,17 +68,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    // Show tracking authorization dialog and ask for permission
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) async {
-  
-          await AppTrackingTransparency.requestTrackingAuthorization();
+      await AppTrackingTransparency.requestTrackingAuthorization();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +84,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => SignUpViewModel()),
         ChangeNotifierProvider(create: (_) => HomeViewmodel()),
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -102,5 +104,13 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }

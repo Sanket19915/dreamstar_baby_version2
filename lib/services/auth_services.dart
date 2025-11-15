@@ -118,17 +118,22 @@ class AuthService {
       Uri.parse(_sendOtpUrl),
       body: {'mobile_number': phone},
     );
-    if (response.statusCode == 200) {
-      var responseData = response.body;
-      Map<String, dynamic> userModel = json.decode(responseData);
-      // Save token to SharedPreferences
-      // await saveToken(userModel["user_id"].toString());
-      print('Token saved: ${userModel["user_id"].toString()}');
+    try {
+      if (response.statusCode == 200) {
+        var responseData = response.body;
+        Map<String, dynamic> userModel = json.decode(responseData);
+        // Save token to SharedPreferences
+        // await saveToken(userModel["user_id"].toString());
+        print('Token saved: ${userModel["user_id"].toString()}');
 
-      Fluttertoast.showToast(msg: userModel['message']);
-      return userModel;
-    } else {
-      print('Login failed: ${response.body}');
+        Fluttertoast.showToast(msg: userModel['message']);
+        return userModel;
+      } else {
+        Fluttertoast.showToast(msg: jsonDecode(response.body)["errors"].toString());
+        print('Login failed: ${response.body}');
+        return null;
+      }
+    } catch (e) {
       return null;
     }
   }
