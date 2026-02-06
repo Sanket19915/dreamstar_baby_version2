@@ -35,9 +35,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   ValueNotifier lodingNotifier = ValueNotifier(true);
-  LoginViewModel get viewModel => Provider.of<LoginViewModel>(context, listen: false);
+  LoginViewModel get viewModel =>
+      Provider.of<LoginViewModel>(context, listen: false);
   File? _profileImage;
 
   bool isLoading = false;
@@ -124,7 +126,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -164,7 +167,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               verifyComplete: (value) async {
                 (_profileImage?.path.isEmpty ?? true)
                     ? await _signUpWithoutImage(value)
-                    : await _signUp(value); // Callback to sign up after verification
+                    : await _signUp(
+                        value); // Callback to sign up after verification
               },
             ),
           ),
@@ -309,215 +313,245 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppImages.loginbg),
-            fit: BoxFit.fitHeight,
-            opacity: 1,
+    return GestureDetector(
+      onTap: () {
+        final currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(AppImages.loginbg),
+              fit: BoxFit.fitHeight,
+              opacity: 1,
+            ),
           ),
-        ),
-        height: double.infinity,
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 70),
-                    const SizedBox(height: 30),
-                    Hero(
-                      tag: 'Logo',
-                      child: Image.asset(
-                        AppImages.logoNew,
-                        height: MediaQuery.of(context).size.height * .06,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: const BoxDecoration(
-                        color: AppColors.whiteColor,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(12),
+          height: double.infinity,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 25),
+            physics: const ClampingScrollPhysics(),
+            child: Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 70),
+                      const SizedBox(height: 30),
+                      Hero(
+                        tag: 'Logo',
+                        child: Image.asset(
+                          AppImages.logoNew,
+                          height: MediaQuery.of(context).size.height * .06,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Create your account',
-                                style: CustomLabels.pbody1TextStyle(
-                                  fontSize: 23,
-                                  fontWeight: CustomLabels.largeFontWeight,
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: const BoxDecoration(
+                          color: AppColors.whiteColor,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Create your account',
+                                  style: CustomLabels.pbody1TextStyle(
+                                    fontSize: 23,
+                                    fontWeight: CustomLabels.largeFontWeight,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Image.asset(
+                                  AppImages.hand,
+                                  gaplessPlayback: true,
+                                  height: 30,
+                                  width: 40,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.025),
+                            GestureDetector(
+                              onTap: _pickImage,
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: AppColors.secondaryTextColor,
+                                backgroundImage: _profileImage != null
+                                    ? FileImage(_profileImage!)
+                                    : null,
+                                child: _profileImage == null
+                                    ? const Icon(Icons.add_a_photo,
+                                        color: Colors.white, size: 50)
+                                    : null,
+                              ),
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.025),
+                            CustomTextField(
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'First Name',
+                              controller: firstNameController,
+                              textInputAction: TextInputAction.next,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.text,
+                              validator: firstNameValidator,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            CustomTextField(
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'Last Name',
+                              controller: lastNameController,
+                              textInputAction: TextInputAction.next,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.text,
+                              validator: lastNameValidator,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            CustomTextField(
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'Phone Number',
+                              controller: phoneController,
+                              textInputAction: TextInputAction.next,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.number,
+                              validator: phoneValidator,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            CustomTextField(
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'Email',
+                              controller: emailController,
+                              textInputAction: TextInputAction.next,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.email,
+                              validator: emailValidator,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            CustomTextField(
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'Password',
+                              controller: passwordController,
+                              textInputAction: TextInputAction.next,
+                              obscureText: true,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.password,
+                              validator: passwordValidator,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            CustomTextField(
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'Confirm Password',
+                              controller: confirmPasswordController,
+                              textInputAction: TextInputAction.done,
+                              obscureText: true,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.password,
+                              validator: confirmPasswordValidator,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.035),
+                            CustomButton(
+                              text: 'Continue',
+                              isEnabled: isFormValid,
+                              borderColor: isFormValid
+                                  ? AppColors.primaryColor
+                                  : AppColors.secondaryTextColor
+                                      .withValues(alpha: .5),
+                              backgroundColor: isFormValid
+                                  ? AppColors.primaryColor
+                                  : AppColors.secondaryTextColor
+                                      .withValues(alpha: .5),
+                              textStyle: CustomLabels.body3GreyTextStyle(
+                                fontSize: 16,
+                                color: AppColors.whiteColor,
+                              ),
+                              onPressed: isFormValid ? _sendOTP : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      RichText(
+                        text: TextSpan(
+                          text: "Already have an account? ",
+                          style: const TextStyle(color: Colors.black45),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Login here',
+                              style: const TextStyle(
+                                color: AppColors.primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  context.go(Routes.login);
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                ValueListenableBuilder(
+                  valueListenable: lodingNotifier,
+                  builder: (context, value, child) {
+                    return isLoading
+                        ? Positioned.fill(
+                            child: Container(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              child: const Center(
+                                child: SpinKitThreeInOut(
+                                  color: AppColors.primaryColor,
+                                  size: 40.0,
                                 ),
                               ),
-                              const SizedBox(width: 5),
-                              Image.asset(
-                                AppImages.hand,
-                                gaplessPlayback: true,
-                                height: 30,
-                                width: 40,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                          GestureDetector(
-                            onTap: _pickImage,
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: AppColors.secondaryTextColor,
-                              backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-                              child: _profileImage == null
-                                  ? const Icon(Icons.add_a_photo, color: Colors.white, size: 50)
-                                  : null,
                             ),
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                          CustomTextField(
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'First Name',
-                            controller: firstNameController,
-                            textInputAction: TextInputAction.next,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.text,
-                            validator: firstNameValidator,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                          CustomTextField(
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Last Name',
-                            controller: lastNameController,
-                            textInputAction: TextInputAction.next,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.text,
-                            validator: lastNameValidator,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                          CustomTextField(
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Phone Number',
-                            controller: phoneController,
-                            textInputAction: TextInputAction.next,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.number,
-                            validator: phoneValidator,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                          CustomTextField(
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Email',
-                            controller: emailController,
-                            textInputAction: TextInputAction.next,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.email,
-                            validator: emailValidator,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                          CustomTextField(
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Password',
-                            controller: passwordController,
-                            textInputAction: TextInputAction.next,
-                            obscureText: true,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.password,
-                            validator: passwordValidator,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                          CustomTextField(
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Confirm Password',
-                            controller: confirmPasswordController,
-                            textInputAction: TextInputAction.done,
-                            obscureText: true,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.password,
-                            validator: confirmPasswordValidator,
-                          ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.035),
-                          CustomButton(
-                            text: 'Continue',
-                            isEnabled: isFormValid,
-                            borderColor: isFormValid
-                                ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withValues(alpha: .5),
-                            backgroundColor: isFormValid
-                                ? AppColors.primaryColor
-                                : AppColors.secondaryTextColor.withValues(alpha: .5),
-                            textStyle: CustomLabels.body3GreyTextStyle(
-                              fontSize: 16,
-                              color: AppColors.whiteColor,
-                            ),
-                            onPressed: isFormValid ? _sendOTP : null,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    RichText(
-                      text: TextSpan(
-                        text: "Already have an account? ",
-                        style: const TextStyle(color: Colors.black45),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Login here',
-                            style: const TextStyle(
-                              color: AppColors.primaryColor,
-                              decoration: TextDecoration.underline,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                context.go(Routes.login);
-                              },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              ValueListenableBuilder(
-                valueListenable: lodingNotifier,
-                builder: (context, value, child) {
-                  return isLoading
-                      ? Positioned.fill(
-                          child: Container(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            child: const Center(
-                              child: SpinKitThreeInOut(
-                                color: AppColors.primaryColor,
-                                size: 40.0,
-                              ),
-                            ),
-                          ),
-                        )
-                      : Container();
-                },
-              )
-              // if (isLoading)
-              //   Positioned.fill(
-              //     child: Container(
-              //       color: Colors.black.withValues(alpha:0.5),
-              //       child: const Center(
-              //         child: SpinKitThreeInOut(
-              //           color: AppColors.primaryColor,
-              //           size: 40.0,
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-            ],
+                          )
+                        : Container();
+                  },
+                )
+                // if (isLoading)
+                //   Positioned.fill(
+                //     child: Container(
+                //       color: Colors.black.withValues(alpha:0.5),
+                //       child: const Center(
+                //         child: SpinKitThreeInOut(
+                //           color: AppColors.primaryColor,
+                //           size: 40.0,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+              ],
+            ),
           ),
         ),
       ),
@@ -553,7 +587,8 @@ class SignUpViewModel with ChangeNotifier {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       })
-      ..files.add(await http.MultipartFile.fromPath('profile_pic', profileImage));
+      ..files
+          .add(await http.MultipartFile.fromPath('profile_pic', profileImage));
     var response = await request.send();
     var jsonData = await http.Response.fromStream(response);
     Map<String, dynamic>? finalResponse;
@@ -580,15 +615,17 @@ class SignUpViewModel with ChangeNotifier {
     required String confirmPassword,
     required String userId,
   }) async {
-    final response = await http.post(Uri.parse('http://dreambaby.pro/api/auth/register-initial'), body: {
-      'first_name': firstName,
-      'last_name': lastName,
-      'phone_no': phone,
-      'email': email,
-      'password': password,
-      'confirm_password': confirmPassword,
-      "user_id": userId
-    });
+    final response = await http.post(
+        Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
+        body: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'phone_no': phone,
+          'email': email,
+          'password': password,
+          'confirm_password': confirmPassword,
+          "user_id": userId
+        });
 
     Map<String, dynamic>? finalResponse;
     // if (response.statusCode == 200) {

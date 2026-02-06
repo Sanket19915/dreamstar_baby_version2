@@ -91,7 +91,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
             InkWell(
               onTap: () {
                 Share.share(
-                    sharePositionOrigin: Rect.fromCenter(center: Offset.zero, width: width, height: height),
+                    sharePositionOrigin: Rect.fromCenter(
+                        center: Offset.zero, width: width, height: height),
                     'Experience the Best Online Garbhasanskar Community in India!');
               },
               child: Image.asset(
@@ -107,14 +108,18 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 ),
                 Text(
                   'DreamStar Baby',
-                  style: GoogleFonts.lobsterTwo(color: AppColors.mainColor, fontSize: 24, fontWeight: FontWeight.w700),
+                  style: GoogleFonts.lobsterTwo(
+                      color: AppColors.mainColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700),
                 )
               ],
             ),
             InkWell(
-                onTap: () => GoRouter.of(context).push(Routes.notification).then(
-                      (value) async => await fetchNotificationCount(),
-                    ),
+                onTap: () =>
+                    GoRouter.of(context).push(Routes.notification).then(
+                          (value) async => await fetchNotificationCount(),
+                        ),
                 child: Stack(
                   alignment: Alignment.topRight,
                   children: [
@@ -127,7 +132,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       backgroundColor: Colors.red,
                       child: Text(
                         "$notificationCount",
-                        style: const TextStyle(color: Colors.white, fontSize: 8),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 8),
                       ),
                     ),
                   ],
@@ -151,7 +157,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             width: double.infinity,
             decoration: const BoxDecoration(
-              image: DecorationImage(image: AssetImage(AppImages.bg), fit: BoxFit.cover),
+              image: DecorationImage(
+                  image: AssetImage(AppImages.bg), fit: BoxFit.cover),
             ),
             child: Column(
               children: [
@@ -172,7 +179,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       }
                     }
                     // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                    if (nextIndex == quotients.length - 1 && quotientStatuses[quotients[nextIndex]] == true) {
+                    if (nextIndex == quotients.length - 1 &&
+                        quotientStatuses[quotients[nextIndex]] == true) {
                       for (int i = 0; i < quotients.length; i++) {
                         if (quotientStatuses[quotients[i]] == false) {
                           nextIndex = i;
@@ -181,7 +189,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       }
                     }
                     // Ensure the index is within bounds and valid (incomplete status)
-                    if (nextIndex < quotients.length && quotientStatuses[quotients[nextIndex]] == false) {
+                    if (nextIndex < quotients.length &&
+                        quotientStatuses[quotients[nextIndex]] == false) {
                       Navigator.of(context)
                           .push(
                         MaterialPageRoute(
@@ -231,7 +240,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         }
                       }
                       // If no incomplete quotient was found and nextIndex is at the end, check from the start
-                      if (nextIndex == quotients.length - 1 && quotientStatuses[quotients[nextIndex]] == true) {
+                      if (nextIndex == quotients.length - 1 &&
+                          quotientStatuses[quotients[nextIndex]] == true) {
                         for (int i = 0; i < quotients.length; i++) {
                           if (quotientStatuses[quotients[i]] == false) {
                             nextIndex = i;
@@ -240,7 +250,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                         }
                       }
                       // Ensure the index is within bounds and valid (incomplete status)
-                      if (nextIndex < quotients.length && quotientStatuses[quotients[nextIndex]] == false) {
+                      if (nextIndex < quotients.length &&
+                          quotientStatuses[quotients[nextIndex]] == false) {
                         Navigator.of(context)
                             .push(
                           MaterialPageRoute(
@@ -297,7 +308,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                 children: [
                                   Container(
                                     height: 190.0,
-                                    width: MediaQuery.of(context).size.width / 2 - 20,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[300],
                                       borderRadius: const BorderRadius.all(
@@ -309,7 +322,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                   Container(
                                     margin: const EdgeInsets.only(right: 10),
                                     height: 190.0,
-                                    width: MediaQuery.of(context).size.width / 2 - 20,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[300],
                                       borderRadius: const BorderRadius.all(
@@ -323,7 +338,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    width: MediaQuery.of(context).size.width / 2 - 20,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
                                     height: 190.0,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[300],
@@ -335,7 +352,9 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                                   const SizedBox(width: 10),
                                   Container(
                                     margin: const EdgeInsets.only(right: 10),
-                                    width: MediaQuery.of(context).size.width / 2 - 20,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2 -
+                                            20,
                                     height: 190.0,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[300],
@@ -378,7 +397,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                     height: height * 0.11,
                     width: width,
                     decoration: const BoxDecoration(
-                      image: DecorationImage(image: AssetImage(AppImages.know), fit: BoxFit.cover),
+                      image: DecorationImage(
+                          image: AssetImage(AppImages.know), fit: BoxFit.cover),
                       borderRadius: BorderRadius.all(
                         Radius.circular(15),
                       ),
@@ -386,15 +406,15 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 10,
-                ),
-                AmazonLinkWidget(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                ),
-                const SizedBox(
                   height: 20,
                 ),
+                // AmazonLinkWidget(
+                //   height: MediaQuery.of(context).size.height,
+                //   width: MediaQuery.of(context).size.width,
+                // ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
               ],
             ),
           ),
@@ -434,7 +454,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
         final data = json.decode(response.body);
         final statuses = data['statuses'] as Map<String, dynamic>;
 
-        quotientStatuses = statuses.map((key, value) => MapEntry(key, value as bool));
+        quotientStatuses =
+            statuses.map((key, value) => MapEntry(key, value as bool));
 
         if (mounted) {
           setState(() {});
@@ -449,7 +470,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
 
   Future<void> fetchNotificationCount() async {
     try {
-      final notificationViewModel = Provider.of<NotificationViewModel>(context, listen: false);
+      final notificationViewModel =
+          Provider.of<NotificationViewModel>(context, listen: false);
 
       var response = await notificationViewModel.unreadNotificationCount();
       notificationCount = response?["count"];
@@ -488,9 +510,13 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   Future<void> getTodaysQuestionStatus() async {
     try {
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
 
-      var request = http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
+      var request = http.Request(
+          'GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
 
       request.headers.addAll(headers);
 
