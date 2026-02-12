@@ -86,112 +86,125 @@ class _KnowEntryState extends State<KnowEntry> {
                               child: Text(
                                 "Important Notes for all these Sections",
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.mainColor, fontSize: 14, fontWeight: FontWeight.w600),
+                                    color: AppColors.mainColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600),
                               ),
                             )
                           ],
                         ),
                         const SizedBox(height: 15),
-                        Column(
-                          children: List.generate(
-                            knowEntry.length,
-                            (index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 20),
-                                child: InkWell(
-                                  onTap: () async {
-                                    // if (knowEntry[index].filePath?.contains(".pdf") ??
-                                    //     false) {
-                                    //   var token = await AuthService.getToken();
-                                    //   var url = Uri.parse(
-                                    //       'http://dreambaby.pro/api/baby_data?week=1&day=1');
-                                    //   var headers = {
-                                    //     'Content-Type': 'application/json',
-                                    //     'Authorization': 'Bearer $token',
-                                    //     'Cookie':
-                                    //         'XSRF-TOKEN=your-token; laravel_session=your-session'
-                                    //   };
+                        LayoutBuilder(builder: (context, constraints) {
+                          bool isTablet = constraints.maxWidth > 450;
+                          return Column(
+                            children: List.generate(
+                              knowEntry.length,
+                              (index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: InkWell(
+                                    onTap: () async {
+                                      // if (knowEntry[index].filePath?.contains(".pdf") ??
+                                      //     false) {
+                                      //   var token = await AuthService.getToken();
+                                      //   var url = Uri.parse(
+                                      //       'http://dreambaby.pro/api/baby_data?week=1&day=1');
+                                      //   var headers = {
+                                      //     'Content-Type': 'application/json',
+                                      //     'Authorization': 'Bearer $token',
+                                      //     'Cookie':
+                                      //         'XSRF-TOKEN=your-token; laravel_session=your-session'
+                                      //   };
 
-                                    //   try {
-                                    //     var response =
-                                    //         await http.get(url, headers: headers);
+                                      //   try {
+                                      //     var response =
+                                      //         await http.get(url, headers: headers);
 
-                                    //     if (response.statusCode == 200) {
-                                    //       var contentType =
-                                    //           response.headers['content-type'];
-                                    //       if (contentType != null &&
-                                    //           contentType
-                                    //               .contains('application/json')) {
-                                    //         var data = json.decode(response.body);
+                                      //     if (response.statusCode == 200) {
+                                      //       var contentType =
+                                      //           response.headers['content-type'];
+                                      //       if (contentType != null &&
+                                      //           contentType
+                                      //               .contains('application/json')) {
+                                      //         var data = json.decode(response.body);
 
-                                    //         setState(() {
-                                    //           week = data[0]['week']?.toString() ?? '0';
-                                    //         });
-                                    //       } else {
-                                    //          setState(() {
-                                    //           isLoading = false;
-                                    //         });
-                                    //         throw Exception(
-                                    //             'Unexpected response format');
-                                    //       }
-                                    //     } else {
-                                    //         setState(() {
-                                    //         isLoading = false;
-                                    //       });
-                                    //       throw Exception(
-                                    //           'Failed to fetch baby data: ${response.reasonPhrase}');
-                                    //     }
-                                    //   } catch (e) {
-                                    //       setState(() {
-                                    //       isLoading = false;
-                                    //     });
-                                    //     print('Error fetching baby data: $e');
-                                    //     throw Exception('Error fetching baby data: $e');
-                                    //   }
+                                      //         setState(() {
+                                      //           week = data[0]['week']?.toString() ?? '0';
+                                      //         });
+                                      //       } else {
+                                      //          setState(() {
+                                      //           isLoading = false;
+                                      //         });
+                                      //         throw Exception(
+                                      //             'Unexpected response format');
+                                      //       }
+                                      //     } else {
+                                      //         setState(() {
+                                      //         isLoading = false;
+                                      //       });
+                                      //       throw Exception(
+                                      //           'Failed to fetch baby data: ${response.reasonPhrase}');
+                                      //     }
+                                      //   } catch (e) {
+                                      //       setState(() {
+                                      //       isLoading = false;
+                                      //     });
+                                      //     print('Error fetching baby data: $e');
+                                      //     throw Exception('Error fetching baby data: $e');
+                                      //   }
 
-                                    try {
-                                      if (knowEntry[index].filePath?.contains(".pdf") ?? false) {
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-                                        String pdfPath = await _loadPdfFromNetwork(
-                                          knowEntry[index].filePath,
-                                        );
+                                      try {
+                                        if (knowEntry[index]
+                                                .filePath
+                                                ?.contains(".pdf") ??
+                                            false) {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
+                                          String pdfPath =
+                                              await _loadPdfFromNetwork(
+                                            knowEntry[index].filePath,
+                                          );
 
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PDFViewerScreen(pdfPath: pdfPath, week: week),
-                                          ),
-                                        );
-                                        setState(() {
-                                          isLoading = false;
-                                        });
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PDFViewerScreen(
+                                                      pdfPath: pdfPath,
+                                                      week: week),
+                                            ),
+                                          );
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                        }
+                                      } catch (e) {
+                                        Fluttertoast.showToast(
+                                            msg: e.toString());
                                       }
-                                    } catch (e) {
-                                      Fluttertoast.showToast(msg: e.toString());
-                                    }
 
-                                    // }
-                                  },
-                                  child: Container(
-                                    height: height * 0.13,
-                                    width: width,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: NetworkImage(
-                                              "http://dreambaby.pro/storage/${knowEntry[index].backgroundImage}"),
-                                          fit: BoxFit.cover),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(15),
+                                      // }
+                                    },
+                                    child: Container(
+                                      height: isTablet ? 250 : height * 0.13,
+                                      width: width,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                "http://dreambaby.pro/storage/${knowEntry[index].backgroundImage}"),
+                                            fit: BoxFit.cover),
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(15),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                                );
+                              },
+                            ),
+                          );
+                        }),
                       ],
                     )),
         ),
@@ -204,7 +217,8 @@ class _KnowEntryState extends State<KnowEntry> {
         context: context,
         builder: (context) => Dialog(
               child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -212,7 +226,9 @@ class _KnowEntryState extends State<KnowEntry> {
                         padding: const EdgeInsets.only(left: 10),
                         child: Text("References",
                             style: GoogleFonts.poppins(
-                                color: AppColors.mainColor, fontSize: 16, fontWeight: FontWeight.w600)),
+                                color: AppColors.mainColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600)),
                       ),
                       Html(
                           data: '''
@@ -251,15 +267,18 @@ class _KnowEntryState extends State<KnowEntry> {
             </ol>
           ''',
                           onAnchorTap: (url, attributes, element) async {
-                            if (url != null && await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                            if (url != null &&
+                                await canLaunchUrl(Uri.parse(url))) {
+                              await launchUrl(Uri.parse(url),
+                                  mode: LaunchMode.externalApplication);
                             }
                           }),
                       Align(
                         alignment: Alignment.bottomRight,
                         child: TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text("Close", style: TextStyle(color: AppColors.mainColor))),
+                            child: const Text("Close",
+                                style: TextStyle(color: AppColors.mainColor))),
                       )
                     ],
                   )),
@@ -267,8 +286,8 @@ class _KnowEntryState extends State<KnowEntry> {
   }
 
   Future<String> _loadPdfFromAssets() async {
-    final ByteData data =
-        await rootBundle.load('assets/pdf/TheNineMonthJourney.pdf'); // Replace with your PDF asset path
+    final ByteData data = await rootBundle.load(
+        'assets/pdf/TheNineMonthJourney.pdf'); // Replace with your PDF asset path
     final Directory tempDir = await getTemporaryDirectory();
     final File tempFile = File('${tempDir.path}/sample.pdf');
     await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
@@ -280,7 +299,8 @@ class _KnowEntryState extends State<KnowEntry> {
       Fluttertoast.showToast(msg: 'File is Empty');
     }
     try {
-      var data = await http.get(Uri.parse("http://dreambaby.pro/storage/$filePath"));
+      var data =
+          await http.get(Uri.parse("http://dreambaby.pro/storage/$filePath"));
       var bytes = data.bodyBytes;
       var dir = await getApplicationDocumentsDirectory();
       String? newFileName = filePath?.split("/").last;
@@ -294,7 +314,8 @@ class _KnowEntryState extends State<KnowEntry> {
   }
 
   Future<String> _affirmationloadPdfFromAssets() async {
-    final ByteData data = await rootBundle.load('assets/pdf/Affirmations.pdf'); // Replace with your PDF asset path
+    final ByteData data = await rootBundle.load(
+        'assets/pdf/Affirmations.pdf'); // Replace with your PDF asset path
     final Directory tempDir = await getTemporaryDirectory();
     final File tempFile = File('${tempDir.path}/sample.pdf');
     await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);

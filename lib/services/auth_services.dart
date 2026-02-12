@@ -7,10 +7,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String _loginUrl = 'http://dreambaby.pro/api/auth/login';
-  static const String _resetPasswordUrl = 'http://dreambaby.pro/api/auth/reset-password';
-  static const String _forgotPasswordUrl = 'http://dreambaby.pro/api/auth/forgot-password';
+  static const String _resetPasswordUrl =
+      'http://dreambaby.pro/api/auth/reset-password';
+  static const String _forgotPasswordUrl =
+      'http://dreambaby.pro/api/auth/forgot-password';
   static const String _sendOtpUrl = 'https://dreambaby.pro/api/auth/send-otp';
-  static const String _verifyOtpUrl = 'https://dreambaby.pro/api/auth/verify-otp';
+  static const String _verifyOtpUrl =
+      'https://dreambaby.pro/api/auth/verify-otp';
 
   static Future<UserModel?> login(String phone, String password) async {
     var headers = {
@@ -57,8 +60,8 @@ class AuthService {
     }
   }
 
-  static Future<int?> forgotPassWordVerifyOTPAndPassword(
-      String newPassword, String confirmPassword, int? userId, String otp) async {
+  static Future<int?> forgotPassWordVerifyOTPAndPassword(String newPassword,
+      String confirmPassword, int? userId, String otp) async {
     var request = http.MultipartRequest('POST', Uri.parse(_resetPasswordUrl));
     request.fields.addAll({
       "user_id": userId.toString(),
@@ -129,7 +132,8 @@ class AuthService {
         Fluttertoast.showToast(msg: userModel['message']);
         return userModel;
       } else {
-        Fluttertoast.showToast(msg: jsonDecode(response.body)["errors"].toString());
+        Fluttertoast.showToast(
+            msg: jsonDecode(response.body)["errors"].toString());
         print('Login failed: ${response.body}');
         return null;
       }
@@ -138,7 +142,8 @@ class AuthService {
     }
   }
 
-  static Future<Map<String, dynamic>?> verifyOtp(String phone, String otp, String userId) async {
+  static Future<Map<String, dynamic>?> verifyOtp(
+      String phone, String otp, String userId) async {
     var response = await http.post(
       Uri.parse(_verifyOtpUrl),
       body: {
@@ -158,7 +163,8 @@ class AuthService {
       Fluttertoast.showToast(msg: userModel['message']);
       return userModel;
     } else {
-      Fluttertoast.showToast(msg: 'Login failed: ${json.decode(response.body)["error"]}');
+      Fluttertoast.showToast(
+          msg: 'Login failed: ${json.decode(response.body)["error"]}');
       return null;
     }
   }

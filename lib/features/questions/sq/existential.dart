@@ -24,7 +24,11 @@ class ExistentialScreen extends StatefulWidget {
   final Function() onExit;
   Map<String, bool> quotientStatuses;
   ExistentialScreen(
-      {super.key, required this.from, required this.index, required this.onExit, required this.quotientStatuses});
+      {super.key,
+      required this.from,
+      required this.index,
+      required this.onExit,
+      required this.quotientStatuses});
 
   @override
   State<ExistentialScreen> createState() => _ExistentialScreenState();
@@ -79,7 +83,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       }
     });
 
-    _controller = VideoPlayerController.networkUrl(Uri.parse('https://www.w3schools.com/html/mov_bbb.mp4'))
+    _controller = VideoPlayerController.networkUrl(
+        Uri.parse('https://www.w3schools.com/html/mov_bbb.mp4'))
       ..initialize().then((_) {
         if (mounted) {
           setState(() {});
@@ -114,7 +119,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
+        backgroundColor:
+            _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
         leading: InkWell(
           onTap: () {
             context.pop();
@@ -171,44 +177,51 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 ),
               ),
               child: (questionsModel?.questions?.data.isEmpty ?? true)
-                  ? Column(
-                      children: [
-                        const SizedBox(height: 120),
-                        Container(
-                          height: deviceheight * 0.173,
-                          width: devicewidth,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(widget.from == "Existential"
-                                  ? AppImages.existential
-                                  : widget.from == "Kinesthetic"
-                                      ? "assets/images/kinestetic.png"
-                                      : widget.from == "Interpersonal"
-                                          ? "assets/images/interpersonal.png"
-                                          : widget.from == "Intrapersonal"
-                                              ? "assets/images/intrapersonal.png"
-                                              : widget.from == "Naturalistic"
-                                                  ? "assets/images/naturalistic.png"
-                                                  : widget.from == "Logical"
-                                                      ? "assets/images/logical.png"
-                                                      : widget.from == "Linguistic"
-                                                          ? "assets/images/linguistic.png"
-                                                          : widget.from == "Spatial Visual"
-                                                              ? "assets/images/spatialvisual.png"
-                                                              : widget.from == "Musical"
-                                                                  ? "assets/images/musical.png"
-                                                                  : AppImages.existential),
-                              fit: BoxFit.fill,
+                  ? LayoutBuilder(builder: (context, constraints) {
+                      bool isTablet = constraints.maxWidth > 450;
+                      return Column(
+                        children: [
+                          const SizedBox(height: 120),
+                          Container(
+                            height: isTablet ? 300 : deviceheight * 0.173,
+                            width: devicewidth,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(widget.from == "Existential"
+                                    ? AppImages.existential
+                                    : widget.from == "Kinesthetic"
+                                        ? "assets/images/kinestetic.png"
+                                        : widget.from == "Interpersonal"
+                                            ? "assets/images/interpersonal.png"
+                                            : widget.from == "Intrapersonal"
+                                                ? "assets/images/intrapersonal.png"
+                                                : widget.from == "Naturalistic"
+                                                    ? "assets/images/naturalistic.png"
+                                                    : widget.from == "Logical"
+                                                        ? "assets/images/logical.png"
+                                                        : widget.from ==
+                                                                "Linguistic"
+                                                            ? "assets/images/linguistic.png"
+                                                            : widget.from ==
+                                                                    "Spatial Visual"
+                                                                ? "assets/images/spatialvisual.png"
+                                                                : widget.from ==
+                                                                        "Musical"
+                                                                    ? "assets/images/musical.png"
+                                                                    : AppImages
+                                                                        .existential),
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Center(
-                          child: Text(
-                              "Congratulations! All activities to be taken up today for this intelligence have been completed."),
-                        )
-                      ],
-                    )
+                          const SizedBox(height: 20),
+                          const Center(
+                            child: Text(
+                                "Congratulations! All activities to be taken up today for this intelligence have been completed."),
+                          )
+                        ],
+                      );
+                    })
                   : PageView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: questionsModel?.questions?.data.length ?? 0,
@@ -225,43 +238,57 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           child: Column(
                             children: [
                               const SizedBox(height: 20),
-                              Container(
-                                height: deviceheight * 0.173,
-                                width: devicewidth,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(widget.from == "Existential"
-                                        ? AppImages.existential
-                                        : widget.from == "Kinesthetic"
-                                            ? "assets/images/kinestetic.png"
-                                            : widget.from == "Interpersonal"
-                                                ? "assets/images/interpersonal.png"
-                                                : widget.from == "Intrapersonal"
-                                                    ? "assets/images/intrapersonal.png"
-                                                    : widget.from == "Naturalistic"
-                                                        ? "assets/images/naturalistic.png"
-                                                        : widget.from == "Logical"
-                                                            ? "assets/images/logical.png"
-                                                            : widget.from == "Linguistic"
-                                                                ? "assets/images/linguistic.png"
-                                                                : widget.from == "Spatial Visual"
-                                                                    ? "assets/images/spatialvisual.png"
-                                                                    : widget.from == "Musical"
-                                                                        ? "assets/images/musical.png"
-                                                                        : AppImages.existential),
-                                    fit: BoxFit.fill,
+                              LayoutBuilder(builder: (context, constraints) {
+                                bool isTablet = constraints.maxWidth > 450;
+                                return Container(
+                                  height: isTablet ? 250 : deviceheight * 0.173,
+                                  width: devicewidth,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(widget.from ==
+                                              "Existential"
+                                          ? AppImages.existential
+                                          : widget.from == "Kinesthetic"
+                                              ? "assets/images/kinestetic.png"
+                                              : widget.from == "Interpersonal"
+                                                  ? "assets/images/interpersonal.png"
+                                                  : widget.from ==
+                                                          "Intrapersonal"
+                                                      ? "assets/images/intrapersonal.png"
+                                                      : widget.from ==
+                                                              "Naturalistic"
+                                                          ? "assets/images/naturalistic.png"
+                                                          : widget.from ==
+                                                                  "Logical"
+                                                              ? "assets/images/logical.png"
+                                                              : widget.from ==
+                                                                      "Linguistic"
+                                                                  ? "assets/images/linguistic.png"
+                                                                  : widget.from ==
+                                                                          "Spatial Visual"
+                                                                      ? "assets/images/spatialvisual.png"
+                                                                      : widget.from ==
+                                                                              "Musical"
+                                                                          ? "assets/images/musical.png"
+                                                                          : AppImages
+                                                                              .existential),
+                                      fit: BoxFit.fill,
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              }),
                               const SizedBox(height: 20),
                               ValueListenableBuilder(
                                   valueListenable: answerNotifier,
                                   builder: (context, value, child) {
                                     return _buildPageView(
-                                        questionsModel?.questions?.data[position],
+                                        questionsModel
+                                            ?.questions?.data[position],
                                         devicewidth,
-                                        questionsModel?.questions?.data[position].options
-                                                .where((e) => e.image.isNotEmpty)
+                                        questionsModel?.questions
+                                                ?.data[position].options
+                                                .where(
+                                                    (e) => e.image.isNotEmpty)
                                                 .toList() ??
                                             []);
                                   }),
@@ -271,25 +298,36 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   Expanded(
                                     child: ElevatedButton(
                                       style: ButtonStyle(
-                                        elevation: const WidgetStatePropertyAll(0),
-                                        backgroundColor:
-                                            WidgetStatePropertyAll(const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
+                                        elevation:
+                                            const WidgetStatePropertyAll(0),
+                                        backgroundColor: WidgetStatePropertyAll(
+                                            const Color(0xFFC4C8D0)
+                                                .withValues(alpha: 0.5)),
                                       ),
                                       onPressed: () async {
-                                        skipQuestions(
-                                            questionsModel?.questions?.data[_selectedIndex].id.toString() ?? "");
-                                        if (questionsModel?.questions?.data.length == (_selectedIndex + 1)) {
+                                        skipQuestions(questionsModel?.questions
+                                                ?.data[_selectedIndex].id
+                                                .toString() ??
+                                            "");
+                                        if (questionsModel
+                                                ?.questions?.data.length ==
+                                            (_selectedIndex + 1)) {
                                           int nextIndex = widget.index;
 
-                                          await getTodaysQuestionStatus(context, nextIndex);
+                                          await getTodaysQuestionStatus(
+                                              context, nextIndex);
                                         } else {
                                           controller.nextPage(
-                                              duration: const Duration(milliseconds: 500), curve: Curves.linear);
+                                              duration: const Duration(
+                                                  milliseconds: 500),
+                                              curve: Curves.linear);
                                         }
                                       },
                                       child: const Text(
                                         'Skip',
-                                        style: TextStyle(color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+                                        style: TextStyle(
+                                            color: Color(0xFF200F31),
+                                            fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ),
@@ -299,25 +337,36 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   Expanded(
                                     child: ElevatedButton(
                                       style: ButtonStyle(
-                                        elevation: const WidgetStatePropertyAll(0),
-                                        backgroundColor:
-                                            WidgetStatePropertyAll(const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
+                                        elevation:
+                                            const WidgetStatePropertyAll(0),
+                                        backgroundColor: WidgetStatePropertyAll(
+                                            const Color(0xFFC4C8D0)
+                                                .withValues(alpha: 0.5)),
                                       ),
                                       onPressed: () async {
-                                        flagQuestions(
-                                            questionsModel?.questions?.data[_selectedIndex].id.toString() ?? "");
-                                        if (questionsModel?.questions?.data.length == (_selectedIndex + 1)) {
+                                        flagQuestions(questionsModel?.questions
+                                                ?.data[_selectedIndex].id
+                                                .toString() ??
+                                            "");
+                                        if (questionsModel
+                                                ?.questions?.data.length ==
+                                            (_selectedIndex + 1)) {
                                           int nextIndex = widget.index;
 
-                                          await getTodaysQuestionStatus(context, nextIndex);
+                                          await getTodaysQuestionStatus(
+                                              context, nextIndex);
                                         } else {
                                           controller.nextPage(
-                                              duration: const Duration(milliseconds: 500), curve: Curves.linear);
+                                              duration: const Duration(
+                                                  milliseconds: 500),
+                                              curve: Curves.linear);
                                         }
                                       },
                                       child: const Text(
                                         'Flag',
-                                        style: TextStyle(color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+                                        style: TextStyle(
+                                            color: Color(0xFF200F31),
+                                            fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   )
@@ -329,32 +378,53 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 child: ElevatedButton(
                                   style: const ButtonStyle(
                                     elevation: WidgetStatePropertyAll(0),
-                                    backgroundColor: WidgetStatePropertyAll(Color(0xFFE71C65)),
+                                    backgroundColor: WidgetStatePropertyAll(
+                                        Color(0xFFE71C65)),
                                   ),
                                   onPressed: () async {
                                     await submitQuestions(
                                         ctx: context,
-                                        data: questionsModel?.questions?.data[position],
-                                        questionId: questionsModel?.questions?.data[_selectedIndex].id.toString() ?? "",
-                                        answer:
-                                            (questionsModel?.questions?.data[_selectedIndex].options.isEmpty ?? true)
-                                                ? ""
-                                                : questionsModel?.questions?.data[_selectedIndex]
-                                                        .options[selectedOptionIndex ?? 0].text ??
-                                                    "");
+                                        data: questionsModel
+                                            ?.questions?.data[position],
+                                        questionId: questionsModel?.questions
+                                                ?.data[_selectedIndex].id
+                                                .toString() ??
+                                            "",
+                                        answer: (questionsModel
+                                                    ?.questions
+                                                    ?.data[_selectedIndex]
+                                                    .options
+                                                    .isEmpty ??
+                                                true)
+                                            ? ""
+                                            : questionsModel
+                                                    ?.questions
+                                                    ?.data[_selectedIndex]
+                                                    .options[
+                                                        selectedOptionIndex ??
+                                                            0]
+                                                    .text ??
+                                                "");
 
-                                    if (questionsModel?.questions?.data.length == (_selectedIndex + 1)) {
+                                    if (questionsModel
+                                            ?.questions?.data.length ==
+                                        (_selectedIndex + 1)) {
                                       int nextIndex = widget.index;
 
-                                      await getTodaysQuestionStatus(context, nextIndex);
+                                      await getTodaysQuestionStatus(
+                                          context, nextIndex);
                                     } else {
                                       controller.nextPage(
-                                          duration: const Duration(milliseconds: 500), curve: Curves.linear);
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                          curve: Curves.linear);
                                     }
                                   },
                                   child: const Text(
                                     'SUBMIT',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ),
@@ -426,7 +496,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     );
   }
 
-  Widget _buildPageView(Datum? data, double devicewidth, List<OptionsModel> options) {
+  Widget _buildPageView(
+      Datum? data, double devicewidth, List<OptionsModel> options) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -464,7 +535,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       ),
                     ),
                     Icon(
-                      data?.isPurposeExpanded ?? false ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      data?.isPurposeExpanded ?? false
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
                       color: AppColors.blackColor,
                     ),
                   ],
@@ -478,7 +551,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       border: Border.all(
-                          color: ((data?.isPurposeExpanded ?? false) && data?.questionDescription != "")
+                          color: ((data?.isPurposeExpanded ?? false) &&
+                                  data?.questionDescription != "")
                               ? AppColors.greyTextColor
                               : Colors.transparent)),
                   child: Column(
@@ -536,7 +610,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   data?.questionText ?? "",
                   textAlign: TextAlign.justify,
                   maxLines: isQuestionExpanded ? null : 5,
-                  overflow: isQuestionExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                  overflow: isQuestionExpanded
+                      ? TextOverflow.visible
+                      : TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -573,9 +649,11 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       height: 220,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(Radius.circular(12)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12)),
                         image: DecorationImage(
-                          image: NetworkImage(("http://dreambaby.pro/storage/${data?.mainImage ?? ""}")),
+                          image: NetworkImage(
+                              ("http://dreambaby.pro/storage/${data?.mainImage ?? ""}")),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -590,7 +668,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       elevation: const WidgetStatePropertyAll(0),
-                      backgroundColor: WidgetStatePropertyAll(const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
+                      backgroundColor: WidgetStatePropertyAll(
+                          const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
                     ),
                     onPressed: () {
                       _controller.dispose();
@@ -598,14 +677,18 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         MaterialPageRoute(
                           builder: (ctx) => VideoPlayerScreen(
                             youtubeLink: data?.youtubeLink ?? "",
-                            isYoutube: (data?.youtubeLink.isEmpty ?? true) ? false : true,
+                            isYoutube: (data?.youtubeLink.isEmpty ?? true)
+                                ? false
+                                : true,
                           ),
                         ),
                       );
                     },
                     child: const Text(
                       'Full Screen',
-                      style: TextStyle(color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Color(0xFF200F31),
+                          fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
@@ -627,12 +710,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       IconButton(
                         iconSize: 64,
                         icon: Icon(
-                          _controller.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                          _controller.value.isPlaying
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_filled,
                           color: Colors.white,
                         ),
                         onPressed: () {
                           setState(() {
-                            _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                            _controller.value.isPlaying
+                                ? _controller.pause()
+                                : _controller.play();
                           });
                         },
                       ),
@@ -642,14 +729,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           (data?.youtubeLink.isEmpty ?? true)
               ? Container()
               : SizedBox(
-                  height: 250,
+                  // height: 250,
                   child: YouTubeWebView(
                     view: data?.youtubeLink ?? "",
                   ),
                 ),
           const SizedBox(height: 20),
           if (data?.options.every(
-                (element) => element.text.isNotEmpty || element.image.isNotEmpty,
+                (element) =>
+                    element.text.isNotEmpty || element.image.isNotEmpty,
               ) ??
               false)
             Align(
@@ -667,8 +755,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             valueListenable: answerNotifier,
             builder: (ctx, value, child) {
               // Filter the options to get only those with images and no text
-              var imageOnlyOptions =
-                  data?.options.where((option) => option.image.isNotEmpty && option.text.isEmpty).toList();
+              var imageOnlyOptions = data?.options
+                  .where((option) =>
+                      option.image.isNotEmpty && option.text.isEmpty)
+                  .toList();
 
               // If there are no options that match the criteria, return an empty container
               if (imageOnlyOptions == null || imageOnlyOptions.isEmpty) {
@@ -685,7 +775,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   mainAxisSpacing: 10,
                   childAspectRatio: 1.5, // Adjust the aspect ratio as needed
                 ),
-                itemCount: imageOnlyOptions.length, // Number of filtered options
+                itemCount:
+                    imageOnlyOptions.length, // Number of filtered options
                 itemBuilder: (context, index) {
                   // Use the correct index from the filtered list
                   final option = imageOnlyOptions[index];
@@ -693,12 +784,17 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   return GestureDetector(
                     onTap: () => isDisable ? null : _selectOption(index),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
                       decoration: BoxDecoration(
                         color: selectedOptionIndex == index
-                            ? ((selectedOptionIndex == index) && (isCorrect != null) && (isCorrect ?? false))
+                            ? ((selectedOptionIndex == index) &&
+                                    (isCorrect != null) &&
+                                    (isCorrect ?? false))
                                 ? Colors.green
-                                : ((selectedOptionIndex == index) && ((isCorrect != null) && !(isCorrect ?? false)))
+                                : ((selectedOptionIndex == index) &&
+                                        ((isCorrect != null) &&
+                                            !(isCorrect ?? false)))
                                     ? Colors.red
                                     : Colors.blue
                             : Colors.grey[300],
@@ -715,7 +811,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
             },
           ),
           for (int i = 0; i < (data?.options.length ?? 0); i++)
-            if ((data?.options[i].image.isEmpty ?? false) && (data?.options[i].text.isNotEmpty ?? false))
+            if ((data?.options[i].image.isEmpty ?? false) &&
+                (data?.options[i].text.isNotEmpty ?? false))
               ValueListenableBuilder(
                   valueListenable: answerNotifier,
                   builder: (ctx, value, child) {
@@ -725,32 +822,41 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
                           decoration: BoxDecoration(
                             color: selectedOptionIndex == i
-                                ? ((selectedOptionIndex == i) && (isCorrect != null) && (isCorrect ?? false))
+                                ? ((selectedOptionIndex == i) &&
+                                        (isCorrect != null) &&
+                                        (isCorrect ?? false))
                                     ? Colors.green
-                                    : ((selectedOptionIndex == i) && ((isCorrect != null) && !(isCorrect ?? false)))
+                                    : ((selectedOptionIndex == i) &&
+                                            ((isCorrect != null) &&
+                                                !(isCorrect ?? false)))
                                         ? Colors.red
                                         : Colors.blue
                                 : Colors.grey[300],
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: (data?.options[i].image.isNotEmpty ?? false)
-                              ? Image.network("http://dreambaby.pro/storage/${data?.options[i].image}")
+                              ? Image.network(
+                                  "http://dreambaby.pro/storage/${data?.options[i].image}")
                               : Text(
                                   '${i + 1}. ${data?.options[i].text}',
                                   style: GoogleFonts.poppins(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: selectedOptionIndex == i ? Colors.white : Colors.black,
+                                    color: selectedOptionIndex == i
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                         ),
                       ),
                     );
                   }),
-          options.every((element) => element.text.isEmpty || element.image.isEmpty)
+          options.every(
+                  (element) => element.text.isEmpty || element.image.isEmpty)
               ? Container()
               : GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
@@ -769,9 +875,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: selectedOptionIndex == index
-                              ? ((selectedOptionIndex == index) && (isCorrect != null) && (isCorrect ?? false))
+                              ? ((selectedOptionIndex == index) &&
+                                      (isCorrect != null) &&
+                                      (isCorrect ?? false))
                                   ? Colors.green
-                                  : ((selectedOptionIndex == index) && ((isCorrect != null) && !(isCorrect ?? false)))
+                                  : ((selectedOptionIndex == index) &&
+                                          ((isCorrect != null) &&
+                                              !(isCorrect ?? false)))
                                       ? Colors.red
                                       : Colors.blue
                               : Colors.grey[300],
@@ -784,14 +894,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: NetworkImage("http://dreambaby.pro/storage/${data?.options[index].image}"),
+                                    image: NetworkImage(
+                                        "http://dreambaby.pro/storage/${data?.options[index].image}"),
                                     fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
                             ),
                             // const SizedBox(height: 8),
-                            options[index].image.isNotEmpty && options[index].text.isEmpty
+                            options[index].image.isNotEmpty &&
+                                    options[index].text.isEmpty
                                 ? Image.network(
                                     "http://dreambaby.pro/storage/${data?.options[index].image}",
                                     fit: BoxFit.contain,
@@ -801,7 +913,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: selectedOptionIndex == index ? Colors.white : Colors.black,
+                                      color: selectedOptionIndex == index
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                           ],
@@ -826,8 +940,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         });
       }
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
-      var request = http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+      var request =
+          http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
       request.body = json.encode({
         // "quotient": widget.from == "Kinesthetic"
         //     ? "Physical"
@@ -896,8 +1014,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         });
       }
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
-      var request = http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+      var request =
+          http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
       request.body = json.encode({
         "quotient": widget.from == "Kinesthetic"
             ? "Physical"
@@ -960,10 +1082,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       //   });
       // }
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
 
-      var request = http.MultipartRequest('POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
-      request.fields.addAll({'question_id': questionId, "is_flagged": '1', "is_skipped": '0'});
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
+      request.fields.addAll(
+          {'question_id': questionId, "is_flagged": '1', "is_skipped": '0'});
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1001,10 +1128,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       //   });
       // }
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
 
-      var request = http.MultipartRequest('POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
-      request.fields.addAll({'question_id': questionId, "is_flagged": '0', "is_skipped": '1'});
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
+      request.fields.addAll(
+          {'question_id': questionId, "is_flagged": '0', "is_skipped": '1'});
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1034,10 +1166,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     }
   }
 
-  Future<void> submitQuestions({String? questionId, String? answer, Datum? data, BuildContext? ctx}) async {
+  Future<void> submitQuestions(
+      {String? questionId,
+      String? answer,
+      Datum? data,
+      BuildContext? ctx}) async {
     try {
-      print("enter new conditions. image = ${data?.options.map((e) => e.image).toList().join(",")}");
-      print("enter new conditions. text = ${data?.options.map((e) => e.text).toList().join(",")}");
+      print(
+          "enter new conditions. image = ${data?.options.map((e) => e.image).toList().join(",")}");
+      print(
+          "enter new conditions. text = ${data?.options.map((e) => e.text).toList().join(",")}");
       if ((data?.options.every((element) => element.image.isEmpty) ?? true) &&
           (data?.options.every((element) => element.text.isEmpty) ?? true) &&
           (data?.answerKeyInput.isNotEmpty ?? false)) {
@@ -1060,7 +1198,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       const Text(
                         'Below is the Correct Answer.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.mainColor),
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.mainColor),
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -1113,12 +1254,29 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         const Text(
                           'Congratulations! Your answer is correct',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.mainColor),
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.mainColor),
                         ),
                         const SizedBox(height: 20),
-                        (((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0"))
-                                    ? (data?.options[(int.parse(data.correctAnswer.first.toString())) - 1].image ?? "")
-                                    : (data?.options[int.parse(data.correctAnswer.first.toString())].image ?? ""))
+                        (((data?.options.length ?? 0) <=
+                                        int.parse(data?.correctAnswer.first
+                                                .toString() ??
+                                            "0"))
+                                    ? (data
+                                            ?.options[(int.parse(data
+                                                    .correctAnswer.first
+                                                    .toString())) -
+                                                1]
+                                            .image ??
+                                        "")
+                                    : (data
+                                            ?.options[int.parse(data
+                                                .correctAnswer.first
+                                                .toString())]
+                                            .image ??
+                                        ""))
                                 .isNotEmpty
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1137,7 +1295,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 ],
                               )
                             : Text(
-                                ((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0"))
+                                ((data?.options.length ?? 0) <=
+                                        int.parse(data?.correctAnswer.first
+                                                .toString() ??
+                                            "0"))
                                     ? "${(int.parse(data?.correctAnswer.first.toString() ?? "0"))}) ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text ?? ""}"
                                     : "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text ?? ""}",
 
@@ -1149,7 +1310,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           (data?.answerKeyInput ?? ""),
                           textAlign: TextAlign.center,
                         ),
-                        if (data?.answerImage != null) const SizedBox(height: 15),
+                        if (data?.answerImage != null)
+                          const SizedBox(height: 15),
                         if (data?.answerImage != null)
                           Image.network(
                             "http://dreambaby.pro/storage/${data?.answerImage}",
@@ -1192,7 +1354,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           const Text(
                             "Wrong Answer",
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.mainColor),
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.mainColor),
                           ),
                           const SizedBox(height: 20),
                           const Text(
@@ -1210,10 +1375,23 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             //     color: AppColors.mainColor),
                           ),
                           const SizedBox(height: 10),
-                          (((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0"))
-                                      ? (data?.options[(int.parse(data.correctAnswer.first.toString())) - 1].image ??
+                          (((data?.options.length ?? 0) <=
+                                          int.parse(data?.correctAnswer.first
+                                                  .toString() ??
+                                              "0"))
+                                      ? (data
+                                              ?.options[(int.parse(data
+                                                      .correctAnswer.first
+                                                      .toString())) -
+                                                  1]
+                                              .image ??
                                           "")
-                                      : (data?.options[int.parse(data.correctAnswer.first.toString())].image ?? ""))
+                                      : (data
+                                              ?.options[int.parse(data
+                                                  .correctAnswer.first
+                                                  .toString())]
+                                              .image ??
+                                          ""))
                                   .isNotEmpty
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1233,7 +1411,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                 )
                               : Text(
                                   ((data?.options.length ?? 0) <=
-                                          int.parse(data?.correctAnswer.first.toString() ?? "0"))
+                                          int.parse(data?.correctAnswer.first
+                                                  .toString() ??
+                                              "0"))
                                       ? "${(int.parse(data?.correctAnswer.first.toString() ?? "0"))}) ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text ?? ""}"
                                       : "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text ?? ""}",
 
@@ -1245,7 +1425,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             data?.answerKeyInput ?? "",
                             textAlign: TextAlign.center,
                           ),
-                          if (data?.answerImage != null) const SizedBox(height: 15),
+                          if (data?.answerImage != null)
+                            const SizedBox(height: 15),
                           if (data?.answerImage != null)
                             Image.network(
                               "http://dreambaby.pro/storage/${data?.answerImage}",
@@ -1275,11 +1456,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       //   });
       // }
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
 
-      var request = http.MultipartRequest('POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
-      request.fields
-          .addAll({'question_id': questionId ?? "", "answer": answer ?? "", "is_flagged": '0', "is_skipped": '0'});
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
+      request.fields.addAll({
+        'question_id': questionId ?? "",
+        "answer": answer ?? "",
+        "is_flagged": '0',
+        "is_skipped": '0'
+      });
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1320,9 +1509,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         });
       }
       var token = await AuthService.getToken();
-      var headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'};
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
 
-      var request = http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
+      var request = http.Request(
+          'GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
 
       request.headers.addAll(headers);
       await Future.delayed(const Duration(milliseconds: 500));
@@ -1352,7 +1545,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         }
 
         // Check if we've reached the end of the list
-        if (nextIndex == quotients.length - 1 && widget.quotientStatuses[quotients[nextIndex]] == true) {
+        if (nextIndex == quotients.length - 1 &&
+            widget.quotientStatuses[quotients[nextIndex]] == true) {
           // All quotients are complete, show final popup
           showFinalPopup(ctx, todayQuestionStatus, nextIndex);
         } else if (nextIndex < quotients.length &&
@@ -1383,7 +1577,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     }
   }
 
-  void showFinalPopup(BuildContext ctx, String todayQuestionStatus, int nextIndex) {
+  void showFinalPopup(
+      BuildContext ctx, String todayQuestionStatus, int nextIndex) {
     showDialog(
       barrierDismissible: false,
       context: ctx,
@@ -1402,14 +1597,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                 Text(
                   todayQuestionStatus,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.mainColor),
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.mainColor),
                 ),
                 const SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.whiteColor)),
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.whiteColor)),
                         onPressed: () {
                           widget.onExit();
                           fetchQuotientStatuses();
@@ -1418,14 +1618,19 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         },
                         child: const Text(
                           'Exit',
-                          style: TextStyle(color: AppColors.mainColor, fontSize: 14, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              color: AppColors.mainColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
                     const SizedBox(width: 15),
                     Expanded(
                       child: ElevatedButton(
-                        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(AppColors.mainColor)),
+                        style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all(AppColors.mainColor)),
                         onPressed: () async {
                           Navigator.of(ctx1).pop();
                           await fetchQuotientStatuses();
@@ -1434,22 +1639,29 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           // Find the next incomplete quotient index
                           while (localIndex < quotients.length - 1) {
                             localIndex++;
-                            if (widget.quotientStatuses[quotients[localIndex]] == false) {
+                            if (widget
+                                    .quotientStatuses[quotients[localIndex]] ==
+                                false) {
                               break;
                             }
                           }
                           if (localIndex < quotients.length &&
-                              widget.quotientStatuses[quotients[localIndex]] == false) {
+                              widget.quotientStatuses[quotients[localIndex]] ==
+                                  false) {
                             navigateToNextQuotient(ctx, localIndex);
                           } else {
                             // If no more incomplete quotients, exit
                             widget.onExit();
-                            Navigator.of(ctx).popUntil((route) => route.isFirst);
+                            Navigator.of(ctx)
+                                .popUntil((route) => route.isFirst);
                           }
                         },
                         child: const Text(
                           'Continue',
-                          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -1482,7 +1694,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   Future<void> fetchQuotientStatuses() async {
     var token = await AuthService.getToken();
     var headers = {'Authorization': 'Bearer $token'};
-    var request = http.Request('GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
+    var request = http.Request(
+        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
 
     request.headers.addAll(headers);
 
@@ -1494,7 +1707,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       final statuses = data['statuses'] as Map<String, dynamic>;
 
       setState(() {
-        widget.quotientStatuses = statuses.map((key, value) => MapEntry(key, value as bool));
+        widget.quotientStatuses =
+            statuses.map((key, value) => MapEntry(key, value as bool));
       });
       print(widget.quotientStatuses);
     } else {
@@ -1627,7 +1841,8 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
   }
 
   String extractYouTubeVideoId(String iframe) {
-    final idRegExp = RegExp(r'src="https:\/\/www\.youtube\.com\/embed\/([^"?]+)');
+    final idRegExp =
+        RegExp(r'src="https:\/\/www\.youtube\.com\/embed\/([^"?]+)');
     final match = idRegExp.firstMatch(iframe);
 
     if (match != null && match.groupCount > 0) {
@@ -1646,7 +1861,8 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
           child: ElevatedButton(
             style: ButtonStyle(
               elevation: const WidgetStatePropertyAll(0),
-              backgroundColor: WidgetStatePropertyAll(const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
+              backgroundColor: WidgetStatePropertyAll(
+                  const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
             ),
             onPressed: () {
               youtubePlayerController?.pause();
@@ -1667,7 +1883,8 @@ class _YouTubeWebViewState extends State<YouTubeWebView> {
             },
             child: const Text(
               'Full Screen',
-              style: TextStyle(color: Color(0xFF200F31), fontWeight: FontWeight.w500),
+              style: TextStyle(
+                  color: Color(0xFF200F31), fontWeight: FontWeight.w500),
             ),
           ),
         ),

@@ -86,8 +86,9 @@ class _FourQuotientsState extends State<FourQuotients> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    return SizedBox(
-      height: 388,
+    double width = MediaQuery.of(context).size.width;
+    return Container(
+      height: (width > 450) ? 550 : 390,
       child: Column(
         children: [
           if (allQuotientStatuses)
@@ -199,10 +200,11 @@ class _FourQuotientsState extends State<FourQuotients> {
                         children: [
                           Container(
                             decoration: const BoxDecoration(
-                              //color: Colors.green,
+                              color: AppColors.greenCBE0CF,
                               image: DecorationImage(
-                                  image: AssetImage(AppImages.exist),
-                                  fit: BoxFit.cover),
+                                  image: AssetImage(
+                                      AppImages.eexistentialWithoutBg),
+                                  fit: BoxFit.contain),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
@@ -257,13 +259,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                         });
                       },
                       child: Stack(
+                        alignment: Alignment.center,
                         children: [
                           Container(
-                            decoration: const BoxDecoration(
-                              // color: Colors.green,
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.orangeCF6747.withValues(alpha: .30),
                               image: DecorationImage(
-                                  image: AssetImage(AppImages.kine),
-                                  fit: BoxFit.cover),
+                                  image: AssetImage(AppImages.kineImg),
+                                  fit: BoxFit.contain),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(12),
                               ),
@@ -345,13 +349,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           children: [
                                             Container(
                                               decoration: const BoxDecoration(
+                                                  color: AppColors.yellowEFD892,
                                                   borderRadius:
                                                       BorderRadius.all(
                                                           Radius.circular(10)),
                                                   image: DecorationImage(
-                                                      image: AssetImage(
-                                                          AppImages.inter),
-                                                      fit: BoxFit.cover)),
+                                                      image: AssetImage(AppImages
+                                                          .interpersonalWithoutBg),
+                                                      fit: BoxFit.contain)),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
@@ -410,14 +415,16 @@ class _FourQuotientsState extends State<FourQuotients> {
                                         child: Stack(
                                           children: [
                                             Container(
-                                              decoration: const BoxDecoration(
+                                              decoration: BoxDecoration(
+                                                  color: AppColors.yellowF6DA7E
+                                                      .withValues(alpha: 0.80),
                                                   borderRadius:
                                                       BorderRadius.all(
                                                           Radius.circular(10)),
                                                   image: DecorationImage(
-                                                      image: AssetImage(
-                                                          AppImages.intra),
-                                                      fit: BoxFit.cover)),
+                                                      image: AssetImage(AppImages
+                                                          .intrapersonalWithoutBg),
+                                                      fit: BoxFit.contain)),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
@@ -478,12 +485,13 @@ class _FourQuotientsState extends State<FourQuotients> {
                                       children: [
                                         Container(
                                           decoration: const BoxDecoration(
+                                              color: AppColors.yellowEFE8B2,
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(10)),
                                               image: DecorationImage(
-                                                  image: AssetImage(
-                                                      AppImages.natu),
-                                                  fit: BoxFit.cover)),
+                                                  image: AssetImage(AppImages
+                                                      .naturalisticWithoutBg),
+                                                  fit: BoxFit.contain)),
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(
@@ -577,13 +585,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           children: [
                                             Container(
                                               decoration: const BoxDecoration(
+                                                  color: AppColors.pinkFFB2C5,
                                                   borderRadius:
                                                       BorderRadius.all(
                                                           Radius.circular(10)),
                                                   image: DecorationImage(
-                                                      image: AssetImage(
-                                                          AppImages.ling),
-                                                      fit: BoxFit.cover)),
+                                                      image: AssetImage(AppImages
+                                                          .linguisticWithoutbg),
+                                                      fit: BoxFit.contain)),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
@@ -644,13 +653,15 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           children: [
                                             Container(
                                               decoration: const BoxDecoration(
+                                                  color: AppColors.pinkFFC2D1,
                                                   borderRadius:
                                                       BorderRadius.all(
                                                           Radius.circular(10)),
                                                   image: DecorationImage(
                                                       image: AssetImage(
-                                                          AppImages.spat),
-                                                      fit: BoxFit.cover)),
+                                                          AppImages
+                                                              .spatialVisual),
+                                                      fit: BoxFit.contain)),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
@@ -718,13 +729,14 @@ class _FourQuotientsState extends State<FourQuotients> {
                                           children: [
                                             Container(
                                               decoration: const BoxDecoration(
+                                                  color: AppColors.pinkFDD5DF,
                                                   borderRadius:
                                                       BorderRadius.all(
                                                           Radius.circular(10)),
                                                   image: DecorationImage(
-                                                      image: AssetImage(
-                                                          AppImages.logi),
-                                                      fit: BoxFit.cover)),
+                                                      image: AssetImage(AppImages
+                                                          .logicalWithoutBg),
+                                                      fit: BoxFit.contain)),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
@@ -781,14 +793,16 @@ class _FourQuotientsState extends State<FourQuotients> {
                                         child: Stack(
                                           children: [
                                             Container(
-                                              decoration: const BoxDecoration(
+                                              decoration: BoxDecoration(
+                                                  color: AppColors.pinkFFC2D1
+                                                      .withValues(alpha: 0.80),
                                                   borderRadius:
                                                       BorderRadius.all(
                                                           Radius.circular(10)),
                                                   image: DecorationImage(
-                                                      image: AssetImage(
-                                                          AppImages.musi),
-                                                      fit: BoxFit.cover)),
+                                                      image: AssetImage(AppImages
+                                                          .musicalWithoutBg),
+                                                      fit: BoxFit.contain)),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(

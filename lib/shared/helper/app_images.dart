@@ -17,17 +17,31 @@ class AppImages {
   static const productPic = "assets/images/product_pic.jpeg";
   static const productPicPng = "assets/images/product_pic.png";
   static const know = "assets/images/know.webp";
+  static const knowledgeHub = "assets/images/knowledge_hub.png";
   static const exist = "assets/images/exist.png";
+  static const eexistentialWithoutBg =
+      "assets/images/existential_without_bg.png";
   static const check = "assets/images/Check.png";
   static const uncheck = "assets/images/Uncheck.png";
   static const kine = "assets/images/kine.png";
+  static const kineImg = "assets/images/kine_img.png";
   static const inter = "assets/images/inter.png";
+  static const interpersonalWithoutBg =
+      "assets/images/interpersonal_without_bg.png";
   static const intra = "assets/images/intra.png";
+  static const intrapersonalWithoutBg =
+      "assets/images/intrapersonal_without_bg.png";
   static const natu = "assets/images/natu.png";
+  static const naturalisticWithoutBg =
+      "assets/images/naturalistic_without_bg.png";
   static const musi = "assets/images/musi.png";
+  static const musicalWithoutBg = "assets/images/musical_without_bg.png";
   static const ling = "assets/images/ling.png";
+  static const linguisticWithoutbg = "assets/images/linguistic_without_bg.png";
   static const spat = "assets/images/spat.png";
+  static const spatialVisual = "assets/images/spatial_visual.png";
   static const logi = "assets/images/logi.png";
+  static const logicalWithoutBg = "assets/images/logical_without_bg.png";
   static const homenew = "assets/images/homenew.png";
   static const testi = "assets/images/testi.png";
   static const about = "assets/images/about.png";

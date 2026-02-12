@@ -90,10 +90,11 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
           children: [
             InkWell(
               onTap: () {
-                Share.share(
+                SharePlus.instance.share(ShareParams(
+                    text:
+                        'Experience the Best Online Garbhasanskar Community in India!',
                     sharePositionOrigin: Rect.fromCenter(
-                        center: Offset.zero, width: width, height: height),
-                    'Experience the Best Online Garbhasanskar Community in India!');
+                        center: Offset.zero, width: width, height: height)));
               },
               child: Image.asset(
                 AppImages.share,
@@ -391,17 +392,64 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 const SizedBox(
                   height: 15,
                 ),
+                // InkWell(
+                //   onTap: () => GoRouter.of(context).push(Routes.knowEntry),
+                //   child: Container(
+                //     height: height * 0.11,
+                //     width: width,
+                //     decoration: const BoxDecoration(
+                //       image: DecorationImage(
+                //           image: AssetImage(AppImages.know), fit: BoxFit.cover),
+                //       borderRadius: BorderRadius.all(
+                //         Radius.circular(15),
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 InkWell(
-                  onTap: () => GoRouter.of(context).push(Routes.knowEntry),
+                  onTap: () {
+                    GoRouter.of(context).push(Routes.knowEntry);
+                  },
                   child: Container(
-                    height: height * 0.11,
-                    width: width,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(AppImages.know), fit: BoxFit.cover),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(15),
-                      ),
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.50),
+                        borderRadius: BorderRadius.circular(15),
+                        gradient: LinearGradient(colors: [
+                          Color(0xffB88FEB).withValues(alpha: 0.90),
+                          Color(0xffADBDF5).withValues(alpha: 0.80),
+                        ])),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Column(
+                            spacing: 8,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AutoSizeText('Knowledge Hub',
+                                  style: GoogleFonts.poppins(
+                                      color: AppColors.babySizeColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                  minFontSize: 13,
+                                  maxLines: 1),
+                              AutoSizeText(
+                                'Mantras, Meditation, Yoga, Nutrition\nand more...',
+                                style: GoogleFonts.poppins(
+                                    color: AppColors.black404155,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w400),
+                                minFontSize: 8,
+                              )
+                            ],
+                          ),
+                        ),
+                        Image.asset(AppImages.knowledgeHub,
+                            fit: BoxFit.contain, height: 80)
+                      ],
                     ),
                   ),
                 ),
