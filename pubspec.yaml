@@ -30,7 +30,7 @@ dependencies:
   device_info_plus: ^12.2.0
   nuts_activity_indicator: ^1.0.0
   permission_handler: ^11.3.1
-  
+
   percent_indicator: ^4.2.5
   google_fonts: ^8.0.1
   fluttertoast: ^9.0.0
@@ -67,12 +67,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  config:
+    enable-swift-package-manager: false
   assets:
     - assets/images/
     - assets/pdf/
-  fonts:  
-    - family: Aristotelica  
-      fonts:  
+  fonts:
+    - family: Aristotelica
+      fonts:
         # - asset: assets/fonts/Zetafonts - Aristotelica Display Extralight.ttf
-        - asset: assets/fonts/Aristotelica Display DemiBold Trial.ttf  
+        - asset: assets/fonts/Aristotelica Display DemiBold Trial.ttf
           # weight: 900
