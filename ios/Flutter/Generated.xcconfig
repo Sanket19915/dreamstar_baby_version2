@@ -1,9 +1,9 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/krunalsutariya/flutter
-FLUTTER_APPLICATION_PATH=/Users/krunalsutariya/Workspace/dreamstar-baby
-FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/krunalsutariya/Workspace/dreamstar-baby/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework
+FLUTTER_ROOT=/Users/a/development/flutter
+FLUTTER_APPLICATION_PATH=/Users/a/Documents/Gal/gal_outside/Flutter/dreamstar-baby
+FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/a/Documents/Gal/gal_outside/Flutter/dreamstar-baby/ios/Flutter/ephemeral/Packages/.packages/FlutterFramework
 COCOAPODS_PARALLEL_CODE_SIGN=true
-FLUTTER_TARGET=/Users/krunalsutariya/Workspace/dreamstar-baby/lib/main.dart
+FLUTTER_TARGET=/Users/a/Documents/Gal/gal_outside/Flutter/dreamstar-baby/lib/main.dart
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
 FLUTTER_BUILD_NUMBER=1
@@ -13,4 +13,4 @@ DART_DEFINES=RkxVVFRFUl9WRVJTSU9OPTMuNDQuMA==,RkxVVFRFUl9DSEFOTkVMPXN0YWJsZQ==,R
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
-PACKAGE_CONFIG=/Users/krunalsutariya/Workspace/dreamstar-baby/.dart_tool/package_config.json
+PACKAGE_CONFIG=/Users/a/Documents/Gal/gal_outside/Flutter/dreamstar-baby/.dart_tool/package_config.json

@@ -130,12 +130,21 @@ class _FourQuotientsState extends State<FourQuotients> {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        'SPIRITUAL QUOTIENT',
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.whiteColor,
-                            fontSize: 11),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            'SPIRITUAL QUOTIENT',
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.whiteColor,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -152,12 +161,21 @@ class _FourQuotientsState extends State<FourQuotients> {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        'PHYSICAL QUOTIENT',
-                        style: GoogleFonts.poppins(
-                            color: AppColors.whiteColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            'PHYSICAL QUOTIENT',
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.whiteColor,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -868,12 +886,21 @@ class _FourQuotientsState extends State<FourQuotients> {
                           Radius.circular(12),
                         )),
                     child: Center(
-                      child: Text(
-                        'EMOTIONAL QUOTIENT',
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.whiteColor,
-                            fontSize: 11),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            'EMOTIONAL QUOTIENT',
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.whiteColor,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -890,12 +917,21 @@ class _FourQuotientsState extends State<FourQuotients> {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        'INTELLECTUAL QUOTIENT',
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.whiteColor,
-                            fontSize: 11),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            'INTELLECTUAL QUOTIENT',
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.whiteColor,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),

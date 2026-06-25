@@ -1,8 +1,10 @@
 // edit_profile_screen.dart
 
-import 'dart:convert';
 import 'dart:io';
 
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
@@ -16,7 +18,6 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-import '../../services/auth_services.dart';
 import '../auth/screens/more_details.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -64,14 +65,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ;
   }
 
+  bool get _hasEddOrLmp {
+    final eed = widget.userProfile['eed']?.toString().trim();
+    final lmp = widget.userProfile['lmp']?.toString().trim();
+    return (eed != null && eed.isNotEmpty && eed != 'null') ||
+        (lmp != null && lmp.isNotEmpty && lmp != 'null');
+  }
+
+  String? get _eddOrLmpFieldKey {
+    final eed = widget.userProfile['eed']?.toString().trim();
+    if (eed != null && eed.isNotEmpty && eed != 'null') return 'eed';
+    return 'lmp';
+  }
+
   @override
   void initState() {
     super.initState();
     // Initialize controllers with user profile data
-    firstNameController = TextEditingController(text: widget.userProfile['first_name']);
-    lastNameController = TextEditingController(text: widget.userProfile['last_name']);
+    firstNameController =
+        TextEditingController(text: widget.userProfile['first_name']);
+    lastNameController =
+        TextEditingController(text: widget.userProfile['last_name']);
     phoneController = TextEditingController(text: widget.userProfile['phone_no']);
-    eddController = TextEditingController(text: widget.userProfile["eed"] ?? widget.userProfile["lmp"]);
+    eddController = TextEditingController(
+        text: widget.userProfile["eed"] ?? widget.userProfile["lmp"]);
 
     emailController = TextEditingController(text: widget.userProfile['email']);
     if (firstNameController.text.isNotEmpty &&
@@ -196,93 +213,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Map<String, String> _profileFields() {
+    final fields = <String, String>{
+      'first_name': firstNameController.text,
+      'last_name': lastNameController.text,
+    };
+    if (_eddOrLmpFieldKey != null) {
+      fields[_eddOrLmpFieldKey!] = eddController.text;
+    }
+    return fields;
+  }
+
   Future<void> _saveProfileWithoutImage() async {
+    if (!await AuthService.hasSession()) return;
+
     try {
-      setState(() {
-        isLoading = true;
-      });
-      var token = await AuthService.getToken();
-      var request = http.MultipartRequest('POST', Uri.parse('http://dreambaby.pro/api/update-profile'))
-        ..fields.addAll({
-          'first_name': firstNameController.text,
-          'last_name': lastNameController.text,
-          //'phone_no': phoneController.text,
-          //'email': emailController.text,
-          widget.userProfile["eed"] != null ? 'eed' : 'lmp': eddController.text
-        })
-        ..headers.addAll(
-            {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer $token'});
-
-      var response = await request.send();
-      var jsonData = await http.Response.fromStream(response);
-      Map<String, dynamic>? finalResponse;
-      if (response.statusCode == 200) {
-        finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
-
-        Fluttertoast.showToast(msg: finalResponse["message"]);
-
-        //Navigator.pop(context, finalResponse["user_profile"]);
-        //Navigator.pop(context, updatedData);
-        // context.go(Routes.settingsScreen);
-        Navigator.of(context).pop();
-      } else {
-        Fluttertoast.showToast(msg: "Something went wrong: ${jsonData.body}");
-        print(jsonData.body);
-      }
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = true);
+      final response = await ApiClient.postMultipart(
+        ApiConfig.updateProfile,
+        _profileFields(),
+        authenticated: true,
+      );
+      Fluttertoast.showToast(
+          msg: response['message']?.toString() ?? 'Profile updated');
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
-      setState(() {
-        isLoading = false;
-      });
+      Fluttertoast.showToast(msg: 'Error: ${e.toString()}');
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
   Future<void> _saveProfile() async {
+    if (!await AuthService.hasSession()) return;
+
     try {
-      setState(() {
-        isLoading = true;
-      });
-      var token = await AuthService.getToken();
-      var request = http.MultipartRequest('POST', Uri.parse('http://dreambaby.pro/api/update-profile'))
-        ..fields.addAll({
-          'first_name': firstNameController.text,
-          'last_name': lastNameController.text,
-          //'phone_no': phoneController.text,
-          //'email': emailController.text,
-          widget.userProfile["eed"] != null ? 'eed' : 'lmp': eddController.text
-        })
-        ..headers.addAll(
-            {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer $token'})
-        ..files.add(await http.MultipartFile.fromPath('profile_pic', _profileImage?.path ?? ""));
-
-      var response = await request.send();
-      var jsonData = await http.Response.fromStream(response);
-      Map<String, dynamic>? finalResponse;
-      if (response.statusCode == 200) {
-        finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
-
-        Fluttertoast.showToast(msg: finalResponse["message"]);
-
-        //Navigator.pop(context, finalResponse["user_profile"]);
-        // context.go(Routes.settingsScreen);
-        Navigator.of(context).pop();
-      } else {
-        Fluttertoast.showToast(msg: "Something went wrong: ${jsonData.body}");
+      setState(() => isLoading = true);
+      final files = <http.MultipartFile>[];
+      if (_profileImage != null) {
+        files.add(
+          await http.MultipartFile.fromPath('profile_pic', _profileImage!.path),
+        );
       }
-      setState(() {
-        isLoading = false;
-      });
+
+      final response = await ApiClient.postMultipart(
+        ApiConfig.updateProfile,
+        _profileFields(),
+        files: files,
+        authenticated: true,
+      );
+      Fluttertoast.showToast(
+          msg: response['message']?.toString() ?? 'Profile updated');
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
-      setState(() {
-        isLoading = false;
-      });
+      Fluttertoast.showToast(msg: 'Error: ${e.toString()}');
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
-    // Handle save profile logic
-    print('Profile saved');
   }
 
   @override
@@ -338,16 +325,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ? CircleAvatar(
                                 radius: 50,
                                 backgroundColor: AppColors.secondaryTextColor,
-                                backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                                backgroundImage: _profileImage != null
+                                    ? FileImage(_profileImage!)
+                                    : null,
                                 child: _profileImage == null
-                                    ? const Icon(Icons.add_a_photo, color: Colors.white, size: 50)
+                                    ? const Icon(Icons.add_a_photo,
+                                        color: Colors.white, size: 50)
                                     : null,
                               )
                             : CircleAvatar(
                                 radius: 50,
                                 backgroundColor: AppColors.secondaryTextColor,
-                                backgroundImage:
-                                    NetworkImage("http://dreambaby.pro/storage/${widget.userProfile["profile_pic"]}"),
+                                backgroundImage: NetworkImage(
+                                  ApiConfig.storageUrl(
+                                    widget.userProfile['profile_pic']?.toString(),
+                                  ),
+                                ),
                               )),
                     const SizedBox(height: 20),
                     Container(
@@ -441,6 +434,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       validator: emailValidator,
                     ),
                     const SizedBox(height: 10),
+
                     Container(
                       padding: const EdgeInsets.only(left: 5),
                       alignment: Alignment.centerLeft,
@@ -453,31 +447,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        // _selectDate(context);
-                      },
-                      child: AbsorbPointer(
-                        child: CustomTextField(
-                          autoValidate: AutovalidateMode.disabled,
-                          hintText: 'EDD or LMP', // Change as per your requirement
-                          controller: eddController,
+                    CustomTextField(
+                      autoValidate: AutovalidateMode.disabled,
+                      hintText: 'EDD or LMP',
+                      onTap: _hasEddOrLmp
+                          ? null
+                          : () {
+                              _selectDate(context);
+                            },
 
-                          // TextEditingController(
-                          //   text: selectedDate != null
-                          //       ? DateFormat('yyyy-MM-dd').format(selectedDate!)
-                          //       : '2024-07-09',
-                          // ),
-                          borderColor: AppColors.secondaryTextColor,
-                          inputType: CustomTextInputType.text,
-                        ),
+                      controller: eddController,
+                      // readOnly: !_hasEddOrLmp,
+                      backGroundColor: _hasEddOrLmp ? AppColors.greyTextColor : null,
+                      borderColor: AppColors.secondaryTextColor,
+                      inputType: CustomTextInputType.text,
+                    ),
+                    const SizedBox(height: 6),
+                    if (_hasEddOrLmp)
+                      Text(
+                        'Please reach out to Admin to change the Dates here!',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.w500),
                       ),
-                    ),
-                    Text(
-                      "Please reach out to Admin to change the Dates here!",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 20),
+
+                    const SizedBox(height: 15),
                     // CustomTextField(
                     //   autoValidate: AutovalidateMode.onUserInteraction,
                     //   hintText: 'Password',
@@ -503,10 +498,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     CustomButton(
                       text: 'Save',
                       isEnabled: isFormValid,
-                      borderColor:
-                          isFormValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: .5),
-                      backgroundColor:
-                          isFormValid ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: .5),
+                      borderColor: isFormValid
+                          ? AppColors.primaryColor
+                          : AppColors.secondaryTextColor.withValues(alpha: .5),
+                      backgroundColor: isFormValid
+                          ? AppColors.primaryColor
+                          : AppColors.secondaryTextColor.withValues(alpha: .5),
                       textStyle: CustomLabels.body3GreyTextStyle(
                         fontSize: 16,
                         color: AppColors.whiteColor,

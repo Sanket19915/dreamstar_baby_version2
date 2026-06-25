@@ -3,6 +3,9 @@ class Routes {
   static const onboard = '/onboard';
   static const login = '/login';
   static const registration = '/registration';
+  static const forgotPassword = '/forgot-password';
+  static const verifyOtp = '/verify-otp';
+  static const forgotOtpReset = '/forgot-otp-reset';
   static const home = '/home';
   static const moreDetails = '/moreDetails';
   static const acknowledgement = '/acknowledgement';

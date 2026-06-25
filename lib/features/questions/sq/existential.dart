@@ -2,6 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/media/network_video_controller.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/core/storage/activity_progress_cache.dart';
 import 'package:dream_baby/features/questions/sq/video_player_screen.dart';
 import 'package:dream_baby/models/options_model.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
@@ -38,7 +42,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _isAppBarTransparent = true;
   bool isQuestionExpanded = false;
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
+  VideoPlayerController? _audioController;
 
   int? selectedOptionIndex;
   bool isLoading = false;
@@ -64,6 +69,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   @override
   void initState() {
     super.initState();
+    final cachedStatuses = ActivityProgressCache.readQuotientStatuses();
+    if (cachedStatuses.isNotEmpty) {
+      widget.quotientStatuses.addAll(cachedStatuses);
+    }
     getQuestions();
     fetchQuestions();
 
@@ -83,19 +92,49 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       }
     });
 
-    _controller = VideoPlayerController.networkUrl(
-        Uri.parse('https://www.w3schools.com/html/mov_bbb.mp4'))
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {});
-        }
-      });
+    // Video loads per-question via [_loadVideoForIndex].
+  }
+
+  Future<void> _loadVideoForIndex(int index) async {
+    final items = questionsModel?.questions?.data;
+    if (items == null || index < 0 || index >= items.length) return;
+
+    final data = items[index];
+    final videoPath = data.mainVideo?.toString() ?? '';
+
+    await _controller?.dispose();
+    _controller = null;
+
+    if (videoPath.isNotEmpty && videoPath != 'null') {
+      _controller = await NetworkVideoController.initialize(
+        videoPath,
+        questionId: data.id,
+      );
+      NetworkVideoController.prefetchVideo(
+        index + 1 < (questionsModel?.questions?.data.length ?? 0)
+            ? items[index + 1].mainVideo?.toString()
+            : null,
+      );
+    }
+
+    final audioPath = data.mainAudio?.toString() ?? '';
+    await _audioController?.dispose();
+    _audioController = null;
+    if (audioPath.isNotEmpty && audioPath != 'null') {
+      _audioController = await NetworkVideoController.initialize(
+        audioPath,
+        questionId: data.id,
+      );
+    }
+
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _controller.dispose();
+    _controller?.dispose();
+    _audioController?.dispose();
     super.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -109,6 +148,30 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     Vibration.vibrate(
       pattern: [500],
     );
+  }
+
+  void _restoreMcqSelection(int index) {
+    final items = questionsModel?.questions?.data;
+    if (items == null || index < 0 || index >= items.length) {
+      selectedOptionIndex = null;
+      return;
+    }
+
+    final question = items[index];
+    final saved = ActivityProgressCache.readMcqAnswers()['${question.id}'];
+    if (saved == null || saved.isEmpty) {
+      selectedOptionIndex = null;
+      return;
+    }
+
+    final options = question.options;
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].text == saved || options[i].image == saved) {
+        selectedOptionIndex = i;
+        return;
+      }
+    }
+    selectedOptionIndex = null;
   }
 
   @override
@@ -229,8 +292,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       onPageChanged: (page) {
                         setState(() {
                           _selectedIndex = page;
-                          selectedOptionIndex = null;
                         });
+                        _restoreMcqSelection(page);
+                        _loadVideoForIndex(page);
                       },
                       itemBuilder: (ctx, position) {
                         return SingleChildScrollView(
@@ -496,6 +560,74 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     );
   }
 
+  Widget _buildAudioPlayer(Datum? data) {
+    final hasAudio = (data?.mainAudio?.toString().isNotEmpty ?? false) &&
+        data?.mainAudio?.toString() != 'null';
+    if (!hasAudio) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F7),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              icon: Icon(
+                (_audioController?.value.isPlaying ?? false)
+                    ? Icons.pause_circle_filled
+                    : Icons.play_circle_filled,
+                color: AppColors.mainColor,
+                size: 40,
+              ),
+              onPressed: () {
+                if (_audioController == null ||
+                    !(_audioController!.value.isInitialized)) {
+                  return;
+                }
+                setState(() {
+                  _audioController!.value.isPlaying
+                      ? _audioController!.pause()
+                      : _audioController!.play();
+                });
+              },
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Listen',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (_audioController?.value.isInitialized ?? false)
+                    VideoProgressIndicator(
+                      _audioController!,
+                      allowScrubbing: true,
+                      colors: const VideoProgressColors(
+                        playedColor: AppColors.mainColor,
+                        bufferedColor: AppColors.cardColor,
+                        backgroundColor: Color(0xFFE0E0E0),
+                      ),
+                    )
+                  else
+                    const LinearProgressIndicator(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPageView(
       Datum? data, double devicewidth, List<OptionsModel> options) {
     return Container(
@@ -653,7 +785,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             const BorderRadius.all(Radius.circular(12)),
                         image: DecorationImage(
                           image: NetworkImage(
-                              ("http://dreambaby.pro/storage/${data?.mainImage ?? ""}")),
+                              ApiConfig.storageUrl(data?.mainImage ?? '')),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -672,14 +804,16 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           const Color(0xFFC4C8D0).withValues(alpha: 0.5)),
                     ),
                     onPressed: () {
-                      _controller.dispose();
+                      final data = questionsModel?.questions?.data[_selectedIndex];
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (ctx) => VideoPlayerScreen(
-                            youtubeLink: data?.youtubeLink ?? "",
-                            isYoutube: (data?.youtubeLink.isEmpty ?? true)
-                                ? false
-                                : true,
+                            youtubeLink: data?.youtubeLink?.toString() ?? '',
+                            videoUrl: data?.mainVideo?.toString(),
+                            questionId: data?.id,
+                            isYoutube: (data?.youtubeLink?.toString().isNotEmpty ??
+                                    false) &&
+                                data!.youtubeLink.toString() != 'null',
                           ),
                         ),
                       );
@@ -701,25 +835,26 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      _controller.value.isInitialized
+                      _controller?.value.isInitialized ?? false
                           ? AspectRatio(
-                              aspectRatio: _controller.value.aspectRatio,
-                              child: VideoPlayer(_controller),
+                              aspectRatio: _controller!.value.aspectRatio,
+                              child: VideoPlayer(_controller!),
                             )
                           : const Center(child: CircularProgressIndicator()),
                       IconButton(
                         iconSize: 64,
                         icon: Icon(
-                          _controller.value.isPlaying
+                          (_controller?.value.isPlaying ?? false)
                               ? Icons.pause_circle_filled
                               : Icons.play_circle_filled,
                           color: Colors.white,
                         ),
                         onPressed: () {
+                          if (_controller == null) return;
                           setState(() {
-                            _controller.value.isPlaying
-                                ? _controller.pause()
-                                : _controller.play();
+                            _controller!.value.isPlaying
+                                ? _controller!.pause()
+                                : _controller!.play();
                           });
                         },
                       ),
@@ -734,6 +869,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                     view: data?.youtubeLink ?? "",
                   ),
                 ),
+          _buildAudioPlayer(data),
           const SizedBox(height: 20),
           if (data?.options.every(
                 (element) =>
@@ -801,7 +937,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Image.network(
-                        "http://dreambaby.pro/storage/${option.image}",
+                        "${ApiConfig.storageBase}/${option.image}",
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -840,7 +976,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           ),
                           child: (data?.options[i].image.isNotEmpty ?? false)
                               ? Image.network(
-                                  "http://dreambaby.pro/storage/${data?.options[i].image}")
+                                  "${ApiConfig.storageBase}/${data?.options[i].image}")
                               : Text(
                                   '${i + 1}. ${data?.options[i].text}',
                                   style: GoogleFonts.poppins(
@@ -895,7 +1031,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
                                     image: NetworkImage(
-                                        "http://dreambaby.pro/storage/${data?.options[index].image}"),
+                                        "${ApiConfig.storageBase}/${data?.options[index].image}"),
                                     fit: BoxFit.fill,
                                   ),
                                 ),
@@ -905,7 +1041,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             options[index].image.isNotEmpty &&
                                     options[index].text.isEmpty
                                 ? Image.network(
-                                    "http://dreambaby.pro/storage/${data?.options[index].image}",
+                                    "${ApiConfig.storageBase}/${data?.options[index].image}",
                                     fit: BoxFit.contain,
                                   )
                                 : Text(
@@ -939,13 +1075,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           isLoading = true;
         });
       }
-      var token = await AuthService.getToken();
+      var token = await AuthService.requireToken();
+      if (token == null) return;
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
       var request =
-          http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
+          http.Request('GET', Uri.parse(ApiConfig.questions));
       request.body = json.encode({
         // "quotient": widget.from == "Kinesthetic"
         //     ? "Physical"
@@ -1013,13 +1150,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           isLoading = true;
         });
       }
-      var token = await AuthService.getToken();
+      var token = await AuthService.requireToken();
+      if (token == null) return;
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
       var request =
-          http.Request('GET', Uri.parse('http://dreambaby.pro/api/questions'));
+          http.Request('GET', Uri.parse(ApiConfig.questions));
       request.body = json.encode({
         "quotient": widget.from == "Kinesthetic"
             ? "Physical"
@@ -1049,6 +1187,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         String responseData = await response.stream.bytesToString();
 
         questionsModel = questionsModelFromJson(responseData);
+        _restoreMcqSelection(_selectedIndex);
+        await _loadVideoForIndex(_selectedIndex);
         setState(() {});
         await Future.delayed(const Duration(milliseconds: 500));
       } else {
@@ -1081,14 +1221,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       //     isLoading = true;
       //   });
       // }
-      var token = await AuthService.getToken();
+      var token = await AuthService.requireToken();
+      if (token == null) return;
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
+          'POST', Uri.parse(ApiConfig.userAnswer));
       request.fields.addAll(
           {'question_id': questionId, "is_flagged": '1', "is_skipped": '0'});
       request.headers.addAll(headers);
@@ -1127,14 +1268,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       //     isLoading = true;
       //   });
       // }
-      var token = await AuthService.getToken();
+      var token = await AuthService.requireToken();
+      if (token == null) return;
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
+          'POST', Uri.parse(ApiConfig.userAnswer));
       request.fields.addAll(
           {'question_id': questionId, "is_flagged": '0', "is_skipped": '1'});
       request.headers.addAll(headers);
@@ -1179,6 +1321,11 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       if ((data?.options.every((element) => element.image.isEmpty) ?? true) &&
           (data?.options.every((element) => element.text.isEmpty) ?? true) &&
           (data?.answerKeyInput.isNotEmpty ?? false)) {
+        if (questionId != null) {
+          await ActivityProgressCache.markReflectionViewed(
+            int.tryParse(questionId) ?? 0,
+          );
+        }
         print("enter new conditions.");
         await showDialog(
             barrierDismissible: false,
@@ -1211,7 +1358,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       if (data?.answerImage != null) const SizedBox(height: 15),
                       if (data?.answerImage != null)
                         Image.network(
-                          "http://dreambaby.pro/storage/${data?.answerImage}",
+                          "${ApiConfig.storageBase}/${data?.answerImage}",
                           height: 120,
                           width: 120,
                         ),
@@ -1288,7 +1435,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     textAlign: TextAlign.center,
                                   ),
                                   Image.network(
-                                    "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                    "${ApiConfig.storageBase}/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
                                     height: 90,
                                     width: 100,
                                   ),
@@ -1314,7 +1461,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                           const SizedBox(height: 15),
                         if (data?.answerImage != null)
                           Image.network(
-                            "http://dreambaby.pro/storage/${data?.answerImage}",
+                            "${ApiConfig.storageBase}/${data?.answerImage}",
                             height: 120,
                             width: 120,
                           ),
@@ -1403,7 +1550,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                       textAlign: TextAlign.center,
                                     ),
                                     Image.network(
-                                      "http://dreambaby.pro/storage/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                      "${ApiConfig.storageBase}/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
                                       height: 90,
                                       width: 100,
                                     ),
@@ -1429,7 +1576,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             const SizedBox(height: 15),
                           if (data?.answerImage != null)
                             Image.network(
-                              "http://dreambaby.pro/storage/${data?.answerImage}",
+                              "${ApiConfig.storageBase}/${data?.answerImage}",
                               height: 120,
                               width: 120,
                             ),
@@ -1455,14 +1602,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       //     isLoading = true;
       //   });
       // }
-      var token = await AuthService.getToken();
+      var token = await AuthService.requireToken();
+      if (token == null) return;
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
 
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://dreambaby.pro/api/user_answer'));
+          'POST', Uri.parse(ApiConfig.userAnswer));
       request.fields.addAll({
         'question_id': questionId ?? "",
         "answer": answer ?? "",
@@ -1475,6 +1623,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         String responseData = await response.stream.bytesToString();
+        if (questionId != null && answer != null && answer.isNotEmpty) {
+          await ActivityProgressCache.saveMcqAnswer(
+            int.tryParse(questionId) ?? 0,
+            answer,
+          );
+        }
         print(responseData);
         print(questionsModel);
       } else {
@@ -1508,14 +1662,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           isLoading = true;
         });
       }
-      var token = await AuthService.getToken();
+      var token = await AuthService.requireToken();
+      if (token == null) return;
       var headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
 
       var request = http.Request(
-          'GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
+          'GET', Uri.parse(ApiConfig.questionsStatusToday));
 
       request.headers.addAll(headers);
       await Future.delayed(const Duration(milliseconds: 500));
@@ -1692,27 +1847,21 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   }
 
   Future<void> fetchQuotientStatuses() async {
-    var token = await AuthService.getToken();
-    var headers = {'Authorization': 'Bearer $token'};
-    var request = http.Request(
-        'GET', Uri.parse('http://dreambaby.pro/api/user-question-status'));
-
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final data = json.decode(responseData);
-      final statuses = data['statuses'] as Map<String, dynamic>;
+    try {
+      final data = await ApiClient.get(
+        ApiConfig.userQuestionStatus,
+        authenticated: true,
+      );
+      final statuses = data['statuses'] as Map<String, dynamic>?;
+      if (statuses == null) return;
 
       setState(() {
         widget.quotientStatuses =
             statuses.map((key, value) => MapEntry(key, value as bool));
       });
-      print(widget.quotientStatuses);
-    } else {
-      print(response.reasonPhrase);
+      await ActivityProgressCache.saveQuotientStatuses(widget.quotientStatuses);
+    } catch (e) {
+      print('Error fetching quotient statuses: $e');
     }
   }
 }

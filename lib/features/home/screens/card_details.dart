@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:dream_baby/features/setting/setting_screen.dart';
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/core/storage/profile_cache.dart';
+import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -68,69 +69,80 @@ class _BabyCardState extends State<BabyCard> {
   }
 
   Future<void> _fetchUserProfile() async {
-    try {
-      var token = await AuthService.getToken();
-      var url = Uri.parse('http://dreambaby.pro/api/profile');
-      var response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
+    if (!await AuthService.hasSession()) return;
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
+    try {
+      final data = await ApiClient.get(ApiConfig.profile, authenticated: true);
+      if (mounted) {
         setState(() {
-          firstName = data['first_name'] ?? '';
-          profilePicture = data['profile_pic'] ?? '';
+          firstName = data['first_name']?.toString() ?? '';
+          profilePicture = data['profile_pic']?.toString() ?? '';
         });
-      } else {
-        print('Failed to fetch user profile: ${response.reasonPhrase}');
+        await ProfileCache.save(data);
       }
     } catch (e) {
-      print('Error fetching user profile: $e');
+      final cached = ProfileCache.read();
+      if (cached != null && mounted) {
+        setState(() {
+          firstName = cached['first_name']?.toString() ?? '';
+          profilePicture = cached['profile_pic']?.toString() ?? '';
+        });
+      } else {
+        print('Error fetching user profile: $e');
+      }
     }
   }
 
   Future<void> fetchBabyData(int week, int day) async {
-    var token = await AuthService.getToken();
-    var url = Uri.parse('http://dreambaby.pro/api/baby_data');
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
+    if (!await AuthService.hasSession()) return;
 
     try {
-      var response = await http.get(url, headers: headers);
+      final data = await ApiClient.get(ApiConfig.babyData, authenticated: true);
 
-      var contentType = response.headers['content-type'];
-      if (contentType != null && contentType.contains('application/json')) {
-        var data = json.decode(response.body);
-        if (response.body.contains("message")) {
-          Fluttertoast.showToast(msg: data["message"]);
-        } else {
-          setState(() {
-            total_day = data['total_days']?.toString() ?? '0';
-            babyData = data["data"][0];
-            weight = babyData['weight']?.toString() ?? '0.0 KG';
-            height = babyData['height']?.toString() ?? '0 CM';
-            weeks = babyData['week']?.toString() ?? '0';
-            days = babyData['day']?.toString() ?? '0';
-            sizes = babyData['size']?.toString() ?? '';
-            images = babyData['image']?.toString() ?? '';
-          });
-        }
+      if (data.containsKey('message')) {
+        return;
+      }
 
-        print(
-            'total_days: $total_day, Weight: $weight, Height: $height, Weeks: $weeks, Days: $days, Size: $sizes');
-      } else {
-        throw Exception('Unexpected response format');
+      final dataList = data['data'];
+      if (dataList is! List || dataList.isEmpty) return;
+
+      final item = dataList[0];
+      if (item is! Map<String, dynamic>) return;
+
+      if (mounted) {
+        setState(() {
+          total_day = data['total_days']?.toString() ?? '0';
+          babyData = item;
+          weight = item['weight']?.toString() ?? '0.0 KG';
+          height = item['height']?.toString() ?? '0 CM';
+          weeks = item['week']?.toString() ?? '0';
+          days = item['day']?.toString() ?? '0';
+          sizes = item['size']?.toString() ?? '';
+          images = item['image']?.toString() ?? '';
+        });
       }
     } catch (e) {
+      _applyCachedPregnancyProgress();
       print('Error fetching baby data: $e');
-      throw Exception('Error fetching baby data: $e');
     }
+  }
+
+  void _applyCachedPregnancyProgress() {
+    final pregnancyDays = ProfileCache.pregnancyDayCount();
+    if (pregnancyDays == null || !mounted) return;
+
+    setState(() {
+      total_day = pregnancyDays.toString();
+      weeks = '${pregnancyDays ~/ 7}';
+      days = '${pregnancyDays % 7}';
+    });
+  }
+
+  String _greetingText() {
+    final name = firstName.trim();
+    if (name.isEmpty) return 'Hi there,';
+    if (name.length == 1) return 'Hi ${name.toUpperCase()},';
+    return 'Hi ${name[0].toUpperCase()}${name.substring(1).toLowerCase()},';
   }
 
   @override
@@ -184,29 +196,26 @@ class _BabyCardState extends State<BabyCard> {
         : Column(
             children: [
               InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
-                },
-
-                //=> GoRouter.of(context).push(Routes.settingsScreen),
+                onTap: () => context.push(Routes.settingsScreen),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(
-                            "http://dreambaby.pro/storage/$profilePicture")),
+                      radius: 20,
+                      backgroundColor: AppColors.secondaryTextColor,
+                      backgroundImage: profilePicture.isNotEmpty
+                          ? NetworkImage(ApiConfig.storageUrl(profilePicture))
+                          : null,
+                      child: profilePicture.isEmpty
+                          ? const Icon(Icons.person, color: Colors.white)
+                          : null,
+                    ),
                     const SizedBox(
                       width: 10,
                     ),
                     Text(
-                      'Hi ${firstName.toString()[0].toUpperCase()}${firstName.toString().substring(1).toLowerCase()},',
+                      _greetingText(),
                       style: GoogleFonts.lobsterTwo(
                           color: AppColors.blackColor,
                           fontSize: 20,
@@ -429,7 +438,7 @@ class _BabyCardState extends State<BabyCard> {
                                                   height: 40,
                                                 )
                                               : Image.network(
-                                                  "http://dreambaby.pro/storage/$images",
+                                                  ApiConfig.storageUrl(images),
                                                   height: 40,
                                                 ),
                                         ),

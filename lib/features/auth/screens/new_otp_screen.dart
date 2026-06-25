@@ -1,290 +1,222 @@
 // lib/otp_screen.dart
+import 'package:dream_baby/core/auth/auth_token.dart';
+import 'package:dream_baby/core/utils/app_messenger.dart';
+import 'package:dream_baby/router/routes.dart';
+import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
+import 'package:dream_baby/shared/widget/auth_back_button.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dream_baby/shared/widget/loading_overlay.dart';
+import 'package:dream_baby/viewmodels/login_viewmodel.dart';
+import 'package:dream_baby/viewmodels/sign_up_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../../viewmodels/login_viewmodel.dart';
 
 class NewOTPScreen extends StatefulWidget {
   final String phoneNumber;
-  Map<String, dynamic>? userModel;
-  final Function(Map<String, dynamic>?) verifyComplete;
+  final Map<String, dynamic>? userModel;
 
-  NewOTPScreen({
+  const NewOTPScreen({
     super.key,
     required this.phoneNumber,
-    required this.userModel,
-    required this.verifyComplete,
+    this.userModel,
   });
 
   @override
-  _NewOTPScreenState createState() => _NewOTPScreenState();
+  State<NewOTPScreen> createState() => _NewOTPScreenState();
 }
 
 class _NewOTPScreenState extends State<NewOTPScreen> {
   LoginViewModel get viewModel =>
       Provider.of<LoginViewModel>(context, listen: false);
+  SignUpViewModel get signUpViewModel =>
+      Provider.of<SignUpViewModel>(context, listen: false);
+
   final TextEditingController otpController = TextEditingController();
-  ValueNotifier buttonNotifier = ValueNotifier(true);
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool isLoading = false;
-  String verificationId = "";
+  final ValueNotifier<String> buttonNotifier = ValueNotifier('');
+  Map<String, dynamic>? _userModel;
 
-  void signInWithOTP() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
+  @override
+  void initState() {
+    super.initState();
+    _userModel = widget.userModel;
+  }
 
-      Map<String, dynamic>? userModel = await viewModel.verifyOtp(
-        widget.phoneNumber,
-        otpController.text,
-        widget.userModel?["user_id"].toString() ?? "",
+  Future<void> signInWithOTP() async {
+    final result = await viewModel.verifyOtp(
+      widget.phoneNumber,
+      otpController.text,
+      _userModel?['user_id'].toString() ?? '',
+    );
+
+    if (!mounted) return;
+
+    if (!result.isSuccess) {
+      AppMessenger.showError(
+        result.errorMessage ?? 'OTP verification failed',
       );
+      return;
+    }
 
-      setState(() {
-        isLoading = false;
-      });
+    final regResult =
+        await signUpViewModel.completePendingRegistration(result.data);
+    if (!mounted) return;
 
-      if (userModel != null) {
-        // context.go(Routes.home);
-        widget.verifyComplete(userModel);
+    if (regResult.isSuccess) {
+      final data = regResult.data!;
+      final token = AuthToken.extract(data);
+      if (token != null && token.isNotEmpty) {
+        await AuthService.establishSession(token);
       }
-
-      // PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      //   verificationId:
-      //       verificationId.isEmpty ? widget.verificationId : verificationId,
-      //   smsCode: otpController.text,
-      // );
-
-      // await _auth
-      //     .signInWithCredential(credential)
-      //     .then((value) => print('User Login In Successful'));
-
-      // widget.onVerified();
-
-      // await Future.delayed(const Duration(seconds: 4));
-      // setState(() {
-      //   isLoading = false;
-      // }); // Call the callback to sign up
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: e.toString());
-      print('Failed to sign in with OTP: $e');
+      context.go(
+        Routes.moreDetails,
+        extra: (data['user_id'] ?? result.data?['user_id']).toString(),
+      );
+    } else {
+      AppMessenger.showError(
+        regResult.errorMessage ?? 'Registration failed',
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppImages.loginbg),
-            fit: BoxFit.fitHeight,
-            opacity: 1,
-          ),
-        ),
-        height: double.infinity,
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 70),
-                    const SizedBox(height: 30),
-                    Hero(
-                      tag: 'Logo',
-                      child: Image.asset(
-                        AppImages.logoNew,
-                        height: MediaQuery.of(context).size.height * .06,
+    final loginVm = Provider.of<LoginViewModel>(context);
+    final isLoading = loginVm.loading || signUpViewModel.loading;
+
+    return LoadingOverlay(
+      isLoading: isLoading,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(AppImages.loginbg),
+                  fit: BoxFit.fitHeight,
+                  opacity: 1,
+                ),
+              ),
+              height: double.infinity,
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).padding.top + 48),
+                      Hero(
+                        tag: 'Logo',
+                        child: Image.asset(
+                          AppImages.logoNew,
+                          height: MediaQuery.of(context).size.height * .06,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: const BoxDecoration(
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: const BoxDecoration(
                           color: AppColors.whiteColor,
-                          borderRadius: BorderRadius.all(Radius.circular(12))),
-                      child: Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Verify Phone Number',
-                                style: CustomLabels.pbody1TextStyle(
-                                  fontSize: 23,
-                                  fontWeight: CustomLabels.largeFontWeight,
-                                ),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              'Verify Phone Number',
+                              textAlign: TextAlign.center,
+                              style: CustomLabels.pbody1TextStyle(
+                                fontSize: 23,
+                                fontWeight: CustomLabels.largeFontWeight,
                               ),
-                            ],
-                          ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.025),
-                          CustomTextField(
-                            onChanged: (p0) {
-                              buttonNotifier.notifyListeners();
-                            },
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Enter OTP',
-                            controller: otpController,
-                            textInputAction: TextInputAction.done,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.number,
-                          ),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.035),
-                          ValueListenableBuilder(
+                            ),
+                            const SizedBox(height: 16),
+                            CustomTextField(
+                              label: 'OTP',
+                              onChanged: (value) => buttonNotifier.value = value,
+                              autoValidate: AutovalidateMode.onUserInteraction,
+                              hintText: 'Enter 6-digit OTP',
+                              controller: otpController,
+                              textInputAction: TextInputAction.done,
+                              borderColor: AppColors.secondaryTextColor,
+                              inputType: CustomTextInputType.number,
+                            ),
+                            const SizedBox(height: 20),
+                            ValueListenableBuilder<String>(
                               valueListenable: buttonNotifier,
                               builder: (context, value, child) {
+                                final enabled = value.length == 6;
                                 return CustomButton(
                                   text: 'Verify',
-                                  isEnabled: otpController.text.length == 6
-                                      ? true
-                                      : false,
-                                  borderColor: otpController.text.length == 6
+                                  isEnabled: enabled,
+                                  borderColor: enabled
                                       ? AppColors.primaryColor
                                       : AppColors.secondaryTextColor
-                                          .withValues(alpha:.5),
-                                  backgroundColor:
-                                      otpController.text.length == 6
-                                          ? AppColors.primaryColor
-                                          : AppColors.secondaryTextColor
-                                              .withValues(alpha:.5),
+                                          .withValues(alpha: .5),
+                                  backgroundColor: enabled
+                                      ? AppColors.primaryColor
+                                      : AppColors.secondaryTextColor
+                                          .withValues(alpha: .5),
                                   textStyle: CustomLabels.body3GreyTextStyle(
                                     fontSize: 16,
                                     color: AppColors.whiteColor,
                                   ),
-                                  onPressed: () async {
-                                    signInWithOTP();
-                                  },
+                                  onPressed: enabled ? signInWithOTP : null,
                                 );
-                              }),
-                        ],
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 40),
-                    Center(
-                      child: RichText(
+                      const SizedBox(height: 24),
+                      RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
                           children: [
-                            // Get language using key
                             const TextSpan(
-                              text: "Did't receive the OTP? ",
+                              text: "Didn't receive the OTP? ",
                               style: TextStyle(color: Colors.black45),
                             ),
-
                             TextSpan(
-                              text: "Resend ",
+                              text: 'Resend',
                               style: const TextStyle(
                                 color: AppColors.primaryColor,
                                 decoration: TextDecoration.underline,
                               ),
                               recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  resendCode();
-                                },
-                            )
+                                ..onTap = resendCode,
+                            ),
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
-              if (isLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withValues(alpha:0.5),
-                    child: const Center(
-                      child: SpinKitThreeInOut(
-                        color: AppColors.primaryColor,
-                        size: 40.0,
-                      ),
-                    ),
+                      const SizedBox(height: 40),
+                    ],
                   ),
                 ),
-            ],
-          ),
+              ),
+            ),
+            const AuthBackButton(fallbackRoute: Routes.registration),
+          ],
         ),
       ),
     );
   }
 
   Future<void> resendCode() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      Map<String, dynamic>? user = await viewModel.sendOtp(
-        widget.phoneNumber,
-      );
+    final result = await viewModel.sendOtp(widget.phoneNumber);
+    if (!mounted) return;
 
-      setState(() {
-        isLoading = false;
-      });
-
-      if (user != null) {
-        widget.userModel = user;
-      }
-
-      // final FirebaseAuth auth = FirebaseAuth.instance;
-      // await auth.verifyPhoneNumber(
-      //   phoneNumber: widget.phoneNumber,
-      //   forceResendingToken: widget.resendToken,
-      //   verificationCompleted: (PhoneAuthCredential credential) async {
-      //     await auth.signInWithCredential(credential).then(
-      //       (value) async {
-      //         print('Logged In Successfully');
-      //         // Call the callback
-      //       },
-      //     );
-      //   },
-      //   verificationFailed: (FirebaseAuthException e) {
-      //     setState(() {
-      //       isLoading = false;
-      //     });
-      //     Fluttertoast.showToast(msg: e.code);
-      //   },
-      //   codeSent: (String verificationId, int? resendToken) async {
-      //     setState(() {
-      //       isLoading = false;
-      //     });
-      //     setState(() {
-      //       verificationId = verificationId;
-      //     });
-      //     // Log the verification ID
-      //   },
-      //   codeAutoRetrievalTimeout: (String verificationId) {
-      //     print('Code auto-retrieval timeout');
-      //   },
-      // );
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+    if (result.isSuccess) {
+      setState(() => _userModel = result.data);
+      AppMessenger.showSuccess('OTP resent successfully');
+    } else {
+      AppMessenger.showError(result.errorMessage ?? 'Failed to resend OTP');
     }
   }
 }

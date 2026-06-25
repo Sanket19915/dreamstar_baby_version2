@@ -1,10 +1,9 @@
-import 'package:dream_baby/features/auth/screens/login.dart';
-import 'package:dream_baby/features/auth/screens/registration.dart';
+import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final Color kDarkBlueColor = const Color(0xFF053149);
@@ -13,18 +12,9 @@ class OnboardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-      debugShowCheckedModeBanner: false,
-      home: OnBoardingSlider(
+    return OnBoardingSlider(
         finishButtonText: 'Register',
-        onFinish: () {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => const RegistrationScreen(),
-            ),
-          );
-        },
+        onFinish: () => context.go(Routes.registration),
         finishButtonStyle: FinishButtonStyle(
           backgroundColor: kDarkBlueColor,
         ),
@@ -44,14 +34,7 @@ class OnboardingScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        trailingFunction: () {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => const LoginScreen(),
-            ),
-          );
-        },
+        trailingFunction: () => context.go(Routes.login),
         controllerColor: AppColors.primaryColor,
         middle: RichText(
           textAlign: TextAlign.center,
@@ -201,7 +184,6 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }

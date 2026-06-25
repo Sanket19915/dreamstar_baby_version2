@@ -1,69 +1,52 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-
-import '../features/auth/model/notification_model.dart';
-import 'auth_services.dart';
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/errors/api_exception.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/features/auth/model/notification_model.dart';
+import 'package:dream_baby/services/auth_services.dart';
 
 class NotificationServices {
-  static Future<Map<String, dynamic>> singleNotificationRead({required int notificationId}) async {
-    String? token = await AuthService.getToken();
-    var uri = Uri.parse('https://dreambaby.pro/api/notifications/$notificationId/read');
-    var response = await http.post(uri, headers: {
-      'Authorization': 'Bearer $token',
-    });
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to get detail of notification');
+  static Future<void> _ensureAuthenticated() async {
+    if (!await AuthService.hasSession()) {
+      throw ApiException(message: 'Not authenticated', statusCode: 401);
     }
   }
 
-  static Future<NotificationData> getAllNotification({required int page}) async {
-    String? token = await AuthService.getToken();
-    var uri = Uri.parse('https://dreambaby.pro/api/notifications?page=$page');
-    var response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
+  static Future<Map<String, dynamic>> singleNotificationRead({
+    required int notificationId,
+  }) async {
+    await _ensureAuthenticated();
+    return ApiClient.postForm(
+      ApiConfig.notificationRead(notificationId),
+      {},
+      authenticated: true,
     );
+  }
 
-    if (response.statusCode == 200) {
-      NotificationData notificationData = notificationDataFromJson(response.body);
-
-      return notificationData;
-    } else {
-      throw Exception('Failed to load notification');
-    }
+  static Future<NotificationData> getAllNotification({
+    required int page,
+  }) async {
+    await _ensureAuthenticated();
+    final body = await ApiClient.get(
+      ApiConfig.notifications(page: page),
+      authenticated: true,
+    );
+    return NotificationData.fromJson(body);
   }
 
   static Future<Map<String, dynamic>> readAllnotification() async {
-    String? token = await AuthService.getToken();
-    var uri = Uri.parse('https://dreambaby.pro/api/notifications/read-all');
-    var response = await http.post(uri, headers: {
-      'Authorization': 'Bearer $token',
-    });
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to mark as read');
-    }
+    await _ensureAuthenticated();
+    return ApiClient.postForm(
+      ApiConfig.notificationsReadAll,
+      {},
+      authenticated: true,
+    );
   }
 
   static Future<Map<String, dynamic>> unreadNotificationCount() async {
-    String? token = await AuthService.getToken();
-    var uri = Uri.parse('https://dreambaby.pro/api/notifications/unread-count');
-    var response = await http.get(uri, headers: {
-      'Authorization': 'Bearer $token',
-    });
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to read notification');
-    }
+    await _ensureAuthenticated();
+    return ApiClient.get(
+      ApiConfig.notificationsUnreadCount,
+      authenticated: true,
+    );
   }
 }

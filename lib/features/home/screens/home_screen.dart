@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dream_baby/core/widgets/offline_banner.dart';
 import 'package:dream_baby/features/about_us/about_us_screen.dart';
 import 'package:dream_baby/features/contact_us/contact_us_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen_content.dart';
 import 'package:dream_baby/features/setting/screens/faq_screen.dart';
 import 'package:dream_baby/features/testimonials_screen/testimonials_screen.dart';
+import 'package:dream_baby/services/push_notification_service.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +17,6 @@ import 'package:motion_tab_bar_v2/motion-tab-bar.dart';
 import 'package:motion_tab_bar_v2/motion-tab-controller.dart';
 import 'package:provider/provider.dart';
 
-import '../../../services/notification_permission_handler_service.dart';
 import '../../../viewmodels/home_viewModel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -52,15 +53,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TabBarView(
-        controller: _motionTabBarController,
-        children: const <Widget>[
-          TestimonialScreen(),
-          AboutUsScreen(),
-          HomeContentScreen(),
-          FAQScreen(),
-          ContactUsScreen(),
-        ],
+      body: OfflineBanner(
+        child: TabBarView(
+          controller: _motionTabBarController,
+          children: const <Widget>[
+            TestimonialScreen(),
+            AboutUsScreen(),
+            HomeContentScreen(),
+            FAQScreen(),
+            ContactUsScreen(),
+          ],
+        ),
       ),
       bottomNavigationBar: MotionTabBar(
         images: const [],
@@ -126,13 +129,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> getActiveUser() async {
     try {
       String? deviceId = await _fetchDeviceInfo();
-      FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance; // Change here
+      pushNotificationService.setDeviceId(deviceId);
+      FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
       String? token = await firebaseMessaging.getToken();
 
       await homeViewModel.activeUser(
         deviceId: deviceId,
         fcmToken: token,
       );
+      if (token != null) {
+        await pushNotificationService.scheduleDailyReminder();
+      }
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     }
@@ -140,7 +147,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> getNotificationPermission() async {
     try {
-      await NotificationService.checkPermissions();
+      await pushNotificationService.requestPermissions();
+      await pushNotificationService.scheduleDailyReminder();
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     }

@@ -1,5 +1,5 @@
-import 'dart:convert';
-
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/network/api_client.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +121,7 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
                                           backgroundImage: userImage != null &&
                                                   userImage.isNotEmpty
                                               ? NetworkImage(
-                                                      "http://dreambaby.pro/storage/$userImage")
+                                                      ApiConfig.storageUrl(userImage))
                                                   as ImageProvider<
                                                       Object> // Explicit cast to ImageProvider<Object>
                                               : const AssetImage(
@@ -181,35 +181,23 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
     );
   }
 
-  void fetchTestimonials() async {
-    var token = await AuthService.getToken();
-    var headers = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
-
-    var url = Uri.parse('http://dreambaby.pro/api/get_testimonials');
+  Future<void> fetchTestimonials() async {
+    if (!await AuthService.hasSession()) {
+      setState(() => isLoading = false);
+      return;
+    }
 
     try {
-      http.Response response = await http.get(url, headers: headers);
-
-      if (response.statusCode == 200) {
-        var responseData = json.decode(response.body);
-        setState(() {
-          testimonials = List<Map<String, dynamic>>.from(responseData['data']);
-          isLoading = false; // Set isLoading to false after data is loaded
-        });
-      } else {
-        print('Failed to fetch testimonials: ${response.statusCode}');
-        setState(() {
-          isLoading = false; // Set isLoading to false even if there is an error
-        });
-      }
+      final body =
+          await ApiClient.get(ApiConfig.getTestimonials, authenticated: true);
+      setState(() {
+        testimonials =
+            List<Map<String, dynamic>>.from(body['data'] ?? const []);
+        isLoading = false;
+      });
     } catch (e) {
       print('Error fetching testimonials: $e');
-      setState(() {
-        isLoading = false; // Set isLoading to false even if there is an error
-      });
+      setState(() => isLoading = false);
     }
   }
 
@@ -275,58 +263,27 @@ class _TestimonialScreenState extends State<TestimonialScreen> {
 
   Future<void> _submitReview(
       double rating, String review, BuildContext context) async {
-    var token = await AuthService.getToken();
-    var headers = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
-
-    var url = Uri.parse('http://dreambaby.pro/api/testimonials');
-    var body = json.encode({
-      'rating': rating.toString(),
-      'review': review,
-    });
+    if (!await AuthService.hasSession()) return;
 
     try {
-      http.Response response = await http.post(
-        url,
-        headers: headers,
-        body: body,
+      await ApiClient.postForm(
+        ApiConfig.testimonials,
+        {
+          'rating': rating.toString(),
+          'review': review,
+        },
+        authenticated: true,
       );
-
-      print('Unexpected response body: $body');
-
-      if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Review submitted successfully')),
-        );
-        fetchTestimonials();
-      } else {
-        var responseBody = response.body;
-        var errorMessage = 'Failed to submit review';
-
-        try {
-          var errorResponse = json.decode(responseBody);
-          if (errorResponse['message'] != null) {
-            errorMessage =
-                'Failed to submit review: ${errorResponse['message']}';
-          }
-        } catch (e) {
-          errorMessage = 'Unexpected response from server';
-          print('Unexpected response body: $responseBody');
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
-    } catch (e) {
-      print('Error: $e');
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
+        const SnackBar(content: Text('Review submitted successfully')),
+      );
+      fetchTestimonials();
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit review: $e')),
       );
     }
-
-    Navigator.of(context).pop();
   }
 }

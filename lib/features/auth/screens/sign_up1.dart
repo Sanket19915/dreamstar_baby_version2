@@ -1,26 +1,25 @@
 // lib/sign_up_screen.dart
 
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:dream_baby/features/auth/screens/new_otp_screen.dart';
+import 'package:dream_baby/core/utils/app_messenger.dart';
+import 'package:dream_baby/router/route_args.dart';
 import 'package:dream_baby/router/routes.dart';
-import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
+import 'package:dream_baby/shared/widget/auth_back_button.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
+import 'package:dream_baby/shared/widget/loading_overlay.dart';
+import 'package:dream_baby/shared/widget/profile_avatar_picker.dart';
+import 'package:dream_baby/viewmodels/login_viewmodel.dart';
+import 'package:dream_baby/viewmodels/sign_up_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
-import '../../../viewmodels/login_viewmodel.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -35,99 +34,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  ValueNotifier lodingNotifier = ValueNotifier(true);
+  final TextEditingController confirmPasswordController = TextEditingController();
   LoginViewModel get viewModel =>
       Provider.of<LoginViewModel>(context, listen: false);
+  SignUpViewModel get signUpViewModel =>
+      Provider.of<SignUpViewModel>(context, listen: false);
   File? _profileImage;
 
-  bool isLoading = false;
-  bool isFirstNameValid = false;
-  bool isLastNameValid = false;
-  bool isPhoneValid = false;
-  bool isEmailValid = false;
-  bool isPasswordValid = false;
-  bool isConfirmPasswordValid = false;
+  final _firstNameKey = GlobalKey<CustomTextFieldState>();
+  final _lastNameKey = GlobalKey<CustomTextFieldState>();
+  final _phoneKey = GlobalKey<CustomTextFieldState>();
+  final _emailKey = GlobalKey<CustomTextFieldState>();
+  final _passwordKey = GlobalKey<CustomTextFieldState>();
+  final _confirmPasswordKey = GlobalKey<CustomTextFieldState>();
 
-  bool get isFormValid {
-    return isFirstNameValid &&
-        isLastNameValid &&
-        isPhoneValid &&
-        isEmailValid &&
-        isPasswordValid &&
-        isConfirmPasswordValid;
-  }
+  bool _firstNameValid = false;
+  bool _lastNameValid = false;
+  bool _phoneValid = false;
+  bool _emailValid = false;
+  bool _passwordValid = false;
+  bool _confirmPasswordValid = false;
 
-  void validateFirstName(String value) {
-    setState(() {
-      isFirstNameValid = value.isNotEmpty;
-    });
-  }
-
-  void validateLastName(String value) {
-    setState(() {
-      isLastNameValid = value.isNotEmpty;
-    });
-  }
-
-  void validatePhone(String value) {
-    setState(() {
-      isPhoneValid = RegExp(r'^\d{10}$').hasMatch(value);
-    });
-  }
-
-  void validateEmail(String value) {
-    setState(() {
-      isEmailValid = RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value);
-    });
-  }
-
-  void validatePassword(String value) {
-    setState(() {
-      isPasswordValid = value.length >= 8;
-    });
-  }
-
-  void validateConfirmPassword(String value) {
-    setState(() {
-      isConfirmPasswordValid = value == passwordController.text;
-    });
-  }
+  bool get isFormValid =>
+      _firstNameValid &&
+      _lastNameValid &&
+      _phoneValid &&
+      _emailValid &&
+      _passwordValid &&
+      _confirmPasswordValid;
 
   String? firstNameValidator(String? value, BuildContext? context) {
-    validateFirstName(value ?? '');
-    return isFirstNameValid ? null : 'First name is required';
+    return (value ?? '').trim().isNotEmpty ? null : 'First name is required';
   }
 
   String? lastNameValidator(String? value, BuildContext? context) {
-    validateLastName(value ?? '');
-    return isLastNameValid ? null : 'Last name is required';
+    return (value ?? '').trim().isNotEmpty ? null : 'Last name is required';
   }
 
   String? phoneValidator(String? value, BuildContext? context) {
-    validatePhone(value ?? '');
-    return isPhoneValid ? null : 'Enter a valid phone number';
+    return RegExp(r'^\d{10}$').hasMatch(value ?? '')
+        ? null
+        : 'Enter a valid 10-digit phone number';
   }
 
   String? emailValidator(String? value, BuildContext? context) {
-    validateEmail(value ?? '');
-    return isEmailValid ? null : 'Enter a valid email address';
+    return RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value ?? '')
+        ? null
+        : 'Enter a valid email address';
   }
 
   String? passwordValidator(String? value, BuildContext? context) {
-    validatePassword(value ?? '');
-    return isPasswordValid ? null : 'Password must be at least 8 characters';
+    return (value ?? '').length >= 8
+        ? null
+        : 'Password must be at least 8 characters';
   }
 
   String? confirmPasswordValidator(String? value, BuildContext? context) {
-    validateConfirmPassword(value ?? '');
-    return isConfirmPasswordValid ? null : 'Passwords do not match';
+    return value == passwordController.text ? null : 'Passwords do not match';
+  }
+
+  bool _validateAllFields() {
+    return _firstNameKey.currentState!.validate() &&
+        _lastNameKey.currentState!.validate() &&
+        _phoneKey.currentState!.validate() &&
+        _emailKey.currentState!.validate() &&
+        _passwordKey.currentState!.validate() &&
+        _confirmPasswordKey.currentState!.validate();
   }
 
   Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -137,510 +113,278 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _sendOTP() async {
-    try {
-      // final FirebaseAuth auth = FirebaseAuth.instance;
-      String phoneNumber = phoneController.text.trim();
+    if (!_validateAllFields()) return;
 
-      // Ensure the phone number is in the correct format
-      if (!phoneNumber.startsWith('+')) {
-        phoneNumber = '+91$phoneNumber'; // Replace '+1' with your country code
-      }
-
-      // setState(() {
-      isLoading = true;
-      lodingNotifier.notifyListeners();
-      // });
-
-      Map<String, dynamic>? response = await viewModel.sendOtp(phoneNumber);
-
-      // setState(() {
-      isLoading = false;
-      lodingNotifier.notifyListeners();
-      // });
-
-      if (response != null) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (ctx) => NewOTPScreen(
-              phoneNumber: phoneNumber,
-              userModel: response,
-              verifyComplete: (value) async {
-                (_profileImage?.path.isEmpty ?? true)
-                    ? await _signUpWithoutImage(value)
-                    : await _signUp(
-                        value); // Callback to sign up after verification
-              },
-            ),
-          ),
-        );
-      }
-      // await auth.verifyPhoneNumber(
-      //   phoneNumber: phoneNumber,
-      //   verificationCompleted: (PhoneAuthCredential credential) async {
-      //     await auth.signInWithCredential(credential).then(
-      //           (value) => print('Logged In Successfully'),
-      //         );
-      //   },
-      //   verificationFailed: (FirebaseAuthException e) {
-      //     setState(() {
-      //       isLoading = false;
-      //     });
-      //     Fluttertoast.showToast(msg: e.code);
-      //     if (e.code == 'invalid-phone-number') {
-      //       print('The provided phone number is not valid.');
-      //     } else {
-      //       print(
-      //           'Phone number verification failed. Code: ${e.code}. Message: ${e.message}');
-      //     }
-      //   },
-      //   codeSent: (String verificationId, int? resendToken) {
-      //     setState(() {
-      //       isLoading = false;
-      //     });
-      //     print('Verification ID: $verificationId'); // Log the verification ID
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => OTPScreen(
-      //           resendToken: resendToken,
-      //           phoneNumber: phoneNumber,
-      //           verificationId: verificationId,
-      //           onVerified: () async {
-      //             (_profileImage?.path.isEmpty ?? true)
-      //                 ? await _signUpWithoutImage()
-      //                 : await _signUp(); // Callback to sign up after verification
-      //           },
-      //         ),
-      //       ),
-      //     );
-      //   },
-      //   codeAutoRetrievalTimeout: (String verificationId) {
-      //     print('Code auto-retrieval timeout');
-      //   },
-      // );
-    } catch (e) {
-      // setState(() {
-      isLoading = false;
-      lodingNotifier.notifyListeners();
-      // });
-      print('Failed to Verify Phone Number: $e');
+    String phoneNumber = phoneController.text.trim();
+    if (!phoneNumber.startsWith('+')) {
+      phoneNumber = '+91$phoneNumber';
     }
-  }
 
-  Future<void> _signUpWithoutImage(Map<String, dynamic>? userModel) async {
-    try {
-      // setState(() {
-      isLoading = true;
-      lodingNotifier.notifyListeners();
-      // });
+    final result = await viewModel.sendOtp(phoneNumber);
+    if (!mounted) return;
 
-      await Provider.of<SignUpViewModel>(context, listen: false)
-          .signUpWithotProfile(
-              firstName: firstNameController.text,
-              lastName: lastNameController.text,
-              phone: phoneController.text,
-              email: emailController.text,
-              password: passwordController.text,
-              confirmPassword: confirmPasswordController.text,
-              userId: userModel?["user_id"] ?? "")
-          .then(
-        (value) {
-          if (!value.containsKey("errors")) {
-            print(value["user_id"]);
-            AuthService.saveToken(value["access_token"]);
-            context.go(Routes.moreDetails, extra: value["user_id"].toString());
-          } else {
-            print(value["message"]);
-            Fluttertoast.showToast(msg: value["message"]);
-          }
-        },
+    if (result.isSuccess) {
+      signUpViewModel.setPendingRegistration(
+        PendingRegistration(
+          firstName: firstNameController.text,
+          lastName: lastNameController.text,
+          phone: phoneController.text,
+          email: emailController.text,
+          password: passwordController.text,
+          confirmPassword: confirmPasswordController.text,
+          profileImagePath: _profileImage?.path,
+        ),
       );
-      // setState(() {
-      isLoading = false;
-      lodingNotifier.notifyListeners();
-      // });
-    } catch (e) {
-      // setState(() {
-      isLoading = false;
-      lodingNotifier.notifyListeners();
-      // });
-      Fluttertoast.showToast(msg: e.toString());
-    }
-  }
-
-  Future<void> _signUp(Map<String, dynamic>? userModel) async {
-    try {
-      // setState(() {
-      isLoading = true;
-      lodingNotifier.notifyListeners();
-      // });
-
-      await Provider.of<SignUpViewModel>(context, listen: false)
-          .signUpWithProfile(
-        firstName: firstNameController.text,
-        lastName: lastNameController.text,
-        phone: phoneController.text,
-        email: emailController.text,
-        password: passwordController.text,
-        confirmPassword: confirmPasswordController.text,
-        profileImage: _profileImage?.path ?? "",
-        userId: userModel?["user_id"] ?? "",
-      )
-          .then(
-        (value) {
-          if (!value.containsKey("errors")) {
-            print("error");
-            AuthService.saveToken(value["access_token"]);
-            context.go(Routes.moreDetails, extra: value["user_id"].toString());
-          } else {
-            print("success");
-            Fluttertoast.showToast(msg: value["message"]);
-          }
-        },
+      context.push(
+        Routes.verifyOtp,
+        extra: OtpRouteArgs(
+          phoneNumber: phoneNumber,
+          userModel: result.data,
+        ),
       );
-      // setState(() {
-      isLoading = false;
-      lodingNotifier.notifyListeners();
-      // });
-    } catch (e) {
-      // setState(() {
-      isLoading = false;
-      lodingNotifier.notifyListeners();
-      // });
-      Fluttertoast.showToast(msg: "Please upload profile picture");
+    } else {
+      AppMessenger.showError(
+        result.errorMessage ?? 'Failed to send OTP',
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        final currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
-      child: Scaffold(
-        body: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(AppImages.loginbg),
-              fit: BoxFit.fitHeight,
-              opacity: 1,
-            ),
-          ),
-          height: double.infinity,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(bottom: 25),
-            physics: const ClampingScrollPhysics(),
-            child: Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 70),
-                      const SizedBox(height: 30),
-                      Hero(
-                        tag: 'Logo',
-                        child: Image.asset(
-                          AppImages.logoNew,
-                          height: MediaQuery.of(context).size.height * .06,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: const BoxDecoration(
-                          color: AppColors.whiteColor,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
+    final loginVm = Provider.of<LoginViewModel>(context);
+    final signUpVm = Provider.of<SignUpViewModel>(context);
+    final isLoading = loginVm.loading || signUpVm.loading;
+
+    return LoadingOverlay(
+      isLoading: isLoading,
+      child: GestureDetector(
+        onTap: () {
+          final currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(AppImages.loginbg),
+                    fit: BoxFit.fitHeight,
+                    opacity: 1,
+                  ),
+                ),
+                height: double.infinity,
+                child: Padding(
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                  child: SafeArea(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(bottom: 25, top: 40),
+                      physics: const ClampingScrollPhysics(),
+                      child: Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  'Create your account',
-                                  style: CustomLabels.pbody1TextStyle(
-                                    fontSize: 23,
-                                    fontWeight: CustomLabels.largeFontWeight,
+                                Hero(
+                                  tag: 'Logo',
+                                  child: Image.asset(
+                                    AppImages.logoNew,
+                                    height: MediaQuery.of(context).size.height * .06,
                                   ),
                                 ),
-                                const SizedBox(width: 5),
-                                Image.asset(
-                                  AppImages.hand,
-                                  gaplessPlayback: true,
-                                  height: 30,
-                                  width: 40,
+                                const SizedBox(height: 20),
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.whiteColor,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(12),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Create your account',
+                                            style: CustomLabels.pbody1TextStyle(
+                                              fontSize: 23,
+                                              fontWeight:
+                                                  CustomLabels.largeFontWeight,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Image.asset(
+                                            AppImages.hand,
+                                            gaplessPlayback: true,
+                                            height: 30,
+                                            width: 40,
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Center(
+                                        child: ProfileAvatarPicker(
+                                          image: _profileImage,
+                                          onTap: _pickImage,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      CustomTextField(
+                                        key: _firstNameKey,
+                                        label: 'First Name',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Enter first name',
+                                        controller: firstNameController,
+                                        textInputAction: TextInputAction.next,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        inputType: CustomTextInputType.text,
+                                        validator: firstNameValidator,
+                                        onValidChanged: (v) =>
+                                            setState(() => _firstNameValid = v),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomTextField(
+                                        key: _lastNameKey,
+                                        label: 'Last Name',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Enter last name',
+                                        controller: lastNameController,
+                                        textInputAction: TextInputAction.next,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        inputType: CustomTextInputType.text,
+                                        validator: lastNameValidator,
+                                        onValidChanged: (v) =>
+                                            setState(() => _lastNameValid = v),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomTextField(
+                                        key: _phoneKey,
+                                        label: 'Phone Number',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Enter 10-digit number',
+                                        controller: phoneController,
+                                        textInputAction: TextInputAction.next,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        inputType: CustomTextInputType.number,
+                                        validator: phoneValidator,
+                                        onValidChanged: (v) =>
+                                            setState(() => _phoneValid = v),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomTextField(
+                                        key: _emailKey,
+                                        label: 'Email',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Enter email address',
+                                        controller: emailController,
+                                        textInputAction: TextInputAction.next,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        inputType: CustomTextInputType.email,
+                                        validator: emailValidator,
+                                        onValidChanged: (v) =>
+                                            setState(() => _emailValid = v),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomTextField(
+                                        key: _passwordKey,
+                                        label: 'Password',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Minimum 8 characters',
+                                        controller: passwordController,
+                                        textInputAction: TextInputAction.next,
+                                        obscureText: true,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        inputType: CustomTextInputType.password,
+                                        validator: passwordValidator,
+                                        onValidChanged: (v) =>
+                                            setState(() => _passwordValid = v),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomTextField(
+                                        key: _confirmPasswordKey,
+                                        label: 'Confirm Password',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Re-enter password',
+                                        controller: confirmPasswordController,
+                                        textInputAction: TextInputAction.done,
+                                        obscureText: true,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        inputType: CustomTextInputType.password,
+                                        validator: confirmPasswordValidator,
+                                        onValidChanged: (v) => setState(
+                                            () => _confirmPasswordValid = v),
+                                      ),
+                                      const SizedBox(height: 24),
+                                      CustomButton(
+                                        text: 'Continue',
+                                        isEnabled: isFormValid,
+                                        borderColor: isFormValid
+                                            ? AppColors.primaryColor
+                                            : AppColors.secondaryTextColor
+                                                .withValues(alpha: .5),
+                                        backgroundColor: isFormValid
+                                            ? AppColors.primaryColor
+                                            : AppColors.secondaryTextColor
+                                                .withValues(alpha: .5),
+                                        textStyle: CustomLabels.body3GreyTextStyle(
+                                          fontSize: 16,
+                                          color: AppColors.whiteColor,
+                                        ),
+                                        onPressed: isFormValid ? _sendOTP : null,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                RichText(
+                                  text: TextSpan(
+                                    text: "Already have an account? ",
+                                    style: const TextStyle(color: Colors.black45),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: 'Login here',
+                                        style: const TextStyle(
+                                          color: AppColors.primaryColor,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            context.go(Routes.login);
+                                          },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.025),
-                            GestureDetector(
-                              onTap: _pickImage,
-                              child: CircleAvatar(
-                                radius: 50,
-                                backgroundColor: AppColors.secondaryTextColor,
-                                backgroundImage: _profileImage != null
-                                    ? FileImage(_profileImage!)
-                                    : null,
-                                child: _profileImage == null
-                                    ? const Icon(Icons.add_a_photo,
-                                        color: Colors.white, size: 50)
-                                    : null,
-                              ),
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.025),
-                            CustomTextField(
-                              autoValidate: AutovalidateMode.onUserInteraction,
-                              hintText: 'First Name',
-                              controller: firstNameController,
-                              textInputAction: TextInputAction.next,
-                              borderColor: AppColors.secondaryTextColor,
-                              inputType: CustomTextInputType.text,
-                              validator: firstNameValidator,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01),
-                            CustomTextField(
-                              autoValidate: AutovalidateMode.onUserInteraction,
-                              hintText: 'Last Name',
-                              controller: lastNameController,
-                              textInputAction: TextInputAction.next,
-                              borderColor: AppColors.secondaryTextColor,
-                              inputType: CustomTextInputType.text,
-                              validator: lastNameValidator,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01),
-                            CustomTextField(
-                              autoValidate: AutovalidateMode.onUserInteraction,
-                              hintText: 'Phone Number',
-                              controller: phoneController,
-                              textInputAction: TextInputAction.next,
-                              borderColor: AppColors.secondaryTextColor,
-                              inputType: CustomTextInputType.number,
-                              validator: phoneValidator,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01),
-                            CustomTextField(
-                              autoValidate: AutovalidateMode.onUserInteraction,
-                              hintText: 'Email',
-                              controller: emailController,
-                              textInputAction: TextInputAction.next,
-                              borderColor: AppColors.secondaryTextColor,
-                              inputType: CustomTextInputType.email,
-                              validator: emailValidator,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01),
-                            CustomTextField(
-                              autoValidate: AutovalidateMode.onUserInteraction,
-                              hintText: 'Password',
-                              controller: passwordController,
-                              textInputAction: TextInputAction.next,
-                              obscureText: true,
-                              borderColor: AppColors.secondaryTextColor,
-                              inputType: CustomTextInputType.password,
-                              validator: passwordValidator,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.01),
-                            CustomTextField(
-                              autoValidate: AutovalidateMode.onUserInteraction,
-                              hintText: 'Confirm Password',
-                              controller: confirmPasswordController,
-                              textInputAction: TextInputAction.done,
-                              obscureText: true,
-                              borderColor: AppColors.secondaryTextColor,
-                              inputType: CustomTextInputType.password,
-                              validator: confirmPasswordValidator,
-                            ),
-                            SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.035),
-                            CustomButton(
-                              text: 'Continue',
-                              isEnabled: isFormValid,
-                              borderColor: isFormValid
-                                  ? AppColors.primaryColor
-                                  : AppColors.secondaryTextColor
-                                      .withValues(alpha: .5),
-                              backgroundColor: isFormValid
-                                  ? AppColors.primaryColor
-                                  : AppColors.secondaryTextColor
-                                      .withValues(alpha: .5),
-                              textStyle: CustomLabels.body3GreyTextStyle(
-                                fontSize: 16,
-                                color: AppColors.whiteColor,
-                              ),
-                              onPressed: isFormValid ? _sendOTP : null,
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      RichText(
-                        text: TextSpan(
-                          text: "Already have an account? ",
-                          style: const TextStyle(color: Colors.black45),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'Login here',
-                              style: const TextStyle(
-                                color: AppColors.primaryColor,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  context.go(Routes.login);
-                                },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-
-                ValueListenableBuilder(
-                  valueListenable: lodingNotifier,
-                  builder: (context, value, child) {
-                    return isLoading
-                        ? Positioned.fill(
-                            child: Container(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              child: const Center(
-                                child: SpinKitThreeInOut(
-                                  color: AppColors.primaryColor,
-                                  size: 40.0,
-                                ),
-                              ),
-                            ),
-                          )
-                        : Container();
-                  },
-                )
-                // if (isLoading)
-                //   Positioned.fill(
-                //     child: Container(
-                //       color: Colors.black.withValues(alpha:0.5),
-                //       child: const Center(
-                //         child: SpinKitThreeInOut(
-                //           color: AppColors.primaryColor,
-                //           size: 40.0,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-              ],
-            ),
+              ),
+              const AuthBackButton(fallbackRoute: Routes.login),
+            ],
           ),
         ),
       ),
     );
-  }
-}
-
-class SignUpViewModel with ChangeNotifier {
-  Future<Map<String, dynamic>> signUpWithProfile({
-    required String firstName,
-    required String lastName,
-    required String phone,
-    required String email,
-    required String password,
-    required String confirmPassword,
-    required String profileImage,
-    required String userId,
-  }) async {
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
-    )
-      ..fields.addAll({
-        'first_name': firstName,
-        'last_name': lastName,
-        'phone_no': phone,
-        'email': email,
-        'password': password,
-        'confirm_password': confirmPassword,
-        "user_id": userId
-      })
-      ..headers.addAll({
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      })
-      ..files
-          .add(await http.MultipartFile.fromPath('profile_pic', profileImage));
-    var response = await request.send();
-    var jsonData = await http.Response.fromStream(response);
-    Map<String, dynamic>? finalResponse;
-    // if (response.statusCode == 200) {
-    finalResponse = jsonDecode(jsonData.body) as Map<String, dynamic>;
-
-    Fluttertoast.showToast(msg: finalResponse["message"]);
-    // String userId =  finalResponse["user_id"];
-    // return finalResponse.containsKey("errors");
-    return finalResponse;
-    // Handle successful response
-    // } else {
-    //   Fluttertoast.showToast(msg: response.reasonPhrase ?? "");
-    //   return true;
-    // }
-  }
-
-  Future<Map<String, dynamic>> signUpWithotProfile({
-    required String firstName,
-    required String lastName,
-    required String phone,
-    required String email,
-    required String password,
-    required String confirmPassword,
-    required String userId,
-  }) async {
-    final response = await http.post(
-        Uri.parse('http://dreambaby.pro/api/auth/register-initial'),
-        body: {
-          'first_name': firstName,
-          'last_name': lastName,
-          'phone_no': phone,
-          'email': email,
-          'password': password,
-          'confirm_password': confirmPassword,
-          "user_id": userId
-        });
-
-    Map<String, dynamic>? finalResponse;
-    // if (response.statusCode == 200) {
-    print("body===${response.body}");
-    finalResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    print(finalResponse);
-    Fluttertoast.showToast(msg: finalResponse["message"]);
-    // String userId =  finalResponse["user_id"];
-    // return finalResponse.containsKey("errors");
-    print(finalResponse);
-    return finalResponse;
-    // Handle successful response
-    // } else {
-    //   Fluttertoast.showToast(msg: response.reasonPhrase ?? "");
-    //   return true;
-    // }
   }
 }

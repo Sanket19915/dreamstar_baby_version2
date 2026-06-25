@@ -1,171 +1,211 @@
-import 'dart:convert';
-
+import 'package:dream_baby/core/auth/auth_notifier.dart';
+import 'package:dream_baby/core/auth/auth_token.dart';
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/network/connectivity_service.dart';
+import 'package:dream_baby/core/storage/profile_cache.dart';
+import 'package:dream_baby/core/errors/api_exception.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/core/network/api_result.dart';
+import 'package:dream_baby/core/storage/token_storage.dart';
 import 'package:dream_baby/models/user_model.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String _loginUrl = 'http://dreambaby.pro/api/auth/login';
-  static const String _resetPasswordUrl =
-      'http://dreambaby.pro/api/auth/reset-password';
-  static const String _forgotPasswordUrl =
-      'http://dreambaby.pro/api/auth/forgot-password';
-  static const String _sendOtpUrl = 'https://dreambaby.pro/api/auth/send-otp';
-  static const String _verifyOtpUrl =
-      'https://dreambaby.pro/api/auth/verify-otp';
+  AuthService._();
 
-  static Future<UserModel?> login(String phone, String password) async {
-    var headers = {
-      'Cookie':
-          'XSRF-TOKEN=eyJpdiI6Ik5qTzE3bmxiUys1WXFIcEduNnlaSXc9PSIsInZhbHVlIjoiR3lHT2g1UkFkbURGNmNmS3JIZTZVUGJGZi8wdTBTL2VkNmx2Tks4Vjg1T2VmdUIxZ0dmQU5HOTZhNUFkK1VmZDBMUlRTU2F4eVFlUWlPS1BBQ2tWbUl6L1J0Y3FmSzRwcnZUdU53eDBjNzBNaUZYbHl6QklQRHlWaGlyOEdaN3UiLCJtYWMiOiJkMGYzMzFmZTdhZWIyMDdiMGVjMTE2NWYzZTJhNzljYjYwNWYwY2Q5YjliMDYwNjI2N2YwZWNiZGNmMTY0OTg3IiwidGFnIjoiIn0%3D; laravel_session=eyJpdiI6IkNNbGV4U1NZZldrbFo3c09jaE9lZkE9PSIsInZhbHVlIjoiVk5SQjRpQ090QUloWWNmeHFPdloxNWJoQk4wcVExWWpkY0I3NmxrUThEbXo3ZVFBdERHQWRkcEFyazczK0tERXFBZUlJc1ZNYmhBcmVHUmpRbVEyamVpT29WS09tQllvWEdnMFErSENFN25FVDZJclhSNGJVd0NrSWxTQXZVSk4iLCJtYWMiOiJiMmQwNTAzZmUyNGMzNmQ1YWZkNTAxZWJjNTg3MjE4NzE3OTEyZWY4NmMzMmQ3NmY4MjlmYzUxMWNhMTMxYTllIiwidGFnIjoiIn0%3D'
-    };
-    var request = http.MultipartRequest('POST', Uri.parse(_loginUrl));
-    request.fields.addAll({
-      'phone_no': phone,
-      'password': password,
-    });
-
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var responseData = await response.stream.bytesToString();
-      var userModel = UserModel.fromJson(json.decode(responseData));
-      // Save token to SharedPreferences
-      await saveToken(userModel.token);
-      print('Token saved: ${userModel.token}');
-      return userModel;
-    } else {
-      print('Login failed: ${response.reasonPhrase}');
-      return null;
-    }
+  static Future<bool> hasSession() async {
+    final token = await TokenStorage.read();
+    return token != null && token.isNotEmpty;
   }
 
-  static Future<int?> forgotPassword(String phone) async {
-    var request = http.MultipartRequest('POST', Uri.parse(_forgotPasswordUrl));
-    request.fields.addAll({
-      'phone_no': phone,
-    });
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var responseData = await response.stream.bytesToString();
-      return jsonDecode(responseData)['user_id'];
-    } else {
-      print('Forgot password failed: ${response.reasonPhrase}');
-      return null;
-    }
-  }
-
-  static Future<int?> forgotPassWordVerifyOTPAndPassword(String newPassword,
-      String confirmPassword, int? userId, String otp) async {
-    var request = http.MultipartRequest('POST', Uri.parse(_resetPasswordUrl));
-    request.fields.addAll({
-      "user_id": userId.toString(),
-      "otp": otp,
-      "new_password": newPassword,
-      "new_password_confirmation": confirmPassword
-    });
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var responseData = await response.stream.bytesToString();
-      return jsonDecode(responseData)['user_id'];
-    } else {
-      print('Forgot password failed: ${response.reasonPhrase}');
-      return null;
-    }
-  }
-
-  static Future<void> saveToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
-  }
-
-  static Future<String?> getToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-    //print('Retrieved token: $token'); // Add this line for debugging
+  static Future<String?> requireToken() async {
+    final token = await TokenStorage.read();
+    if (token == null || token.isEmpty) return null;
     return token;
   }
 
-  static Future<void> deleteToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
+  static Future<void> establishSession(String token) async {
+    await TokenStorage.save(token);
+    authNotifier.markAuthenticated();
   }
 
-  static Future<UserModel?> loginWithToken(String token) async {
-    var headers = {
-      'Authorization': 'Bearer $token',
-    };
-    var request = http.Request('GET', Uri.parse(_loginUrl));
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var responseData = await response.stream.bytesToString();
-      return UserModel.fromJson(json.decode(responseData));
-    } else {
-      print('Token-based login failed: ${response.reasonPhrase}');
-      return null;
-    }
+  static Future<void> logout() async {
+    await TokenStorage.delete();
+    authNotifier.markUnauthenticated();
   }
 
-  static Future<Map<String, dynamic>?> sendOtp(String phone) async {
-    var response = await http.post(
-      Uri.parse(_sendOtpUrl),
-      body: {'mobile_number': phone},
-    );
+  static Future<ApiResult<UserModel>> validateSession() async {
     try {
-      if (response.statusCode == 200) {
-        var responseData = response.body;
-        Map<String, dynamic> userModel = json.decode(responseData);
-        // Save token to SharedPreferences
-        // await saveToken(userModel["user_id"].toString());
-        print('Token saved: ${userModel["user_id"].toString()}');
-
-        Fluttertoast.showToast(msg: userModel['message']);
-        return userModel;
-      } else {
-        Fluttertoast.showToast(
-            msg: jsonDecode(response.body)["errors"].toString());
-        print('Login failed: ${response.body}');
-        return null;
+      final stored = await requireToken();
+      if (stored == null) {
+        return ApiResult.failure('Not authenticated');
       }
-    } catch (e) {
-      return null;
+
+      final online = await connectivityService.checkOnline();
+      if (!online) {
+        if (ProfileCache.read() != null) {
+          return ApiResult.success(UserModel(phoneNo: '', token: stored));
+        }
+        return ApiResult.failure('You are offline. Connect to validate session.');
+      }
+
+      final body = await ApiClient.get(
+        ApiConfig.profile,
+        authenticated: true,
+      );
+      await ProfileCache.save(body);
+      return ApiResult.success(UserModel(
+        phoneNo: body['phone_no']?.toString() ?? '',
+        token: stored,
+      ));
+    } on ApiException catch (_) {
+      await logout();
+      return ApiResult.failure('Session expired. Please log in again.');
+    } catch (_) {
+      return ApiResult.failure('Unable to restore session.');
     }
   }
 
-  static Future<Map<String, dynamic>?> verifyOtp(
-      String phone, String otp, String userId) async {
-    var response = await http.post(
-      Uri.parse(_verifyOtpUrl),
-      body: {
-        'mobile_number': phone,
-        'otp': otp,
-        'user_id': userId,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      var responseData = response.body;
-
-      Map<String, dynamic> userModel = json.decode(responseData);
-      // Save token to SharedPreferences
-      await saveToken(userModel["user_id"].toString());
-      print('Token saved: ${userModel["user_id"].toString()}');
-      Fluttertoast.showToast(msg: userModel['message']);
-      return userModel;
-    } else {
-      Fluttertoast.showToast(
-          msg: 'Login failed: ${json.decode(response.body)["error"]}');
-      return null;
+  static Future<ApiResult<UserModel>> login(
+      String phone, String password) async {
+    try {
+      final body = await ApiClient.postForm(
+        ApiConfig.login,
+        {'phone_no': phone, 'password': password},
+      );
+      final user = UserModel.fromJson(body);
+      final token =
+          user.token.isNotEmpty ? user.token : AuthToken.extract(body);
+      if (token == null || token.isEmpty) {
+        return ApiResult.failure('Login failed. No access token received.');
+      }
+      await establishSession(token);
+      return ApiResult.success(UserModel(phoneNo: user.phoneNo, token: token));
+    } on ApiException catch (e) {
+      return ApiResult.failure(
+        e.message,
+        statusCode: e.statusCode,
+        fieldErrors: e.body != null
+            ? ApiException.parseFieldErrors(e.body!)
+            : null,
+      );
+    } catch (_) {
+      return ApiResult.failure('Unable to connect. Please check your internet.');
     }
   }
+
+  /// @deprecated Use [validateSession] instead.
+  static Future<ApiResult<UserModel>> loginWithToken(String token) =>
+      validateSession();
+
+  static Future<ApiResult<int>> forgotPassword(String phone) async {
+    try {
+      final body = await ApiClient.postForm(
+        ApiConfig.forgotPassword,
+        {'phone_no': phone},
+      );
+      final userId = body['user_id'];
+      if (userId == null) {
+        return ApiResult.failure('Could not start password reset.');
+      }
+      return ApiResult.success(userId is int ? userId : int.parse('$userId'));
+    } on ApiException catch (e) {
+      return ApiResult.failure(
+        e.message,
+        statusCode: e.statusCode,
+        fieldErrors: e.body != null
+            ? ApiException.parseFieldErrors(e.body!)
+            : null,
+      );
+    } catch (_) {
+      return ApiResult.failure('Unable to connect. Please try again.');
+    }
+  }
+
+  static Future<ApiResult<int>> forgotPassWordVerifyOTPAndPassword(
+    String newPassword,
+    String confirmPassword,
+    int? userId,
+    String otp,
+  ) async {
+    try {
+      final body = await ApiClient.postForm(
+        ApiConfig.resetPassword,
+        {
+          'user_id': userId.toString(),
+          'otp': otp,
+          'new_password': newPassword,
+          'new_password_confirmation': confirmPassword,
+        },
+      );
+      final id = body['user_id'];
+      if (id == null) {
+        return ApiResult.failure('Password reset failed.');
+      }
+      return ApiResult.success(id is int ? id : int.parse('$id'));
+    } on ApiException catch (e) {
+      return ApiResult.failure(
+        e.message,
+        statusCode: e.statusCode,
+        fieldErrors: e.body != null
+            ? ApiException.parseFieldErrors(e.body!)
+            : null,
+      );
+    } catch (_) {
+      return ApiResult.failure('Unable to connect. Please try again.');
+    }
+  }
+
+  static Future<ApiResult<Map<String, dynamic>>> sendOtp(String phone) async {
+    try {
+      final body = await ApiClient.postForm(
+        ApiConfig.sendOtp,
+        {'mobile_number': phone},
+      );
+      return ApiResult.success(body);
+    } on ApiException catch (e) {
+      return ApiResult.failure(
+        e.message,
+        statusCode: e.statusCode,
+        fieldErrors: e.body != null
+            ? ApiException.parseFieldErrors(e.body!)
+            : null,
+      );
+    } catch (_) {
+      return ApiResult.failure('Unable to send OTP. Please try again.');
+    }
+  }
+
+  static Future<ApiResult<Map<String, dynamic>>> verifyOtp(
+    String phone,
+    String otp,
+    String userId,
+  ) async {
+    try {
+      final body = await ApiClient.postForm(
+        ApiConfig.verifyOtp,
+        {
+          'mobile_number': phone,
+          'otp': otp,
+          'user_id': userId,
+        },
+      );
+      return ApiResult.success(body);
+    } on ApiException catch (e) {
+      return ApiResult.failure(
+        e.message,
+        statusCode: e.statusCode,
+        fieldErrors: e.body != null
+            ? ApiException.parseFieldErrors(e.body!)
+            : null,
+      );
+    } catch (_) {
+      return ApiResult.failure('OTP verification failed. Please try again.');
+    }
+  }
+
+  static Future<void> saveToken(String token) => establishSession(token);
+
+  static Future<String?> getToken() => TokenStorage.read();
+
+  static Future<void> deleteToken() => logout();
 }

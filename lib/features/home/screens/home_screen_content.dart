@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/core/network/connectivity_service.dart';
+import 'package:dream_baby/core/storage/activity_progress_cache.dart';
 import 'package:dream_baby/features/home/screens/card_details.dart';
 import 'package:dream_baby/features/home/screens/four_quotients.dart';
 import 'package:dream_baby/features/rough.dart';
@@ -50,6 +54,11 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   @override
   void initState() {
     super.initState();
+
+    final cached = ActivityProgressCache.readQuotientStatuses();
+    if (cached.isNotEmpty) {
+      quotientStatuses = cached;
+    }
 
     fetchNotificationCount();
     fetchQuotientStatuses();
@@ -300,36 +309,32 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                       return Shimmer.fromColors(
                         baseColor: Colors.grey[300]!,
                         highlightColor: Colors.grey[100]!,
-                        child: Container(
+                        child: SizedBox(
                           height: 420,
-                          margin: const EdgeInsets.only(right: 20),
                           child: Column(
                             children: [
                               Row(
                                 children: [
-                                  Container(
-                                    height: 190.0,
-                                    width:
-                                        MediaQuery.of(context).size.width / 2 -
-                                            20,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(20),
+                                  Expanded(
+                                    child: Container(
+                                      height: 190,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    height: 190.0,
-                                    width:
-                                        MediaQuery.of(context).size.width / 2 -
-                                            20,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(20),
+                                  Expanded(
+                                    child: Container(
+                                      height: 190,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -338,29 +343,26 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                               const SizedBox(height: 20),
                               Row(
                                 children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2 -
-                                            20,
-                                    height: 190.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(20),
+                                  Expanded(
+                                    child: Container(
+                                      height: 190,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
-                                  Container(
-                                    margin: const EdgeInsets.only(right: 10),
-                                    width:
-                                        MediaQuery.of(context).size.width / 2 -
-                                            20,
-                                    height: 190.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(20),
+                                  Expanded(
+                                    child: Container(
+                                      height: 190,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -490,29 +492,48 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   }
 
   Future<void> fetchQuotientStatuses() async {
+    final token = await AuthService.requireToken();
+    if (token == null) {
+      final cached = ActivityProgressCache.readQuotientStatuses();
+      if (cached.isNotEmpty) {
+        quotientStatuses = cached;
+        if (mounted) setState(() {});
+      }
+      return;
+    }
+
+    if (!await connectivityService.checkOnline()) {
+      final cached = ActivityProgressCache.readQuotientStatuses();
+      if (cached.isNotEmpty) {
+        quotientStatuses = cached;
+        if (mounted) setState(() {});
+      }
+      return;
+    }
+
     try {
-      var token = await AuthService.getToken();
-      var response = await http.get(
-        Uri.parse('http://dreambaby.pro/api/user-question-status'),
-        headers: {'Authorization': 'Bearer $token'},
+      final data = await ApiClient.get(
+        ApiConfig.userQuestionStatus,
+        authenticated: true,
       );
-      print("Response status: ${response.statusCode}");
+      final statuses = data['statuses'] as Map<String, dynamic>?;
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final statuses = data['statuses'] as Map<String, dynamic>;
-
+      if (statuses != null) {
         quotientStatuses =
             statuses.map((key, value) => MapEntry(key, value as bool));
+        await ActivityProgressCache.saveQuotientStatuses(quotientStatuses);
 
         if (mounted) {
           setState(() {});
         }
-      } else {
-        print("Error: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
-      print("Error fetching data: $e");
+      final cached = ActivityProgressCache.readQuotientStatuses();
+      if (cached.isNotEmpty) {
+        quotientStatuses = cached;
+        if (mounted) setState(() {});
+      }
+      print('Error fetching data: $e');
     }
   }
 
@@ -522,78 +543,47 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
           Provider.of<NotificationViewModel>(context, listen: false);
 
       var response = await notificationViewModel.unreadNotificationCount();
-      notificationCount = response?["count"];
+      notificationCount = (response?['count'] as num?)?.toInt() ?? 0;
       if (mounted) {
         setState(() {});
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
+      print('Error fetching notification count: $e');
     }
   }
 
   Future<void> fetchQuotientStatuses1() async {
+    final token = await AuthService.requireToken();
+    if (token == null) return;
+
     try {
-      var token = await AuthService.getToken();
-      var response = await http.get(
-        Uri.parse('http://dreambaby.pro/api/user-question-status'),
-        headers: {'Authorization': 'Bearer $token'},
+      await ApiClient.get(
+        ApiConfig.userQuestionStatus,
+        authenticated: true,
       );
-
-      print("Response status: ${response.statusCode}");
-      //print("Response body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        // if (mounted) {
-        //   setState(() {});
-        // }
-        // Process the data
-      } else {
-        print("Error: ${response.statusCode} - ${response.body}");
-      }
     } catch (e) {
-      print("Error fetching data: $e");
+      print('Error fetching data: $e');
     }
   }
 
   Future<void> getTodaysQuestionStatus() async {
+    final token = await AuthService.requireToken();
+    if (token == null) return;
+
     try {
-      var token = await AuthService.getToken();
-      var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
-      };
+      final data = await ApiClient.get(
+        ApiConfig.questionsStatusToday,
+        authenticated: true,
+      );
+      final flagged = (data['flagged'] as num?)?.toInt() ?? 0;
+      todayQuestionStatus =
+          flagged > 0 ? "Today's $flagged Flagged Activities" : '';
 
-      var request = http.Request(
-          'GET', Uri.parse('http://dreambaby.pro/api/questions/status/today'));
-
-      request.headers.addAll(headers);
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        String responseData = await response.stream.bytesToString();
-        //print(responseData);
-        await Future.delayed(const Duration(seconds: 2));
-        // await Future.delayed(const Duration(milliseconds: 2500));
-        int? flagged = jsonDecode(responseData)['flagged'];
-
-        todayQuestionStatus = "Today's $flagged Flagged Activities";
-
-        if (mounted) {
-          setState(() {});
-        }
-
-        //print(todayQuestionStatus);
-      } else {
-        print(response.reasonPhrase);
+      if (mounted) {
+        setState(() {});
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text(e.toString()),
-      //   ),
-      // );
+      print('Error fetching today question status: $e');
     }
   }
 }

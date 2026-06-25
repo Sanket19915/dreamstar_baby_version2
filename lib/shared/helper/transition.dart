@@ -18,11 +18,10 @@ class MyCustomRouteTransition extends PageRouteBuilder {
         );
 }
 
-class CustomSlideTransitionPage extends CustomTransitionPage {
-  final Widget child;
-
+class CustomSlideTransitionPage extends CustomTransitionPage<void> {
   CustomSlideTransitionPage({
-    required this.child,
+    required super.key,
+    required Widget child,
   }) : super(
           transitionDuration: const Duration(milliseconds: 300),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -30,7 +29,7 @@ class CustomSlideTransitionPage extends CustomTransitionPage {
             const end = Offset(0.0, 0.0);
             const curve = Curves.easeInOut;
 
-            var tween =
+            final tween =
                 Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
             return SlideTransition(

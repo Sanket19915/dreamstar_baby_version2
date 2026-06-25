@@ -1,20 +1,22 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:dream_baby/features/auth/screens/login.dart';
+import 'package:dream_baby/core/config/api_config.dart';
+import 'package:dream_baby/core/errors/api_exception.dart';
+import 'package:dream_baby/core/network/api_client.dart';
+import 'package:dream_baby/core/storage/profile_cache.dart';
 import 'package:dream_baby/features/setting/screens/privacy_policy_screen.dart';
 import 'package:dream_baby/features/setting/screens/termsnconditions_screen.dart';
 import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
+import 'package:dream_baby/shared/widget/loading_overlay.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -36,236 +38,233 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> fetchUserProfile() async {
+    if (!await AuthService.hasSession()) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        context.go(Routes.login);
+      }
+      return;
+    }
+
     try {
-      var token = await AuthService.getToken();
-
-      // Check if the token is empty
-      if (token == null || token.isEmpty) {
-        // Handle the case where token is blank
-        if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
-        }
-        return;
-      }
-
-      var url = Uri.parse('http://dreambaby.pro/api/profile');
-      var response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      // Print response for debugging
-
-      if (response.statusCode == 200) {
-        var contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          var data = json.decode(response.body);
-          if (mounted) {
-            setState(() {
-              userProfile = data;
-              userId = data['id']; // Store user ID for delete API
-              isLoading = false; // Set loading state to false after data is fetched
-            });
-          }
-        } else {
-          Fluttertoast.showToast(msg: "Something went wrong");
-          // Handle non-JSON response
-          if (mounted) {
-            setState(() {
-              isLoading = false; // Set loading state to false
-            });
-          }
-        }
-      } else {
-        // Handle error
-        if (mounted) {
-          setState(() {
-            isLoading = false; // Set loading state to false
-          });
-        }
-      }
-    } catch (e) {
-      // Handle error
+      final data = await ApiClient.get(ApiConfig.profile, authenticated: true);
       if (mounted) {
         setState(() {
-          isLoading = false; // Set loading state to false
+          userProfile = data;
+          userId = (data['id'] as num?)?.toInt();
+          isLoading = false;
         });
+        await ProfileCache.save(data);
+      }
+    } on ApiException catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        Fluttertoast.showToast(msg: e.message);
+        if (e.statusCode == 401) {
+          await AuthService.logout();
+          if (mounted) context.go(Routes.login);
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => isLoading = false);
+        Fluttertoast.showToast(msg: 'Failed to load profile');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context, true); // Pass true when navigating back
-            //Navigator.of(context).pop();
-          },
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-            size: 24,
+    return LoadingOverlay(
+      isLoading: isLoading,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => context.pop(true),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                color: Colors.black, size: 22),
           ),
-        ),
-        centerTitle: true,
-        title: Text(
-          'Settings',
-          style: GoogleFonts.poppins(
-            color: AppColors.mainColor,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            height: height,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(AppImages.bg),
-                fit: BoxFit.cover,
-              ),
+          centerTitle: true,
+          title: Text(
+            'Settings',
+            style: GoogleFonts.poppins(
+              color: AppColors.mainColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          ),
+        ),
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(AppImages.bg),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 110),
-                  InkWell(
-                    onTap: () {},
-                    child: Container(
-                      height: height * 0.2,
-                      width: width * 0.5,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage(AppImages.propic),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.edit, color: AppColors.mainColor),
-                            onPressed: !(isLoading)
-                                ? () {
-                                    GoRouter.of(context).push(Routes.EditProfileScreen, extra: userProfile).then(
-                                      (value) {
-                                        fetchUserProfile();
-                                      },
-                                    );
-                                    // context
-                                    //     .push(
-                                    //   Routes.EditProfileScreen,
-                                    //   extra: userProfile, // Pass userProfile data
-                                    // )
-                                    //     .then(
-                                    //   (value) {
-                                    //     fetchUserProfile();
-                                    //   },
-                                    // );
-                                  }
-                                : () {},
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  // _buildSettingOption('FAQ', Icons.question_answer, () {
-                  //   Navigator.of(context).push(
-                  //     MaterialPageRoute(
-                  //       builder: (context) => FAQScreen(),
-                  //     ),
-                  //   );
-                  // }),
-                  _buildSettingOption('Privacy Policy', Icons.privacy_tip, () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => PrivacyPolicyScreen(),
-                      ),
-                    );
-                  }),
-                  _buildSettingOption('Terms & Conditions', Icons.description, () async {
-                    String pdfPath = await _loadPdfFromAsset();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => TermsAndConditionsScreen(
-                          pdfPath: pdfPath,
-                        ),
-                      ),
-                    );
-                  }),
-                  _buildSettingOption('Delete my account', Icons.delete, () {
-                    _showDeleteConfirmationDialog();
-                  }),
-                  _buildSettingOption('Logout', Icons.logout, () async {
-                    try {
-                      await FirebaseAuth.instance.signOut();
-                      await AuthService.deleteToken();
-                      SessionManager().clearSession(); // Clear session data
-                      context.go(Routes.login);
-                    } catch (e) {
-                      // Handle error as needed
-                    }
-                  }),
+                  const SizedBox(height: 16),
+                  _buildProfileAvatar(),
+                  const SizedBox(height: 32),
+                  _buildSettingsCard(),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.only(top: 100),
-              child: LinearProgressIndicator(),
-            ), // Show LinearProgressIndicator while loading
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileAvatar() {
+    const size = 108.0;
+    final pic = userProfile['profile_pic']?.toString();
+    final hasPic = pic != null && pic.isNotEmpty && pic != 'null';
+
+    final ImageProvider avatarImage;
+    if (hasPic) {
+      avatarImage = NetworkImage(ApiConfig.storageUrl(pic));
+    } else {
+      avatarImage = const AssetImage(AppImages.propic);
+    }
+
+    return GestureDetector(
+      onTap: isLoading
+          ? null
+          : () {
+              context.push(Routes.EditProfileScreen, extra: userProfile).then((_) {
+                fetchUserProfile();
+              });
+            },
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.12), width: 1.5),
+                image: DecorationImage(
+                  image: avatarImage,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Positioned(
+              right: 2,
+              bottom: 2,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: AppColors.mainColor.withValues(alpha: 0.2)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.edit_outlined,
+                  size: 17,
+                  color: AppColors.mainColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsCard() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          _buildSettingOption('Privacy Policy', Icons.privacy_tip_outlined, () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
+            );
+          }),
+          const Divider(height: 1, indent: 56),
+          _buildSettingOption('Terms & Conditions', Icons.description_outlined,
+              () async {
+            final pdfPath = await _loadPdfFromAsset();
+            if (!mounted) return;
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => TermsAndConditionsScreen(pdfPath: pdfPath),
+              ),
+            );
+          }),
+          const Divider(height: 1, indent: 56),
+          _buildSettingOption('Delete my account', Icons.delete_outline, () {
+            _showDeleteConfirmationDialog();
+          }),
+          const Divider(height: 1, indent: 56),
+          _buildSettingOption('Logout', Icons.logout, () async {
+            try {
+              await FirebaseAuth.instance.signOut();
+              await AuthService.logout();
+              if (mounted) context.go(Routes.login);
+            } catch (_) {}
+          }),
         ],
       ),
     );
   }
 
   Widget _buildSettingOption(String title, IconData icon, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: InkWell(
-        onTap: () {
-          if (title == 'Logout') {
-            _showLogoutConfirmationDialog(onTap);
-          } else {
-            onTap();
-          }
-        },
+    return InkWell(
+      onTap: () {
+        if (title == 'Logout') {
+          _showLogoutConfirmationDialog(onTap);
+        } else {
+          onTap();
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: ListTile(
-          leading: Icon(icon, color: AppColors.mainColor),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          leading: Icon(icon, color: AppColors.mainColor, size: 24),
           title: Text(
             title,
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: Colors.black,
+              color: Colors.black87,
             ),
           ),
-          trailing: const Icon(Icons.arrow_forward_ios, color: AppColors.mainColor),
+          trailing: const Icon(
+            Icons.arrow_forward_ios_rounded,
+            color: AppColors.mainColor,
+            size: 16,
+          ),
         ),
       ),
     );
@@ -290,7 +289,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               TextButton(
-                child: const Text("Logout", style: TextStyle(color: AppColors.mainColor)),
+                child: const Text("Logout",
+                    style: TextStyle(color: AppColors.mainColor)),
                 onPressed: () {
                   logoutAction();
                   Navigator.of(context).pop(); // Close the dialog
@@ -331,49 +331,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _deleteAccount() async {
+    if (userId == null || !await AuthService.hasSession()) return;
+
     try {
-      var token = await AuthService.getToken(); // Retrieve token from storage
-
-      // Check if the token is empty
-      if (token == null || token.isEmpty) {
-        // Handle the case where token is blank
-        return;
-      }
-
-      if (userId == null) {
-        // Handle the case where user ID is not available
-        return;
-      }
-
-      var url = Uri.parse('http://dreambaby.pro/api/auth/delete-account/$userId');
-      var response = await http.delete(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
+      await ApiClient.delete(
+        ApiConfig.deleteAccountForUser(userId!),
+        authenticated: true,
       );
-
-      // Print response for debugging
-
-      if (response.statusCode == 200) {
-        // Account deleted successfully
-        // Handle any UI changes or navigations as needed
-        // Example: Navigate to login screen after deletion
-        context.go(Routes.login);
-      } else {
-        // Handle error
-        // Example: Show error message to the user
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to delete account: ${response.reasonPhrase}'),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
+      await AuthService.logout();
+      if (mounted) context.go(Routes.login);
     } catch (e) {
-      // Handle error
-      // Example: Show error message to the user
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error deleting account: $e'),
@@ -384,7 +352,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<String> _loadPdfFromAsset() async {
-    final ByteData data = await rootBundle.load('assets/pdf/tnc.pdf'); // Replace with your PDF asset path
+    final ByteData data = await rootBundle
+        .load('assets/pdf/tnc.pdf'); // Replace with your PDF asset path
     final Directory tempDir = await getTemporaryDirectory();
     final File tempFile = File('${tempDir.path}/sample.pdf');
     await tempFile.writeAsBytes(data.buffer.asUint8List(), flush: true);

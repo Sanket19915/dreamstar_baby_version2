@@ -2,15 +2,17 @@
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/helper/app_label.dart';
+import 'package:dream_baby/router/routes.dart';
+import 'package:dream_baby/shared/widget/auth_back_button.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
 import 'package:dream_baby/shared/widget/custom_textfield.dart';
+import 'package:dream_baby/core/utils/app_messenger.dart';
+import 'package:dream_baby/shared/widget/loading_overlay.dart';
+import 'package:dream_baby/viewmodels/login_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../../viewmodels/login_viewmodel.dart';
 
 class ForgotOtpAndPasswordScreen extends StatefulWidget {
   final String phoneNumber;
@@ -31,7 +33,6 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
 
   final TextEditingController otpController = TextEditingController();
   ValueNotifier buttonNotifier = ValueNotifier(true);
-  bool isLoading = false;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -73,8 +74,14 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    final loginVm = Provider.of<LoginViewModel>(context);
+
+    return LoadingOverlay(
+      isLoading: loginVm.loading,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
         width: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -94,8 +101,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 70),
-                    const SizedBox(height: 30),
+                    SizedBox(height: MediaQuery.of(context).padding.top + 48),
                     Hero(
                       tag: 'Logo',
                       child: Image.asset(
@@ -109,61 +115,56 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                       decoration: const BoxDecoration(
                           color: AppColors.whiteColor, borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Verify Phone Number',
-                                style: CustomLabels.pbody1TextStyle(
-                                  fontSize: 23,
-                                  fontWeight: CustomLabels.largeFontWeight,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            'Reset Password',
+                            textAlign: TextAlign.center,
+                            style: CustomLabels.pbody1TextStyle(
+                              fontSize: 23,
+                              fontWeight: CustomLabels.largeFontWeight,
+                            ),
                           ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.025),
+                          const SizedBox(height: 16),
                           CustomTextField(
+                            label: 'OTP',
                             onChanged: (p0) {
-                              buttonNotifier.notifyListeners();
+                              buttonNotifier.value = p0;
                             },
                             autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Enter OTP',
+                            hintText: 'Enter 6-digit OTP',
                             controller: otpController,
-                            textInputAction: TextInputAction.done,
+                            textInputAction: TextInputAction.next,
                             borderColor: AppColors.secondaryTextColor,
                             inputType: CustomTextInputType.number,
                           ),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              children: [
-                                // Get language using key
-                                const TextSpan(
-                                  text: "Did't receive the OTP? ",
-                                  style: TextStyle(color: Colors.black45),
-                                ),
-
-                                TextSpan(
-                                  text: "Resend ",
-                                  style: const TextStyle(
-                                    color: AppColors.primaryColor,
-                                    decoration: TextDecoration.underline,
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: "Didn't receive the OTP? ",
+                                    style: TextStyle(color: Colors.black45),
                                   ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      resendCode();
-                                    },
-                                )
-                              ],
+                                  TextSpan(
+                                    text: 'Resend',
+                                    style: const TextStyle(
+                                      color: AppColors.primaryColor,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = resendCode,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.035),
+                          const SizedBox(height: 12),
                           CustomTextField(
+                            label: 'New Password',
                             autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Password',
+                            hintText: 'Minimum 8 characters',
                             controller: passwordController,
                             textInputAction: TextInputAction.next,
                             obscureText: true,
@@ -171,10 +172,11 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                             inputType: CustomTextInputType.password,
                             validator: passwordValidator,
                           ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          const SizedBox(height: 12),
                           CustomTextField(
+                            label: 'Confirm Password',
                             autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Confirm Password',
+                            hintText: 'Re-enter password',
                             controller: confirmPasswordController,
                             textInputAction: TextInputAction.done,
                             obscureText: true,
@@ -182,7 +184,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                             inputType: CustomTextInputType.password,
                             validator: confirmPasswordValidator,
                           ),
-                          SizedBox(height: MediaQuery.of(context).size.height * 0.035),
+                          const SizedBox(height: 20),
                           ValueListenableBuilder(
                               valueListenable: buttonNotifier,
                               builder: (context, value, child) {
@@ -211,94 +213,41 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                   ],
                 ),
               ),
-              if (isLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    child: const Center(
-                      child: SpinKitThreeInOut(
-                        color: AppColors.primaryColor,
-                        size: 40.0,
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
+        ),
+      ),
+            const AuthBackButton(fallbackRoute: Routes.forgotPassword),
+          ],
         ),
       ),
     );
   }
 
   Future<void> resendCode() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      final user = await viewModel.forgotPassWord(widget.phoneNumber);
-
-      setState(() {
-        isLoading = false;
-      });
-
-      if (user != null) {
-        widget.userId = user;
-      }
-
-      // final FirebaseAuth auth = FirebaseAuth.instance;
-      // await auth.verifyPhoneNumber(
-      //   phoneNumber: widget.phoneNumber,
-      //   forceResendingToken: widget.resendToken,
-      //   verificationCompleted: (PhoneAuthCredential credential) async {
-      //     await auth.signInWithCredential(credential).then(
-      //       (value) async {
-      //         print('Logged In Successfully');
-      //         // Call the callback
-      //       },
-      //     );
-      //   },
-      //   verificationFailed: (FirebaseAuthException e) {
-      //     setState(() {
-      //       isLoading = false;
-      //     });
-      //     Fluttertoast.showToast(msg: e.code);
-      //   },
-      //   codeSent: (String verificationId, int? resendToken) async {
-      //     setState(() {
-      //       isLoading = false;
-      //     });
-      //     setState(() {
-      //       verificationId = verificationId;
-      //     });
-      //     // Log the verification ID
-      //   },
-      //   codeAutoRetrievalTimeout: (String verificationId) {
-      //     print('Code auto-retrieval timeout');
-      //   },
-      // );
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+    final result = await viewModel.forgotPassWord(widget.phoneNumber);
+    if (!mounted) return;
+    if (result.isSuccess) {
+      setState(() => widget.userId = result.data);
+      AppMessenger.showSuccess('OTP resent successfully');
+    } else {
+      AppMessenger.showError(result.errorMessage ?? 'Failed to resend OTP');
     }
   }
 
   Future<void> signInWithOTP() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      final user = await viewModel.forgotPassWordVerifyOTPAndPassword(
-          passwordController.text, confirmPasswordController.text, widget.userId, otpController.text);
-      Navigator.of(context).popUntil((route) => route.isFirst);
-
-      Fluttertoast.showToast(msg: "Password has been reset successfully!!");
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
+    final result = await viewModel.forgotPassWordVerifyOTPAndPassword(
+      passwordController.text,
+      confirmPasswordController.text,
+      widget.userId,
+      otpController.text,
+    );
+    if (!mounted) return;
+    if (result.isSuccess) {
+      context.go(Routes.login);
+      AppMessenger.showSuccess('Password has been reset successfully');
+    } else {
+      AppMessenger.showError(result.errorMessage ?? 'Password reset failed');
     }
   }
 }

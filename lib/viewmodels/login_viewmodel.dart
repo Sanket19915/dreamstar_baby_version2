@@ -1,3 +1,4 @@
+import 'package:dream_baby/core/network/api_result.dart';
 import 'package:dream_baby/models/user_model.dart';
 import 'package:dream_baby/services/auth_services.dart';
 import 'package:flutter/material.dart';
@@ -6,70 +7,70 @@ class LoginViewModel extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
 
-  Future<UserModel?> login(String phone, String password) async {
-    _loading = true;
+  String? _lastError;
+  String? get lastError => _lastError;
+
+  void _setLoading(bool value) {
+    _loading = value;
     notifyListeners();
-
-    final user = await AuthService.login(phone, password);
-
-    _loading = false;
-    notifyListeners();
-
-    return user;
   }
 
-  Future<int?> forgotPassWord(String phone) async {
-    _loading = true;
-    notifyListeners();
-
-    final user = await AuthService.forgotPassword(phone);
-
-    _loading = false;
-    notifyListeners();
-
-    return user;
+  Future<ApiResult<UserModel>> login(String phone, String password) async {
+    _setLoading(true);
+    _lastError = null;
+    final result = await AuthService.login(phone, password);
+    _lastError = result.errorMessage;
+    _setLoading(false);
+    return result;
   }
 
-  Future<int?> forgotPassWordVerifyOTPAndPassword(
-      String newPassword, String confirmPassword, int? userId, String otp) async {
-    _loading = true;
-    notifyListeners();
-
-    final user = await AuthService.forgotPassWordVerifyOTPAndPassword(newPassword, confirmPassword, userId, otp);
-
-    _loading = false;
-    notifyListeners();
-
-    return user;
+  Future<ApiResult<int>> forgotPassWord(String phone) async {
+    _setLoading(true);
+    _lastError = null;
+    final result = await AuthService.forgotPassword(phone);
+    _lastError = result.errorMessage;
+    _setLoading(false);
+    return result;
   }
 
-  Future<Map<String, dynamic>?> sendOtp(String phone) async {
-    try {
-      _loading = true;
-      notifyListeners();
-
-      final user = await AuthService.sendOtp(phone);
-
-      _loading = false;
-      notifyListeners();
-
-      return user;
-    } catch (e) {
-      _loading = false;
-      notifyListeners();
-      return null;
-    }
+  Future<ApiResult<int>> forgotPassWordVerifyOTPAndPassword(
+    String newPassword,
+    String confirmPassword,
+    int? userId,
+    String otp,
+  ) async {
+    _setLoading(true);
+    _lastError = null;
+    final result = await AuthService.forgotPassWordVerifyOTPAndPassword(
+      newPassword,
+      confirmPassword,
+      userId,
+      otp,
+    );
+    _lastError = result.errorMessage;
+    _setLoading(false);
+    return result;
   }
 
-  Future<Map<String, dynamic>?> verifyOtp(String phone, String otp, String userId) async {
-    _loading = true;
-    notifyListeners();
+  Future<ApiResult<Map<String, dynamic>>> sendOtp(String phone) async {
+    _setLoading(true);
+    _lastError = null;
+    final result = await AuthService.sendOtp(phone);
+    _lastError = result.errorMessage;
+    _setLoading(false);
+    return result;
+  }
 
-    Map<String, dynamic>? userModel = await AuthService.verifyOtp(phone, otp, userId);
-
-    _loading = false;
-    notifyListeners();
-
-    return userModel;
+  Future<ApiResult<Map<String, dynamic>>> verifyOtp(
+    String phone,
+    String otp,
+    String userId,
+  ) async {
+    _setLoading(true);
+    _lastError = null;
+    final result = await AuthService.verifyOtp(phone, otp, userId);
+    _lastError = result.errorMessage;
+    _setLoading(false);
+    return result;
   }
 }

@@ -1,3 +1,5 @@
+import 'package:dream_baby/core/auth/auth_token.dart';
+
 class UserModel {
   final String phoneNo;
   final String token;
@@ -7,7 +9,7 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       phoneNo: json['phone_no'] as String? ?? '',
-      token: json['access_token'] as String? ?? '',
+      token: AuthToken.extract(json) ?? '',
     );
   }
 }
