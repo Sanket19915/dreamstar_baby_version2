@@ -8,6 +8,13 @@ import 'package:dream_baby/features/auth/screens/new_otp_screen.dart';
 import 'package:dream_baby/features/auth/screens/onboarding.dart';
 import 'package:dream_baby/features/auth/screens/sign_up1.dart';
 import 'package:dream_baby/features/auth/screens/splash1.dart';
+import 'package:dream_baby/features/auth/screens/journey_selection_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_dashboard_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_delay_check_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_irregular_insights_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_calendar_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_history_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_step9_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen.dart';
 import 'package:dream_baby/features/konwledge_hub/know_entry.dart';
 import 'package:dream_baby/features/notifications/screen/notification_screen.dart';
@@ -31,6 +38,9 @@ const _publicRoutes = {
   Routes.forgotPassword,
   Routes.verifyOtp,
   Routes.forgotOtpReset,
+  Routes.journeySelection,
+  Routes.moreDetails,
+  Routes.conceptionStep9,
 };
 
 String? _authRedirect(GoRouterState state) {
@@ -154,13 +164,34 @@ void initAppRouter({required String initialLocation}) {
         ),
       ),
       GoRoute(
-        path: Routes.moreDetails,
+        path: Routes.journeySelection,
         pageBuilder: (context, state) {
           final userId = state.extra as String;
           return adaptivePage(
             state: state,
-            child: MoreDetailsScreen(userId: userId),
+            child: JourneySelectionScreen(userId: userId),
           );
+        },
+      ),
+      GoRoute(
+        path: Routes.moreDetails,
+        pageBuilder: (context, state) {
+          if (state.extra is Map) {
+            final args = state.extra as Map<String, dynamic>;
+            return adaptivePage(
+              state: state,
+              child: MoreDetailsScreen(
+                userId: args['userId'] as String,
+                journeyType: args['journeyType'] as String?,
+              ),
+            );
+          } else {
+            final userId = state.extra as String;
+            return adaptivePage(
+              state: state,
+              child: MoreDetailsScreen(userId: userId),
+            );
+          }
         },
       ),
       GoRoute(
@@ -179,6 +210,49 @@ void initAppRouter({required String initialLocation}) {
             child: EditProfileScreen(userProfile: userProfile),
           );
         },
+      ),
+      // Conception Flow
+      GoRoute(
+        path: Routes.conceptionStep9,
+        pageBuilder: (context, state) => adaptivePage(
+          state: state,
+          child: const ConceptionStep9Screen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.conceptionDashboard,
+        pageBuilder: (context, state) => adaptivePage(
+          state: state,
+          child: const ConceptionDashboardScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.conceptionDelayCheck,
+        pageBuilder: (context, state) => CustomSlideTransitionPage(
+          key: state.pageKey,
+          child: const ConceptionDelayCheckScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.conceptionIrregularInsights,
+        pageBuilder: (context, state) => CustomSlideTransitionPage(
+          key: state.pageKey,
+          child: const ConceptionIrregularInsightsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.conceptionCalendar,
+        pageBuilder: (context, state) => CustomSlideTransitionPage(
+          key: state.pageKey,
+          child: const ConceptionCalendarScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.conceptionHistory,
+        pageBuilder: (context, state) => CustomSlideTransitionPage(
+          key: state.pageKey,
+          child: const ConceptionHistoryScreen(),
+        ),
       ),
     ],
   );

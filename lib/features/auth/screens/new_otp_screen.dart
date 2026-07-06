@@ -74,7 +74,7 @@ class _NewOTPScreenState extends State<NewOTPScreen> {
         await AuthService.establishSession(token);
       }
       context.go(
-        Routes.moreDetails,
+        Routes.journeySelection,
         extra: (data['user_id'] ?? result.data?['user_id']).toString(),
       );
     } else {

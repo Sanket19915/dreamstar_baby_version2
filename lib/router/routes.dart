@@ -15,4 +15,14 @@ class Routes {
   static const EditProfileScreen = '/EditProfileScreen';
   static const BottoNavbarScreen = '/botto_navbar_screen';
   // static const ExistentialScreenScreen = '/ExistentialScreen';
+
+  // Conception Flow
+  static const conceptionStep9 = '/conceptionStep9';
+  static const conceptionDashboard = '/conceptionDashboard';
+  static const conceptionDelayCheck = '/conceptionDelayCheck';
+  static const conceptionIrregularInsights = '/conceptionIrregularInsights';
+  static const conceptionCalendar = '/conceptionCalendar';
+  static const conceptionHistory = '/conceptionHistory';
+
+  static const journeySelection = '/journeySelection';
 }

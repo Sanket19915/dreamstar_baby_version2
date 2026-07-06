@@ -63,4 +63,10 @@ class AppImages {
   static const whatsapp = "assets/images/whatsapp.png";
   static const sq = "assets/images/sq.webp";
   static const existential = "assets/images/existential.png";
+
+  // Conception Quotient images
+  static const atmaConception = "assets/images/meditation_icon.png";
+  static const sharirConception = "assets/images/nutrition_icon.png";
+  static const bhavConception = "assets/images/heart_icon.png";
+  static const mannConception = "assets/images/brain_icon.png";
 }

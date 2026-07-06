@@ -79,6 +79,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
     return LoadingOverlay(
       isLoading: loginVm.loading,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             Container(
@@ -92,6 +93,9 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
         ),
         height: double.infinity,
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 25,
+          ),
           physics: const ClampingScrollPhysics(),
           child: Stack(
             children: [

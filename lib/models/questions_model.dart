@@ -175,7 +175,9 @@ class Datum {
         options: (json["options"] == null && json["options"] == [])
             ? []
             : (optionsModelFromJson(json["options"]).toList() ?? []),
-        correctAnswer: jsonDecode(json["correct_answer"]),
+        correctAnswer: json["correct_answer"] is String
+            ? jsonDecode(json["correct_answer"])
+            : (json["correct_answer"] as List<dynamic>? ?? []),
         feedback: json["feedback"] ?? false,
         answerKeyInput: json["answer_key_input"] ?? "",
         answerImage: json["answer_image"],

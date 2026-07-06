@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dream_baby/core/widgets/offline_banner.dart';
+import 'package:dream_baby/core/storage/profile_cache.dart';
 import 'package:dream_baby/features/about_us/about_us_screen.dart';
+import 'package:dream_baby/features/conception/screens/conception_dashboard_screen.dart';
 import 'package:dream_baby/features/contact_us/contact_us_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen_content.dart';
 import 'package:dream_baby/features/setting/screens/faq_screen.dart';
@@ -52,16 +54,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final profile = ProfileCache.read() ?? {};
+    final journeyType = profile['journey_type']?.toString();
+    final isConception = journeyType == 'conception';
+
     return Scaffold(
       body: OfflineBanner(
         child: TabBarView(
           controller: _motionTabBarController,
-          children: const <Widget>[
-            TestimonialScreen(),
-            AboutUsScreen(),
-            HomeContentScreen(),
-            FAQScreen(),
-            ContactUsScreen(),
+          children: <Widget>[
+            const TestimonialScreen(),
+            const AboutUsScreen(),
+            isConception ? const ConceptionDashboardScreen(isEmbedded: true) : const HomeContentScreen(),
+            const FAQScreen(),
+            const ContactUsScreen(),
           ],
         ),
       ),

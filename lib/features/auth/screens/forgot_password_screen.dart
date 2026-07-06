@@ -55,6 +55,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 height: double.infinity,
                 child: SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 25,
+                  ),
                   physics: const ClampingScrollPhysics(),
                   child: BlocProvider(
                     create: (_) => IsFormValidBloc(),

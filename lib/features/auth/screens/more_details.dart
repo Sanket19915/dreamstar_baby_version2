@@ -20,7 +20,8 @@ enum DetailType { EDD, LMP }
 
 class MoreDetailsScreen extends StatefulWidget {
   final String? userId;
-  const MoreDetailsScreen({super.key, this.userId});
+  final String? journeyType;
+  const MoreDetailsScreen({super.key, this.userId, this.journeyType});
 
   @override
   State<MoreDetailsScreen> createState() => _MoreDetailsScreenState();
@@ -31,9 +32,16 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   final TextEditingController eddController = TextEditingController();
   ValueNotifier<String> buttonNotifier = ValueNotifier('');
-  DetailType selectType = DetailType.EDD;
+  late DetailType selectType;
   bool isSelected = true;
   bool isLoading = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    selectType = widget.journeyType == 'conception' ? DetailType.LMP : DetailType.EDD;
+  }
+  
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
@@ -43,6 +51,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
           children: [
             Container(
               width: double.infinity,
+              height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(AppImages.loginbg),
@@ -102,23 +111,23 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Which of these do you know?',
-                              style: CustomLabels.pbody1TextStyle(
-                                fontSize: 14,
-                                color: AppColors.greyTextColor,
-                                fontWeight: CustomLabels.verySmallFontWeight,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildRadioOption(
-                              title: 'Estimated Date of Delivery (EDD)',
-                              value: DetailType.EDD,
-                            ),
-                            _buildRadioOption(
-                              title: 'Date of last Menstruation (LMP)',
-                              value: DetailType.LMP,
-                            ),
+                            // Text(
+                            //   'Which of these do you know?',
+                            //   style: CustomLabels.pbody1TextStyle(
+                            //     fontSize: 14,
+                            //     color: AppColors.greyTextColor,
+                            //     fontWeight: CustomLabels.verySmallFontWeight,
+                            //   ),
+                            // ),
+                            // const SizedBox(height: 8),
+                            // _buildRadioOption(
+                            //   title: 'Estimated Date of Delivery (EDD)',
+                            //   value: DetailType.EDD,
+                            // ),
+                            // _buildRadioOption(
+                            //   title: 'Date of last Menstruation (LMP)',
+                            //   value: DetailType.LMP,
+                            // ),
                             const SizedBox(height: 16),
                             CustomTextField(
                               label: selectType == DetailType.EDD
@@ -233,33 +242,35 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                 );
                               },
                             ),
-                            const SizedBox(height: 12),
-                            ValueListenableBuilder(
-                              valueListenable: buttonNotifier,
-                              builder: (context, value, child) {
-                                final canSkip = dobController.text.isEmpty &&
-                                    eddController.text.isEmpty;
-                                return CustomButton(
-                                  text: 'Skip',
-                                  isEnabled: canSkip,
-                                  borderColor: canSkip
-                                      ? AppColors.primaryColor
-                                      : AppColors.secondaryTextColor
-                                          .withValues(alpha: .5),
-                                  backgroundColor: canSkip
-                                      ? AppColors.primaryColor
-                                      : AppColors.secondaryTextColor
-                                          .withValues(alpha: .5),
-                                  textStyle: CustomLabels.body3GreyTextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.whiteColor,
-                                  ),
-                                  onPressed: canSkip
-                                      ? () => skipInformation(widget.userId ?? '')
-                                      : null,
-                                );
-                              },
-                            ),
+                            if (widget.journeyType != 'conception') ...[
+                              const SizedBox(height: 12),
+                              ValueListenableBuilder(
+                                valueListenable: buttonNotifier,
+                                builder: (context, value, child) {
+                                  final canSkip = dobController.text.isEmpty &&
+                                      eddController.text.isEmpty;
+                                  return CustomButton(
+                                    text: 'Skip',
+                                    isEnabled: canSkip,
+                                    borderColor: canSkip
+                                        ? AppColors.primaryColor
+                                        : AppColors.secondaryTextColor
+                                            .withValues(alpha: .5),
+                                    backgroundColor: canSkip
+                                        ? AppColors.primaryColor
+                                        : AppColors.secondaryTextColor
+                                            .withValues(alpha: .5),
+                                    textStyle: CustomLabels.body3GreyTextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.whiteColor,
+                                    ),
+                                    onPressed: canSkip
+                                        ? () => skipInformation(widget.userId ?? '')
+                                        : null,
+                                  );
+                                },
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -362,6 +373,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     required String userId,
     required String lmp,
     required String eed,
+    String? journeyType,
   }) async {
     if (!await AuthService.hasSession()) return;
 
@@ -374,6 +386,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
           'user_id': userId,
           'lmp': lmp,
           'eed': eed,
+          if (journeyType != null) 'journey_type': journeyType,
         },
         authenticated: true,
       );
@@ -382,6 +395,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         'dob': dob,
         'lmp': lmp,
         'eed': eed,
+        if (journeyType != null) 'journey_type': journeyType,
       });
       if (mounted) {
         Fluttertoast.showToast(msg: 'Registration completed successfully');

@@ -26,13 +26,16 @@ class ExistentialScreen extends StatefulWidget {
   final String from;
   final int index;
   final Function() onExit;
+  final int? cycleDay;
   Map<String, bool> quotientStatuses;
+
   ExistentialScreen(
       {super.key,
       required this.from,
       required this.index,
-      required this.onExit,
-      required this.quotientStatuses});
+      this.cycleDay,
+      required this.quotientStatuses,
+      required this.onExit});
 
   @override
   State<ExistentialScreen> createState() => _ExistentialScreenState();
@@ -55,26 +58,42 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   bool isDisable = false;
   ValueNotifier answerNotifier = ValueNotifier(true);
   String todayQuestionStatus = "";
-  List<String> quotients = [
-    "Existential",
-    "Kinesthetic",
-    "Logical",
-    "Linguistic",
-    "Spatial Visual",
-    "Musical",
-    "Intrapersonal",
-    "Naturalistic",
-    "Interpersonal",
-  ];
+  List<String> quotients = [];
+  
   @override
   void initState() {
     super.initState();
+    if (widget.from.contains('Conception')) {
+      quotients = [
+        "Atma Conception",
+        "Sharir Conception",
+        "Bhav Conception",
+        "Mann Conception",
+      ];
+    } else {
+      quotients = [
+        "Existential",
+        "Kinesthetic",
+        "Logical",
+        "Linguistic",
+        "Spatial Visual",
+        "Musical",
+        "Intrapersonal",
+        "Naturalistic",
+        "Interpersonal",
+      ];
+    }
+
     final cachedStatuses = ActivityProgressCache.readQuotientStatuses();
     if (cachedStatuses.isNotEmpty) {
       widget.quotientStatuses.addAll(cachedStatuses);
     }
     getQuestions();
-    fetchQuestions();
+    // Only call the count-only fetchQuestions for non-conception flows;
+    // for conception, getQuestions() already handles everything.
+    if (!widget.from.contains('Conception')) {
+      fetchQuestions();
+    }
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels > 0) {
@@ -196,10 +215,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         ),
         centerTitle: true,
         title: Text(
-          'Brain Development Activity',
+          widget.from.contains('Conception')
+              ? widget.from
+              : 'Brain Development Activity',
           style: GoogleFonts.poppins(
             color: AppColors.blackColor,
-            fontSize: 20,
+            fontSize: widget.from.contains('Conception') ? 16 : 20,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -231,7 +252,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                   ? "assets/images/SPATIALVISUAL.webp"
                                                   : widget.from == "Musical"
                                                       ? "assets/images/MUSICAL.webp"
-                                                      : AppImages.sq),
+                                                      : widget.from.contains('Conception')
+                                                          ? AppImages.loginbg
+                                                          : AppImages.sq),
                   colorFilter: ColorFilter.mode(
                     Colors.white.withValues(alpha: 0.6),
                     BlendMode.srcATop,
@@ -245,38 +268,39 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       return Column(
                         children: [
                           const SizedBox(height: 120),
-                          Container(
-                            height: isTablet ? 300 : deviceheight * 0.173,
-                            width: devicewidth,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(widget.from == "Existential"
-                                    ? AppImages.existential
-                                    : widget.from == "Kinesthetic"
-                                        ? "assets/images/kinestetic.png"
-                                        : widget.from == "Interpersonal"
-                                            ? "assets/images/interpersonal.png"
-                                            : widget.from == "Intrapersonal"
-                                                ? "assets/images/intrapersonal.png"
-                                                : widget.from == "Naturalistic"
-                                                    ? "assets/images/naturalistic.png"
-                                                    : widget.from == "Logical"
-                                                        ? "assets/images/logical.png"
-                                                        : widget.from ==
-                                                                "Linguistic"
-                                                            ? "assets/images/linguistic.png"
-                                                            : widget.from ==
-                                                                    "Spatial Visual"
-                                                                ? "assets/images/spatialvisual.png"
-                                                                : widget.from ==
-                                                                        "Musical"
-                                                                    ? "assets/images/musical.png"
-                                                                    : AppImages
-                                                                        .existential),
-                                fit: BoxFit.fill,
+                          if (!widget.from.contains('Conception'))
+                            Container(
+                              height: isTablet ? 300 : deviceheight * 0.173,
+                              width: devicewidth,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(widget.from == "Existential"
+                                      ? AppImages.existential
+                                      : widget.from == "Kinesthetic"
+                                          ? "assets/images/kinestetic.png"
+                                          : widget.from == "Interpersonal"
+                                              ? "assets/images/interpersonal.png"
+                                              : widget.from == "Intrapersonal"
+                                                  ? "assets/images/intrapersonal.png"
+                                                  : widget.from == "Naturalistic"
+                                                      ? "assets/images/naturalistic.png"
+                                                      : widget.from == "Logical"
+                                                          ? "assets/images/logical.png"
+                                                          : widget.from ==
+                                                                  "Linguistic"
+                                                              ? "assets/images/linguistic.png"
+                                                              : widget.from ==
+                                                                      "Spatial Visual"
+                                                                  ? "assets/images/spatialvisual.png"
+                                                                  : widget.from ==
+                                                                          "Musical"
+                                                                      ? "assets/images/musical.png"
+                                                                      : AppImages
+                                                                          .existential),
+                                  fit: BoxFit.fill,
+                                ),
                               ),
                             ),
-                          ),
                           const SizedBox(height: 20),
                           const Center(
                             child: Text(
@@ -630,6 +654,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
   Widget _buildPageView(
       Datum? data, double devicewidth, List<OptionsModel> options) {
+    final bool isConception = widget.from.contains('Conception');
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1156,10 +1181,24 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       };
+      final bool isConception = widget.from.contains('Conception');
+
       var request =
           http.Request('GET', Uri.parse(ApiConfig.questions));
-      request.body = json.encode({
-        "quotient": widget.from == "Kinesthetic"
+
+      final Map<String, dynamic> bodyData = {};
+
+      bodyData["intelligence_type"] = widget.from;
+      bodyData["question_type"] = "";
+
+      if (isConception) {
+        bodyData["quotient"] = widget.from;
+        
+        if (widget.cycleDay != null) {
+          bodyData["day"] = widget.cycleDay;
+        }
+      } else {
+        bodyData["quotient"] = widget.from == "Kinesthetic"
             ? "Physical"
             : widget.from == "Interpersonal"
                 ? "Emotional"
@@ -1175,10 +1214,10 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                     ? "Intellectual"
                                     : widget.from == "Musical"
                                         ? "Intellectual"
-                                        : "Spiritual",
-        "intelligence_type": widget.from,
-        "question_type": ""
-      });
+                                        : "Spiritual";
+      }
+      
+      request.body = json.encode(bodyData);
       request.headers.addAll(headers);
       print(widget.from);
       http.StreamedResponse response = await request.send();
@@ -1706,7 +1745,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
           showFinalPopup(ctx, todayQuestionStatus, nextIndex);
         } else if (nextIndex < quotients.length &&
             widget.quotientStatuses[quotients[nextIndex]] == false &&
-            widget.index != 8) {
+            widget.index != (quotients.length - 1)) {
           // There's another incomplete quotient, navigate to it
 
           navigateToNextQuotient(ctx, nextIndex);

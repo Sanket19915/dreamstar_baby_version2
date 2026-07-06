@@ -165,6 +165,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           }
         },
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           body: Stack(
             children: [
               Container(
@@ -181,7 +182,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                   child: SafeArea(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.only(bottom: 25, top: 40),
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 25,
+                        top: 40,
+                      ),
                       physics: const ClampingScrollPhysics(),
                       child: Stack(
                         children: [

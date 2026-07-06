@@ -394,20 +394,55 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                // InkWell(
-                //   onTap: () => GoRouter.of(context).push(Routes.knowEntry),
-                //   child: Container(
-                //     height: height * 0.11,
-                //     width: width,
-                //     decoration: const BoxDecoration(
-                //       image: DecorationImage(
-                //           image: AssetImage(AppImages.know), fit: BoxFit.cover),
-                //       borderRadius: BorderRadius.all(
-                //         Radius.circular(15),
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                InkWell(
+                  onTap: () {
+                    GoRouter.of(context).push(Routes.conceptionDashboard);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.50),
+                        borderRadius: BorderRadius.circular(15),
+                        gradient: LinearGradient(colors: [
+                          AppColors.primaryColor.withValues(alpha: 0.80),
+                          AppColors.pinkFFC2D1.withValues(alpha: 0.80),
+                        ])),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: Column(
+                            spacing: 8,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AutoSizeText('Conception Journey',
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                  minFontSize: 13,
+                                  maxLines: 1),
+                              AutoSizeText(
+                                'Track your cycle & conceive faster',
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400),
+                                  minFontSize: 10,
+                              )
+                            ],
+                          ),
+                        ),
+                        const Text('🌸', style: TextStyle(fontSize: 48)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
                 InkWell(
                   onTap: () {
                     GoRouter.of(context).push(Routes.knowEntry);

@@ -1,7 +1,7 @@
 class ApiConfig {
   ApiConfig._();
 
-  static const String baseUrl = 'https://dreambaby.pro';
+  static const String baseUrl = 'http://127.0.0.1:8000';
   static const String apiBase = '$baseUrl/api';
   static const String storageBase = '$baseUrl/storage';
 
@@ -32,6 +32,7 @@ class ApiConfig {
 
   // Questions & activities
   static const String questions = '$apiBase/questions';
+  static const String conceptionQuestions = '$apiBase/conception/questions';
   static const String userAnswer = '$apiBase/user_answer';
   static const String userQuestionStatus = '$apiBase/user-question-status';
   static const String questionsStatusToday = '$apiBase/questions/status/today';
@@ -54,4 +55,12 @@ class ApiConfig {
 
   static String deleteAccountForUser(int userId) =>
       '$apiBase/auth/delete-account/$userId';
+
+  // Conception Cycle Tracking
+  static const String conceptionCycleInit = '$apiBase/conception/cycle/init';
+  static const String conceptionCycleStatus = '$apiBase/conception/cycle/status';
+  static const String conceptionCycleLogPeriod = '$apiBase/conception/cycle/log-period';
+  static const String conceptionCyclePregnancyTest = '$apiBase/conception/cycle/pregnancy-test';
+  static const String conceptionCycleHistory = '$apiBase/conception/cycle/history';
+  static const String conceptionCycleStep9 = '$apiBase/conception/cycle/step-9-questions';
 }
