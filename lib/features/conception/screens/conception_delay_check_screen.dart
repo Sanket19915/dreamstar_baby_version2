@@ -227,7 +227,7 @@ class _ConceptionDelayCheckScreenState
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       Text(
-                        'Delay Check',
+                        'Test your pregnancy',
                         style: GoogleFonts.poppins(
                           color: AppColors.mainColor,
                           fontSize: 20,
@@ -261,13 +261,31 @@ class _ConceptionDelayCheckScreenState
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.warningColor.withValues(alpha: 0.1),
+            color: AppColors.pinkFFC2D1.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.warningColor.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
-              const Text('⏰', style: TextStyle(fontSize: 52)),
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/mom_preg.png',
+                    height: 80,
+                    width: 80,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 'Period Delayed',
@@ -279,7 +297,7 @@ class _ConceptionDelayCheckScreenState
               ),
               const SizedBox(height: 8),
               Text(
-                'Your period hasn\'t arrived yet. Could you be pregnant?',
+                'Your period hasn\'t arrived yet. Are you Pregnant?',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   color: AppColors.primaryTextColor,
@@ -291,7 +309,7 @@ class _ConceptionDelayCheckScreenState
         ),
         const SizedBox(height: 32),
         Text(
-          '6B. Could you be pregnant?',
+          'Are you Pregnant?',
           style: GoogleFonts.poppins(
             color: AppColors.primaryTextColor,
             fontSize: 18,
@@ -301,7 +319,7 @@ class _ConceptionDelayCheckScreenState
         const SizedBox(height: 24),
         _buildRiskOption(
           emoji: '✅',
-          label: 'Yes / Not Sure',
+          label: 'Might Be',
           color: AppColors.primaryColor,
           onTap: () => setState(() {
             _couldBePregnant = true;
@@ -311,7 +329,7 @@ class _ConceptionDelayCheckScreenState
         const SizedBox(height: 12),
         _buildRiskOption(
           emoji: '❌',
-          label: 'No, definitely not',
+          label: 'Not this time',
           color: AppColors.babySizeColor,
           onTap: () {
             showDialog(
@@ -381,10 +399,29 @@ class _ConceptionDelayCheckScreenState
           ),
           child: Column(
             children: [
-              const Text('🔬', style: TextStyle(fontSize: 52)),
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/mom_son.png',
+                    height: 80,
+                    width: 80,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
-                '6B(ii). Have you taken a pregnancy test?',
+                'Have you taken a pregnancy test?',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   color: AppColors.primaryTextColor,

@@ -5,6 +5,7 @@ import 'package:dream_baby/core/config/api_config.dart';
 import 'package:dream_baby/core/network/api_client.dart';
 import 'package:dream_baby/core/network/connectivity_service.dart';
 import 'package:dream_baby/core/storage/activity_progress_cache.dart';
+import 'package:dream_baby/core/storage/profile_cache.dart';
 import 'package:dream_baby/features/home/screens/card_details.dart';
 import 'package:dream_baby/features/home/screens/four_quotients.dart';
 import 'package:dream_baby/features/rough.dart';
@@ -46,6 +47,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
 
   String todayQuestionStatus = "";
   Map<String, bool> quotientStatuses = {};
+  Map<String, int>? quotientTotals;
   int notificationCount = 0;
 
   //final ScrollController _scrollController = ScrollController();
@@ -382,6 +384,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                     } else {
                       return FourQuotients(
                         quotientStatuses: quotientStatuses,
+                        quotientTotals: quotientTotals,
                         notifyWidget: () {
                           fetchQuotientStatuses();
                           getTodaysQuestionStatus();
@@ -394,55 +397,47 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                InkWell(
-                  onTap: () {
-                    GoRouter.of(context).push(Routes.conceptionDashboard);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.50),
-                        borderRadius: BorderRadius.circular(15),
-                        gradient: LinearGradient(colors: [
-                          AppColors.primaryColor.withValues(alpha: 0.80),
-                          AppColors.pinkFFC2D1.withValues(alpha: 0.80),
-                        ])),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Column(
-                            spacing: 8,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                if (ProfileCache.pregnancyDayCount() == null) ...[
+                  InkWell(
+                    onTap: () {
+                      GoRouter.of(context).push(Routes.conceptionDashboard);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+                      decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.50),
+                          borderRadius: BorderRadius.circular(15),
+                          gradient: LinearGradient(colors: [
+                            const Color(0xffB88FEB).withValues(alpha: 0.90),
+                            const Color(0xffADBDF5).withValues(alpha: 0.80),
+                          ])),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             children: [
-                              AutoSizeText('Conception Journey',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
-                                  minFontSize: 13,
-                                  maxLines: 1),
-                              AutoSizeText(
-                                'Track your cycle & conceive faster',
-                                style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400),
-                                  minFontSize: 10,
-                              )
+                              const Text(
+                                "Conception Journey",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.mainColor,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ],
                           ),
-                        ),
-                        const Text('🌸', style: TextStyle(fontSize: 48)),
-                      ],
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: AppColors.mainColor,
+                            size: 18,
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                ],
                 InkWell(
                   onTap: () {
                     GoRouter.of(context).push(Routes.knowEntry);
@@ -493,13 +488,13 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                // AmazonLinkWidget(
-                //   height: MediaQuery.of(context).size.height,
-                //   width: MediaQuery.of(context).size.width,
-                // ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
+                AmazonLinkWidget(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
               ],
             ),
           ),
@@ -556,6 +551,12 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
       if (statuses != null) {
         quotientStatuses =
             statuses.map((key, value) => MapEntry(key, value as bool));
+            
+        final totals = data['totals'] as Map<String, dynamic>?;
+        if (totals != null) {
+          quotientTotals = totals.map((key, value) => MapEntry(key, (value as num).toInt()));
+        }
+        
         await ActivityProgressCache.saveQuotientStatuses(quotientStatuses);
 
         if (mounted) {

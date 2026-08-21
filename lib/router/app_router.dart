@@ -97,10 +97,13 @@ void initAppRouter({required String initialLocation}) {
       ),
       GoRoute(
         path: Routes.forgotPassword,
-        pageBuilder: (context, state) => adaptivePage(
-          state: state,
-          child: const ForgotPasswordScreen(),
-        ),
+        pageBuilder: (context, state) {
+          final initialPhoneNumber = state.extra as String?;
+          return adaptivePage(
+            state: state,
+            child: ForgotPasswordScreen(initialPhoneNumber: initialPhoneNumber),
+          );
+        },
       ),
       GoRoute(
         path: Routes.verifyOtp,

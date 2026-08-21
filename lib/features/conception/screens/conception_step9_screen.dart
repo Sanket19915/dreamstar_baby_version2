@@ -5,7 +5,9 @@ import 'package:dream_baby/services/conception_cycle_service.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:dream_baby/shared/helper/app_images.dart';
 import 'package:dream_baby/shared/widget/custom_button.dart';
+import 'package:dream_baby/shared/widget/custom_textfield.dart';
 import 'package:dream_baby/shared/widget/loading_overlay.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,6 +26,17 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
   int _periodDuration = 5;
   int _avgCycleLength = 28;
   bool _isLoading = false;
+  final TextEditingController _lmpController = TextEditingController();
+  final TextEditingController _periodController = TextEditingController(text: '5 days');
+  final TextEditingController _cycleController = TextEditingController(text: '28 days');
+
+  @override
+  void dispose() {
+    _lmpController.dispose();
+    _periodController.dispose();
+    _cycleController.dispose();
+    super.dispose();
+  }
 
   bool get _isValid => _lmpDate != null;
 
@@ -31,7 +44,7 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now().subtract(const Duration(days: 7)),
-      firstDate: DateTime.now().subtract(const Duration(days: 90)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
@@ -45,7 +58,130 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
         child: child!,
       ),
     );
-    if (picked != null) setState(() => _lmpDate = picked);
+    if (picked != null) {
+      setState(() {
+        _lmpDate = picked;
+        _lmpController.text = DateFormat('d MMMM yyyy').format(picked);
+      });
+    }
+  }
+
+  void _showCenteredPicker(Widget picker) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            height: 300,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: const Text('Done', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: picker,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _pickPeriodDuration() {
+    _showCenteredPicker(
+      CupertinoPicker(
+        scrollController: FixedExtentScrollController(initialItem: _periodDuration - 1),
+        itemExtent: 38.0,
+        backgroundColor: Colors.white,
+        onSelectedItemChanged: (int index) {
+          setState(() {
+            _periodDuration = index + 1;
+            _periodController.text = '$_periodDuration days';
+          });
+        },
+        children: List<Widget>.generate(15, (int index) {
+          return Center(
+            child: Text('${index + 1} days', style: const TextStyle(fontSize: 18)),
+          );
+        }),
+      ),
+    );
+  }
+
+  void _pickAvgCycleLength() {
+    int initialItem = 0;
+    if (_avgCycleLength < 20) {
+      initialItem = 0;
+    } else if (_avgCycleLength > 40) {
+      initialItem = 22;
+    } else {
+      initialItem = _avgCycleLength - 19;
+    }
+
+    _showCenteredPicker(
+      CupertinoPicker(
+        scrollController: FixedExtentScrollController(initialItem: initialItem),
+        itemExtent: 38.0,
+        backgroundColor: Colors.white,
+        onSelectedItemChanged: (int index) {
+          setState(() {
+            if (index == 0) {
+              _avgCycleLength = 19;
+              _cycleController.text = 'Below 20 days';
+            } else if (index == 22) {
+              _avgCycleLength = 41;
+              _cycleController.text = 'Above 40 days';
+            } else {
+              _avgCycleLength = index + 19;
+              _cycleController.text = '$_avgCycleLength days';
+            }
+          });
+        },
+        children: List<Widget>.generate(23, (int index) {
+          String text;
+          if (index == 0) {
+            text = 'Below 20 days';
+          } else if (index == 22) {
+            text = 'Above 40 days';
+          } else {
+            text = '${index + 19} days';
+          }
+          return Center(
+            child: Text(text, style: const TextStyle(fontSize: 18)),
+          );
+        }),
+      ),
+    );
   }
 
   Future<void> _submit() async {
@@ -63,6 +199,12 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
       final currentProfile = ProfileCache.read() ?? {};
       currentProfile['journey_type'] = 'conception';
       await ProfileCache.save(currentProfile);
+      
+      if (_avgCycleLength >= 40 || _avgCycleLength < 20) {
+        await ProfileCache.setHasIrregularCycle(true);
+      } else {
+        await ProfileCache.setHasIrregularCycle(false);
+      }
       if (!mounted) return;
       context.go(Routes.home);
     } else {
@@ -117,9 +259,8 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                           decoration: BoxDecoration(
-                            color: AppColors.whiteColor.withValues(alpha: 0.85),
+                            color: Colors.transparent,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.primaryColor.withValues(alpha: 0.1)),
                           ),
                           child: Row(
                             children: [
@@ -151,16 +292,8 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: AppColors.whiteColor.withValues(alpha: 0.95),
+                            color: Colors.transparent,
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: AppColors.primaryColor.withValues(alpha: 0.15), width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primaryColor.withValues(alpha: 0.08),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              )
-                            ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,118 +301,66 @@ class _ConceptionStep9ScreenState extends State<ConceptionStep9Screen> {
                         // Q1
                         _buildSectionLabel('1. When was your last period?'),
                         const SizedBox(height: 8),
-                        GestureDetector(
+                        CustomTextField(
+                          label: null,
+                          onChanged: (_) {},
+                          controller: _lmpController,
+                          borderColor: Colors.transparent,
+                          backGroundColor: Colors.white.withValues(alpha: 0.9),
+                          hintText: 'Tap to select date',
+                          readOnly: true,
                           onTap: _pickLmpDate,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            decoration: BoxDecoration(
-                              color: AppColors.whiteColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _lmpDate != null
-                                    ? AppColors.primaryColor
-                                    : AppColors.secondaryTextColor.withValues(alpha: 0.4),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.calendar_month_rounded,
-                                  color: _lmpDate != null
-                                      ? AppColors.primaryColor
-                                      : AppColors.secondaryTextColor,
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  _lmpDate != null
-                                      ? DateFormat('d MMMM yyyy').format(_lmpDate!)
-                                      : 'Tap to select date',
-                                  style: GoogleFonts.poppins(
-                                    color: _lmpDate != null
-                                        ? AppColors.primaryTextColor
-                                        : AppColors.secondaryTextColor,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
+                          suffix: const Padding(
+                            padding: EdgeInsets.only(right: 12.0),
+                            child: Icon(
+                              Icons.calendar_today_outlined,
+                              color: AppColors.mainColor,
                             ),
                           ),
                         ),
                         const SizedBox(height: 28),
                         // Q2
                         _buildSectionLabel('2. How long does your period last?'),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$_periodDuration days',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.primaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
+                        const SizedBox(height: 8),
+                        CustomTextField(
+                          label: null,
+                          onChanged: (_) {},
+                          controller: _periodController,
+                          borderColor: Colors.transparent,
+                          backGroundColor: Colors.white.withValues(alpha: 0.9),
+                          readOnly: true,
+                          onTap: _pickPeriodDuration,
+                          suffix: const Padding(
+                            padding: EdgeInsets.only(right: 12.0),
+                            child: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: AppColors.mainColor,
+                            ),
                           ),
-                        ),
-                        SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            activeTrackColor: AppColors.primaryColor,
-                            thumbColor: AppColors.primaryColor,
-                            inactiveTrackColor: AppColors.pinkFFC2D1,
-                            overlayColor: AppColors.primaryColor.withValues(alpha: 0.15),
-                          ),
-                          child: Slider(
-                            value: _periodDuration.toDouble(),
-                            min: 1,
-                            max: 15,
-                            divisions: 14,
-                            label: '$_periodDuration days',
-                            onChanged: (v) =>
-                                setState(() => _periodDuration = v.toInt()),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('1 day', style: GoogleFonts.poppins(color: AppColors.secondaryTextColor, fontSize: 12)),
-                            Text('15 days', style: GoogleFonts.poppins(color: AppColors.secondaryTextColor, fontSize: 12)),
-                          ],
                         ),
                         const SizedBox(height: 28),
                         // Q3
                         _buildSectionLabel('3. What is your average cycle length?'),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$_avgCycleLength days',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.primaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
+                        const SizedBox(height: 8),
+                        CustomTextField(
+                          label: null,
+                          onChanged: (_) {},
+                          controller: _cycleController,
+                          borderColor: Colors.transparent,
+                          backGroundColor: Colors.white.withValues(alpha: 0.9),
+                          readOnly: true,
+                          onTap: _pickAvgCycleLength,
+                          suffix: const Padding(
+                            padding: EdgeInsets.only(right: 12.0),
+                            child: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: AppColors.mainColor,
+                            ),
                           ),
                         ),
-                        SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            activeTrackColor: AppColors.primaryColor,
-                            thumbColor: AppColors.primaryColor,
-                            inactiveTrackColor: AppColors.pinkFFC2D1,
-                            overlayColor: AppColors.primaryColor.withValues(alpha: 0.15),
-                          ),
-                          child: Slider(
-                            value: _avgCycleLength.toDouble(),
-                            min: 21,
-                            max: 45,
-                            divisions: 24,
-                            label: '$_avgCycleLength days',
-                            onChanged: (v) =>
-                                setState(() => _avgCycleLength = v.toInt()),
-                          ),
-                        ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('21 days', style: GoogleFonts.poppins(color: AppColors.secondaryTextColor, fontSize: 12)),
-                                  Text('45 days', style: GoogleFonts.poppins(color: AppColors.secondaryTextColor, fontSize: 12)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                      ],
+                    ),
+                  ),
                         const SizedBox(height: 36),
                         CustomButton(
                           text: 'Continue',

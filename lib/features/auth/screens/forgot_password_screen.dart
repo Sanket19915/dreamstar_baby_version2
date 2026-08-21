@@ -4,6 +4,7 @@ import 'package:dream_baby/router/routes.dart';
 import 'package:dream_baby/shared/widget/auth_back_button.dart';
 import 'package:dream_baby/shared/widget/loading_overlay.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -18,14 +19,27 @@ import '../../../viewmodels/login_viewmodel.dart';
 import '../bloc/form_validate.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  final String? initialPhoneNumber;
+  const ForgotPasswordScreen({super.key, this.initialPhoneNumber});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController txtPhone = TextEditingController();
+  late final TextEditingController txtPhone;
+
+  @override
+  void initState() {
+    super.initState();
+    txtPhone = TextEditingController(text: widget.initialPhoneNumber ?? '');
+  }
+
+  @override
+  void dispose() {
+    txtPhone.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +126,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 autoFocus: true,
                                 borderColor: AppColors.secondaryTextColor,
                                 inputType: CustomTextInputType.number,
+                                prefixText: '+91 ',
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(10),
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
                                 scrollPhysics:
                                     const AlwaysScrollableScrollPhysics(),
                                 onChanged: (value) {

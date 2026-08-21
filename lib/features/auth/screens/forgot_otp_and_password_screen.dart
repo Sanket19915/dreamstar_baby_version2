@@ -117,7 +117,7 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: const BoxDecoration(
-                          color: AppColors.whiteColor, borderRadius: BorderRadius.all(Radius.circular(12))),
+                          color: Colors.transparent, borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -130,18 +130,74 @@ class _ForgotOtpAndPasswordScreenState extends State<ForgotOtpAndPasswordScreen>
                             ),
                           ),
                           const SizedBox(height: 16),
-                          CustomTextField(
-                            label: 'OTP',
-                            onChanged: (p0) {
-                              buttonNotifier.value = p0;
-                            },
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Enter 6-digit OTP',
-                            controller: otpController,
-                            textInputAction: TextInputAction.next,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.number,
+                          const Text(
+                            'OTP',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.blackColor,
+                            ),
                           ),
+                          const SizedBox(height: 8),
+                          ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: otpController,
+                            builder: (context, value, child) {
+                              String text = value.text;
+                              return Stack(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(6, (index) {
+                                      String digit = '';
+                                      if (text.length > index) {
+                                        digit = text[index];
+                                      }
+                                      bool isActive = text.length == index;
+                                      return Container(
+                                        width: 45,
+                                        height: 55,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: isActive ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: 0.5),
+                                            width: isActive ? 2 : 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: AppColors.whiteColor,
+                                        ),
+                                        child: Text(
+                                          digit,
+                                          style: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.mainColor),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  Positioned.fill(
+                                    child: Opacity(
+                                      opacity: 0.0,
+                                      child: TextField(
+                                        controller: otpController,
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 6,
+                                        autofocus: true,
+                                        onChanged: (val) {
+                                          buttonNotifier.value = val;
+                                        },
+                                        decoration: const InputDecoration(
+                                          counterText: "",
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
                           Align(
                             alignment: Alignment.centerRight,
                             child: RichText(

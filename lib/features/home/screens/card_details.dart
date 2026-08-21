@@ -214,12 +214,32 @@ class _BabyCardState extends State<BabyCard> {
                     const SizedBox(
                       width: 10,
                     ),
-                    Text(
-                      _greetingText(),
-                      style: GoogleFonts.lobsterTwo(
-                          color: AppColors.blackColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _greetingText(),
+                          style: GoogleFonts.lobsterTwo(
+                              color: AppColors.blackColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Pregnancy Journey',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.primaryColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 ),
@@ -440,6 +460,12 @@ class _BabyCardState extends State<BabyCard> {
                                               : Image.network(
                                                   ApiConfig.storageUrl(images),
                                                   height: 40,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return Image.asset(
+                                                      AppImages.bellPepper,
+                                                      height: 40,
+                                                    );
+                                                  },
                                                 ),
                                         ),
                                         const SizedBox(

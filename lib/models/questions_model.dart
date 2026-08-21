@@ -14,10 +14,12 @@ String questionsModelToJson(QuestionsModel data) => json.encode(data.toJson());
 class QuestionsModel {
   Questions? questions;
   List<dynamic> flaggedQuestions;
+  int totalConfigured;
 
   QuestionsModel({
     this.questions,
     this.flaggedQuestions = const [],
+    this.totalConfigured = 0,
   });
 
   factory QuestionsModel.fromJson(Map<String, dynamic> json) => QuestionsModel(
@@ -26,11 +28,13 @@ class QuestionsModel {
                 (json["flagged_questions"] == []))
             ? []
             : List<dynamic>.from(json["flagged_questions"].map((x) => x)),
+        totalConfigured: json["total_configured"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
         "questions": questions?.toJson(),
         "flagged_questions": List<dynamic>.from(flaggedQuestions.map((x) => x)),
+        "total_configured": totalConfigured,
       };
 }
 
@@ -160,7 +164,7 @@ class Datum {
         quotient: json["quotient"] ?? "",
         intelligenceType: json["intelligence_type"] ?? "",
         week: json["week"] ?? "",
-        day: json["day"] ?? "",
+        day: json["day"]?.toString() ?? "",
         questionType: json["question_type"] ?? "",
         questionCode: json["question_code"] ?? "",
         questionText: json["question_text"] ?? "",
@@ -172,9 +176,11 @@ class Datum {
         mainAudio: json["main_audio"],
         mainAudio2: json["main_audio2"],
         youtubeLink: json["youtube_link"] ?? "",
-        options: (json["options"] == null && json["options"] == [])
+        options: (json["options"] == null || json["options"] == [])
             ? []
-            : (optionsModelFromJson(json["options"]).toList() ?? []),
+            : (json["options"] is String
+                ? optionsModelFromJson(json["options"]).toList()
+                : (json["options"] as List).map((x) => x == null || x is! Map<String, dynamic> ? OptionsModel() : OptionsModel.fromJson(Map<String, dynamic>.from(x))).toList()),
         correctAnswer: json["correct_answer"] is String
             ? jsonDecode(json["correct_answer"])
             : (json["correct_answer"] as List<dynamic>? ?? []),

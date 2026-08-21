@@ -13,9 +13,10 @@ import 'package:http/http.dart' as http;
 
 class FourQuotients extends StatefulWidget {
   final Map<String, bool> quotientStatuses;
+  final Map<String, int>? quotientTotals;
   final void Function() notifyWidget;
   const FourQuotients(
-      {super.key, required this.notifyWidget, required this.quotientStatuses});
+      {super.key, required this.notifyWidget, required this.quotientStatuses, this.quotientTotals});
 
   @override
   State<FourQuotients> createState() => _FourQuotientsState();
@@ -36,6 +37,7 @@ class _FourQuotientsState extends State<FourQuotients> {
 
   Map<String, bool> quotientStatuses = {};
   bool allQuotientStatuses = false;
+  bool hasNoActivities = false;
 
   @override
   void initState() {
@@ -48,6 +50,10 @@ class _FourQuotientsState extends State<FourQuotients> {
     if (quotientStatusesList.isNotEmpty) {
       allQuotientStatuses =
           quotientStatusesList.every((element) => element == true);
+    }
+    
+    if (widget.quotientTotals != null && widget.quotientTotals!.isNotEmpty) {
+      hasNoActivities = widget.quotientTotals!.entries.every((e) => e.value == 0);
     }
   }
 
@@ -91,7 +97,29 @@ class _FourQuotientsState extends State<FourQuotients> {
       height: (width > 450) ? 550 : 390,
       child: Column(
         children: [
-          if (allQuotientStatuses)
+          if (hasNoActivities)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+              decoration: const BoxDecoration(
+                color: AppColors.mainColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20),
+                ),
+              ),
+              child: Center(
+                child: AutoSizeText(
+                  'No questions are available for today.',
+                  style: GoogleFonts.poppins(
+                      color: AppColors.whiteColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                  minFontSize: 13,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            )
+          else if (allQuotientStatuses)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
               decoration: const BoxDecoration(

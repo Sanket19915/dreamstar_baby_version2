@@ -92,7 +92,7 @@ class _KnowEntryState extends State<KnowEntry> {
                     ),
                     const SizedBox(height: 15),
                     LayoutBuilder(
-                      builder: (context, constraints) {
+                      builder: (layoutContext, constraints) {
                         final isTablet = constraints.maxWidth > 450;
                         return Column(
                           children: List.generate(
@@ -116,7 +116,7 @@ class _KnowEntryState extends State<KnowEntry> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
+                                            builder: (ctx) =>
                                                 PDFViewerScreen(
                                               pdfPath: pdfPath,
                                               week: week,
@@ -134,21 +134,25 @@ class _KnowEntryState extends State<KnowEntry> {
                                       Fluttertoast.showToast(msg: e.toString());
                                     }
                                   },
-                                  child: Container(
-                                    height: isTablet ? 250 : height * 0.13,
-                                    width: width,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          ApiConfig.storageUrl(
-                                            knowEntry[index].backgroundImage,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(
+                                      ApiConfig.storageUrl(
+                                        knowEntry[index].backgroundImage,
+                                      ),
+                                      height: isTablet ? 250 : height * 0.13,
+                                      width: width,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (errContext, error, stackTrace) {
+                                        return Container(
+                                          height: isTablet ? 250 : height * 0.13,
+                                          width: width,
+                                          color: Colors.grey.shade300,
+                                          child: const Center(
+                                            child: Icon(Icons.image_not_supported, color: Colors.grey),
                                           ),
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(15),
-                                      ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ),
@@ -254,6 +258,9 @@ class _KnowEntryState extends State<KnowEntry> {
     try {
       var data =
           await http.get(Uri.parse(ApiConfig.storageUrl(filePath)));
+      if (data.statusCode != 200) {
+        throw Exception("Failed to load PDF (HTTP ${data.statusCode})");
+      }
       var bytes = data.bodyBytes;
       var dir = await getApplicationDocumentsDirectory();
       String? newFileName = filePath?.split("/").last;
@@ -262,7 +269,7 @@ class _KnowEntryState extends State<KnowEntry> {
       File urlFile = await file.writeAsBytes(bytes);
       return urlFile.path;
     } catch (e) {
-      throw Exception("Error opening url file");
+      throw Exception("Error opening url file: $e");
     }
   }
 
