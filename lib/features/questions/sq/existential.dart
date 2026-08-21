@@ -43,6 +43,7 @@ class ExistentialScreen extends StatefulWidget {
 
 class _ExistentialScreenState extends State<ExistentialScreen> {
   final ScrollController _scrollController = ScrollController();
+  final Stopwatch _stopwatch = Stopwatch();
   bool _isAppBarTransparent = true;
   bool isQuestionExpanded = false;
   VideoPlayerController? _controller;
@@ -63,6 +64,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
   @override
   void initState() {
     super.initState();
+    _stopwatch.start();
     if (widget.from.contains('Conception')) {
       quotients = [
         "Atma Conception",
@@ -201,8 +203,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor:
-            _isAppBarTransparent ? AppColors.whiteColor : AppColors.whiteColor,
+        elevation: 0,
+        backgroundColor: AppColors.whiteColor.withOpacity(0.95),
         leading: InkWell(
           onTap: () {
             context.pop();
@@ -216,7 +218,13 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         centerTitle: true,
         title: Text(
           widget.from.contains('Conception')
-              ? widget.from
+              ? (widget.from == 'Atma Conception'
+                  ? 'Spiritual Upliftment'
+                  : widget.from == 'Sharir Conception'
+                      ? 'Physical Detoxification'
+                      : widget.from == 'Bhav Conception'
+                          ? 'Emotional Cleansing'
+                          : 'Mental Purification')
               : 'Brain Development Activity',
           style: GoogleFonts.poppins(
             color: AppColors.blackColor,
@@ -253,7 +261,7 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                                   : widget.from == "Musical"
                                                       ? "assets/images/MUSICAL.webp"
                                                       : widget.from.contains('Conception')
-                                                          ? AppImages.loginbg
+                                                          ? AppImages.bg
                                                           : AppImages.sq),
                   colorFilter: ColorFilter.mode(
                     Colors.white.withValues(alpha: 0.6),
@@ -302,9 +310,14 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               ),
                             ),
                           const SizedBox(height: 20),
-                          const Center(
+                          Center(
                             child: Text(
-                                "Congratulations! All activities to be taken up today for this intelligence have been completed."),
+                                (questionsModel?.totalConfigured ?? 0) == 0
+                                    ? "No questions are available for today."
+                                    : "Congratulations! All activities to be taken up today for this intelligence have been completed.",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 16),
+                            ),
                           )
                         ],
                       );
@@ -314,6 +327,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                       itemCount: questionsModel?.questions?.data.length ?? 0,
                       controller: controller,
                       onPageChanged: (page) {
+                        _stopwatch.reset();
+                        _stopwatch.start();
                         setState(() {
                           _selectedIndex = page;
                         });
@@ -328,6 +343,126 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               const SizedBox(height: 20),
                               LayoutBuilder(builder: (context, constraints) {
                                 bool isTablet = constraints.maxWidth > 450;
+                                if (widget.from.contains('Conception')) {
+                                  String upliftmentText = 'SPIRITUAL\nUPLIFTMENT';
+                                  Color bgColor = const Color(0xFFE6D6EB);
+                                  String iconPath = AppImages.atmaConception;
+                                  
+                                  if (widget.from == 'Sharir Conception') {
+                                    upliftmentText = 'PHYSICAL\nDETOXIFICATION';
+                                    bgColor = const Color(0xFFE2F0DD);
+                                    iconPath = AppImages.sharirConception;
+                                  } else if (widget.from == 'Bhav Conception') {
+                                    upliftmentText = 'EMOTIONAL\nCLEANSING';
+                                    bgColor = const Color(0xFFF9DDD6);
+                                    iconPath = AppImages.bhavConception;
+                                  } else if (widget.from == 'Mann Conception') {
+                                    upliftmentText = 'MENTAL\nPURIFICATION';
+                                    bgColor = const Color(0xFFFAECD4);
+                                    iconPath = AppImages.mannConception;
+                                  }
+
+                                  String currentIntelligenceType = widget.from;
+                                  if (questionsModel != null && 
+                                      questionsModel!.questions != null && 
+                                      questionsModel!.questions!.data.isNotEmpty && 
+                                      position < questionsModel!.questions!.data.length) {
+                                      
+                                      String? qText = questionsModel!.questions!.data[position].questionText;
+                                      String? qDesc = questionsModel!.questions!.data[position].questionDescription;
+                                      String combined = "${(qText ?? '').toLowerCase()} ${(qDesc ?? '').toLowerCase()}";
+                                      
+                                      if (widget.from == 'Atma Conception') {
+                                        if (combined.contains('seva')) currentIntelligenceType = 'Seva';
+                                        else if (combined.contains('sankirtan')) currentIntelligenceType = 'Sankirtan';
+                                        else if (combined.contains('swadhyay')) currentIntelligenceType = 'Swadhyay';
+                                        else if (combined.contains('sadhna') || combined.contains('sadhana')) currentIntelligenceType = 'Sadhana';
+                                        else {
+                                          List<String> t = ['Seva', 'Sankirtan', 'Swadhyay', 'Sadhana'];
+                                          currentIntelligenceType = t[((int.tryParse(questionsModel!.questions!.data[position].day) ?? 1) - 1) % t.length];
+                                        }
+                                      } else if (widget.from == 'Sharir Conception') {
+                                        if (combined.contains('ahaar')) currentIntelligenceType = 'Ahaar';
+                                        else if (combined.contains('vihar')) currentIntelligenceType = 'Vihar';
+                                        else if (combined.contains('vichar')) currentIntelligenceType = 'Vichar';
+                                        else if (combined.contains('vyavahar')) currentIntelligenceType = 'Vyavahar';
+                                        else if (combined.contains('nidra') || combined.contains('sleep')) currentIntelligenceType = 'Nidra';
+                                        else {
+                                          List<String> t = ['Ahaar', 'Vihar', 'Vichar', 'Vyavahar', 'Nidra', 'Brahmacharya', 'Sanyam', 'Vatavaran'];
+                                          currentIntelligenceType = t[((int.tryParse(questionsModel!.questions!.data[position].day) ?? 1) - 1) % t.length];
+                                        }
+                                      } else if (widget.from == 'Bhav Conception') {
+                                        if (combined.contains('kritagyata') || combined.contains('gratitude')) currentIntelligenceType = 'Gratitude';
+                                        else if (combined.contains('kshama') || combined.contains('forgiveness')) currentIntelligenceType = 'Forgiveness';
+                                        else if (combined.contains('karuna') || combined.contains('compassion')) currentIntelligenceType = 'Compassion';
+                                        else {
+                                          List<String> t = ['Gratitude', 'Forgiveness', 'Compassion'];
+                                          currentIntelligenceType = t[((int.tryParse(questionsModel!.questions!.data[position].day) ?? 1) - 1) % t.length];
+                                        }
+                                      } else if (widget.from == 'Mann Conception') {
+                                        if (combined.contains('sankalp') || combined.contains('affirmation')) currentIntelligenceType = 'Affirmation';
+                                        else if (combined.contains('dhyan') || combined.contains('meditation')) currentIntelligenceType = 'Meditation';
+                                        else if (combined.contains('kalpanik') || combined.contains('visualisation')) currentIntelligenceType = 'Visualisation';
+                                        else {
+                                          List<String> t = ['Affirmation', 'Meditation', 'Visualisation'];
+                                          currentIntelligenceType = t[((int.tryParse(questionsModel!.questions!.data[position].day) ?? 1) - 1) % t.length];
+                                        }
+                                      }
+                                  }
+
+                                  return Container(
+                                    width: devicewidth,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: const Color(0xFFEEEEEE)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.03),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: devicewidth * 0.35,
+                                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Image.asset(
+                                                iconPath,
+                                                height: 75,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 20),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                currentIntelligenceType,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                                
                                 return Container(
                                   height: isTablet ? 250 : deviceheight * 0.173,
                                   width: devicewidth,
@@ -1183,22 +1318,24 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
       };
       final bool isConception = widget.from.contains('Conception');
 
-      var request =
-          http.Request('GET', Uri.parse(ApiConfig.questions));
-
-      final Map<String, dynamic> bodyData = {};
-
-      bodyData["intelligence_type"] = widget.from;
-      bodyData["question_type"] = "";
+      final Map<String, String> queryParams = {};
+      queryParams["intelligence_type"] = widget.from;
+      queryParams["question_type"] = "";
 
       if (isConception) {
-        bodyData["quotient"] = widget.from;
+        final conceptionQuotientMap = {
+          'Atma Conception': 'Spiritual',
+          'Sharir Conception': 'Physical',
+          'Bhav Conception': 'Emotional',
+          'Mann Conception': 'Mental',
+        };
+        queryParams["quotient"] = conceptionQuotientMap[widget.from] ?? widget.from;
         
         if (widget.cycleDay != null) {
-          bodyData["day"] = widget.cycleDay;
+          queryParams["day"] = widget.cycleDay.toString();
         }
       } else {
-        bodyData["quotient"] = widget.from == "Kinesthetic"
+        queryParams["quotient"] = widget.from == "Kinesthetic"
             ? "Physical"
             : widget.from == "Interpersonal"
                 ? "Emotional"
@@ -1217,21 +1354,26 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                                         : "Spiritual";
       }
       
-      request.body = json.encode(bodyData);
+      var uri = Uri.parse(ApiConfig.questions);
+      final newUri = uri.replace(queryParameters: queryParams);
+      
+      var request = http.Request('GET', newUri);
       request.headers.addAll(headers);
-      print(widget.from);
+      print('🔍 CONCEPTION URL: ${newUri.toString()}');
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
+        print('🔍 CONCEPTION RESPONSE: $responseData');
 
         questionsModel = questionsModelFromJson(responseData);
+        print('🔍 QUESTIONS COUNT: ${questionsModel?.questions?.data.length}');
         _restoreMcqSelection(_selectedIndex);
         await _loadVideoForIndex(_selectedIndex);
         setState(() {});
         await Future.delayed(const Duration(milliseconds: 500));
       } else {
-        print(response.reasonPhrase);
+        print('🔍 ERROR ${response.statusCode}: ${response.reasonPhrase}');
       }
       if (mounted) {
         setState(() {
@@ -1269,8 +1411,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
       var request = http.MultipartRequest(
           'POST', Uri.parse(ApiConfig.userAnswer));
-      request.fields.addAll(
-          {'question_id': questionId, "is_flagged": '1', "is_skipped": '0'});
+      request.fields.addAll({
+          'question_id': questionId, 
+          "is_flagged": '1', 
+          "is_skipped": '0',
+          "time_spent_seconds": _stopwatch.elapsed.inSeconds.toString()
+      });
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1316,8 +1462,12 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
       var request = http.MultipartRequest(
           'POST', Uri.parse(ApiConfig.userAnswer));
-      request.fields.addAll(
-          {'question_id': questionId, "is_flagged": '0', "is_skipped": '1'});
+      request.fields.addAll({
+          'question_id': questionId, 
+          "is_flagged": '0', 
+          "is_skipped": '1',
+          "time_spent_seconds": _stopwatch.elapsed.inSeconds.toString()
+      });
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
@@ -1654,7 +1804,8 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
         'question_id': questionId ?? "",
         "answer": answer ?? "",
         "is_flagged": '0',
-        "is_skipped": '0'
+        "is_skipped": '0',
+        "time_spent_seconds": _stopwatch.elapsed.inSeconds.toString()
       });
       request.headers.addAll(headers);
 

@@ -435,42 +435,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 10),
 
-                    Container(
-                      padding: const EdgeInsets.only(left: 5),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'EDD or LMP',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.blackColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
+                    if (widget.userProfile['journey_type']?.toString().toLowerCase() != 'conception') ...[
+                      Container(
+                        padding: const EdgeInsets.only(left: 5),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'EDD or LMP',
+                          style: GoogleFonts.poppins(
+                            color: AppColors.blackColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
-                    ),
-                    CustomTextField(
-                      autoValidate: AutovalidateMode.disabled,
-                      hintText: 'EDD or LMP',
-                      onTap: _hasEddOrLmp
-                          ? null
-                          : () {
-                              _selectDate(context);
-                            },
-
-                      controller: eddController,
-                      // readOnly: !_hasEddOrLmp,
-                      backGroundColor: _hasEddOrLmp ? AppColors.greyTextColor : null,
-                      borderColor: AppColors.secondaryTextColor,
-                      inputType: CustomTextInputType.text,
-                    ),
-                    const SizedBox(height: 6),
-                    if (_hasEddOrLmp)
-                      Text(
-                        'Please reach out to Admin to change the Dates here!',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w500),
+                      CustomTextField(
+                        autoValidate: AutovalidateMode.disabled,
+                        hintText: 'EDD or LMP',
+                        onTap: _hasEddOrLmp
+                            ? null
+                            : () {
+                                _selectDate(context);
+                              },
+                        controller: eddController,
+                        backGroundColor: _hasEddOrLmp ? AppColors.greyTextColor : null,
+                        borderColor: AppColors.secondaryTextColor,
+                        inputType: CustomTextInputType.text,
                       ),
+                      const SizedBox(height: 6),
+                      if (_hasEddOrLmp)
+                        Text(
+                          'Please reach out to Admin to change the Dates here!',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w500),
+                        ),
+                    ],
 
                     const SizedBox(height: 15),
                     // CustomTextField(

@@ -48,7 +48,7 @@ class ApiClient {
   }) async {
     final headers =
         authenticated ? await _authHeaders() : Map<String, String>.from(_defaultHeaders);
-    final response = await http.get(Uri.parse(url), headers: headers);
+    final response = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 15));
     final body = _decodeBody(response.body);
     _throwIfFailed(response.statusCode, body);
     return body;
@@ -65,7 +65,7 @@ class ApiClient {
       Uri.parse(url),
       headers: headers,
       body: fields,
-    );
+    ).timeout(const Duration(seconds: 15));
     final body = _decodeBody(response.body);
     _throwIfFailed(response.statusCode, body);
     return body;
@@ -85,7 +85,7 @@ class ApiClient {
         authenticated ? await _authHeaders() : Map<String, String>.from(_defaultHeaders);
     request.headers.addAll(headers);
 
-    final streamed = await request.send();
+    final streamed = await request.send().timeout(const Duration(seconds: 15));
     final response = await http.Response.fromStream(streamed);
     final body = _decodeBody(response.body);
     _throwIfFailed(response.statusCode, body);
@@ -99,7 +99,7 @@ class ApiClient {
     final headers = authenticated
         ? await _authHeaders()
         : Map<String, String>.from(_defaultHeaders);
-    final response = await http.delete(Uri.parse(url), headers: headers);
+    final response = await http.delete(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 15));
     final body = _decodeBody(response.body);
     _throwIfFailed(response.statusCode, body);
     return body;
@@ -117,7 +117,7 @@ class ApiClient {
       Uri.parse(url),
       headers: headers,
       body: fields,
-    );
+    ).timeout(const Duration(seconds: 15));
     return (statusCode: response.statusCode, body: _decodeBody(response.body));
   }
 }

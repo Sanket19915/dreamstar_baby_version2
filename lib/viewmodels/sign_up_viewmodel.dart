@@ -13,6 +13,7 @@ class PendingRegistration {
   final String password;
   final String confirmPassword;
   final String? profileImagePath;
+  final String? dob;
 
   const PendingRegistration({
     required this.firstName,
@@ -22,6 +23,7 @@ class PendingRegistration {
     required this.password,
     required this.confirmPassword,
     this.profileImagePath,
+    this.dob,
   });
 }
 
@@ -61,6 +63,7 @@ class SignUpViewModel with ChangeNotifier {
             confirmPassword: pending.confirmPassword,
             profileImage: pending.profileImagePath!,
             userId: userId,
+            dob: pending.dob,
           )
         : await signUpWithoutProfile(
             firstName: pending.firstName,
@@ -70,6 +73,7 @@ class SignUpViewModel with ChangeNotifier {
             password: pending.password,
             confirmPassword: pending.confirmPassword,
             userId: userId,
+            dob: pending.dob,
           );
 
     if (result.isSuccess) {
@@ -87,6 +91,7 @@ class SignUpViewModel with ChangeNotifier {
     required String confirmPassword,
     required String profileImage,
     required String userId,
+    String? dob,
   }) async {
     _loading = true;
     notifyListeners();
@@ -101,6 +106,7 @@ class SignUpViewModel with ChangeNotifier {
           'password': password,
           'confirm_password': confirmPassword,
           'user_id': userId,
+          if (dob != null) 'dob': dob,
         },
         files: [
           await http.MultipartFile.fromPath('profile_pic', profileImage),
@@ -131,6 +137,7 @@ class SignUpViewModel with ChangeNotifier {
     required String password,
     required String confirmPassword,
     required String userId,
+    String? dob,
   }) async {
     _loading = true;
     notifyListeners();
@@ -145,6 +152,7 @@ class SignUpViewModel with ChangeNotifier {
           'password': password,
           'confirm_password': confirmPassword,
           'user_id': userId,
+          if (dob != null) 'dob': dob,
         },
       );
       return ApiResult.success(body);

@@ -20,6 +20,16 @@ class ProfileCache {
     await Hive.box<String>(_boxName).put(_profileKey, jsonEncode(profile));
   }
 
+  static Future<void> setHasIrregularCycle(bool value) async {
+    await init();
+    await Hive.box<String>(_boxName).put('has_irregular_cycle', value.toString());
+  }
+
+  static bool hasIrregularCycle() {
+    if (!Hive.isBoxOpen(_boxName)) return false;
+    return Hive.box<String>(_boxName).get('has_irregular_cycle') == 'true';
+  }
+
   static Map<String, dynamic>? read() {
     if (!Hive.isBoxOpen(_boxName)) return null;
     final raw = Hive.box<String>(_boxName).get(_profileKey);

@@ -17,6 +17,7 @@ import 'package:dream_baby/viewmodels/login_viewmodel.dart';
 import 'package:dream_baby/viewmodels/sign_up_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
   LoginViewModel get viewModel =>
       Provider.of<LoginViewModel>(context, listen: false);
   SignUpViewModel get signUpViewModel =>
@@ -47,6 +49,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailKey = GlobalKey<CustomTextFieldState>();
   final _passwordKey = GlobalKey<CustomTextFieldState>();
   final _confirmPasswordKey = GlobalKey<CustomTextFieldState>();
+  final _dobKey = GlobalKey<CustomTextFieldState>();
 
   bool _firstNameValid = false;
   bool _lastNameValid = false;
@@ -54,6 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _emailValid = false;
   bool _passwordValid = false;
   bool _confirmPasswordValid = false;
+  bool _dobValid = false;
 
   bool get isFormValid =>
       _firstNameValid &&
@@ -61,7 +65,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _phoneValid &&
       _emailValid &&
       _passwordValid &&
-      _confirmPasswordValid;
+      _confirmPasswordValid &&
+      _dobValid;
 
   String? firstNameValidator(String? value, BuildContext? context) {
     return (value ?? '').trim().isNotEmpty ? null : 'First name is required';
@@ -93,13 +98,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return value == passwordController.text ? null : 'Passwords do not match';
   }
 
+  String? dobValidator(String? value, BuildContext? context) {
+    return (value ?? '').trim().isNotEmpty ? null : 'Date of Birth is required';
+  }
+
   bool _validateAllFields() {
     return _firstNameKey.currentState!.validate() &&
         _lastNameKey.currentState!.validate() &&
         _phoneKey.currentState!.validate() &&
         _emailKey.currentState!.validate() &&
         _passwordKey.currentState!.validate() &&
-        _confirmPasswordKey.currentState!.validate();
+        _confirmPasswordKey.currentState!.validate() &&
+        _dobKey.currentState!.validate();
+  }
+
+  Future<void> _pickDob() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000, 1, 1),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      final y = pickedDate.year.toString().padLeft(4, '0');
+      final m = pickedDate.month.toString().padLeft(2, '0');
+      final d = pickedDate.day.toString().padLeft(2, '0');
+      dobController.text = '$y-$m-$d';
+      setState(() => _dobValid = true);
+    }
   }
 
   Future<void> _pickImage() async {
@@ -133,6 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: passwordController.text,
           confirmPassword: confirmPasswordController.text,
           profileImagePath: _profileImage?.path,
+          dob: dobController.text,
         ),
       );
       context.push(
@@ -283,6 +310,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         textInputAction: TextInputAction.next,
                                         borderColor: AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.number,
+                                        prefixText: '+91 ',
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(10),
+                                          FilteringTextInputFormatter.digitsOnly,
+                                        ],
                                         validator: phoneValidator,
                                         onValidChanged: (v) =>
                                             setState(() => _phoneValid = v),
@@ -301,6 +333,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         validator: emailValidator,
                                         onValidChanged: (v) =>
                                             setState(() => _emailValid = v),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomTextField(
+                                        key: _dobKey,
+                                        label: 'Date of Birth',
+                                        autoValidate:
+                                            AutovalidateMode.onUserInteraction,
+                                        hintText: 'Select date of birth',
+                                        controller: dobController,
+                                        readOnly: true,
+                                        borderColor: AppColors.secondaryTextColor,
+                                        validator: dobValidator,
+                                        onValidChanged: (v) =>
+                                            setState(() => _dobValid = v),
+                                        suffix: InkWell(
+                                          onTap: _pickDob,
+                                          child: const Padding(
+                                            padding: EdgeInsets.only(right: 12.0),
+                                            child: Icon(
+                                              Icons.calendar_today_outlined,
+                                              color: AppColors.mainColor,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(height: 12),
                                       CustomTextField(

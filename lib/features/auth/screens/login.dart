@@ -11,6 +11,7 @@ import 'package:dream_baby/shared/widget/loading_overlay.dart';
 import 'package:dream_baby/viewmodels/login_viewmodel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -137,6 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             autoFocus: true,
                             borderColor: AppColors.secondaryTextColor,
                             inputType: CustomTextInputType.number,
+                            prefixText: '+91 ',
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(10),
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                             scrollPhysics: const AlwaysScrollableScrollPhysics(),
                             onChanged: (value) {
                               bool valid =
@@ -182,7 +188,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: InkWell(
-                              onTap: () => context.push(Routes.forgotPassword),
+                              onTap: () => context.push(
+                                Routes.forgotPassword,
+                                extra: txtPhone.text.isNotEmpty ? txtPhone.text : null,
+                              ),
                               child: const SizedBox(
                                 height: 30,
                                 width: double.infinity,
@@ -235,10 +244,52 @@ class _LoginScreenState extends State<LoginScreen> {
                                     if (result.isSuccess) {
                                       context.go(Routes.home);
                                     } else {
-                                      AppMessenger.showSnackBar(
-                                        context,
-                                        result.errorMessage ??
-                                            'Incorrect credentials',
+                                      String errorMsg = result.errorMessage ?? 'Incorrect credentials';
+                                      if (errorMsg.toLowerCase() == 'unauthorized') {
+                                        errorMsg = 'Incorrect phone number or password. Please check your credentials and try again.';
+                                      }
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            title: const Row(
+                                              children: [
+                                                Icon(Icons.error_outline, color: Colors.redAccent, size: 28),
+                                                SizedBox(width: 10),
+                                                Text(
+                                                  'Login Failed',
+                                                  style: TextStyle(
+                                                    color: Colors.redAccent,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            content: Text(
+                                              errorMsg,
+                                              style: const TextStyle(fontSize: 15, color: Colors.black87),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor: AppColors.whiteColor,
+                                                  backgroundColor: AppColors.primaryColor,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                                onPressed: () => Navigator.of(context).pop(),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                                  child: Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       );
                                     }
                                   }

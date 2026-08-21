@@ -93,7 +93,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: const BoxDecoration(
-                          color: AppColors.whiteColor, borderRadius: BorderRadius.all(Radius.circular(12))),
+                          color: Colors.transparent, borderRadius: BorderRadius.all(Radius.circular(12))),
                       child: Column(
                         children: [
                           Row(
@@ -110,16 +110,62 @@ class _OTPScreenState extends State<OTPScreen> {
                             ],
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                          CustomTextField(
-                            onChanged: (p0) {
-                              buttonNotifier.notifyListeners();
+                          ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: otpController,
+                            builder: (context, value, child) {
+                              String text = value.text;
+                              return Stack(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(6, (index) {
+                                      String digit = '';
+                                      if (text.length > index) {
+                                        digit = text[index];
+                                      }
+                                      bool isActive = text.length == index;
+                                      return Container(
+                                        width: 45,
+                                        height: 55,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: isActive ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: 0.5),
+                                            width: isActive ? 2 : 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: AppColors.whiteColor,
+                                        ),
+                                        child: Text(
+                                          digit,
+                                          style: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.mainColor),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  Positioned.fill(
+                                    child: Opacity(
+                                      opacity: 0.0,
+                                      child: TextField(
+                                        controller: otpController,
+                                        keyboardType: TextInputType.number,
+                                        maxLength: 6,
+                                        autofocus: true,
+                                        onChanged: (val) {
+                                          buttonNotifier.notifyListeners();
+                                        },
+                                        decoration: const InputDecoration(
+                                          counterText: "",
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
                             },
-                            autoValidate: AutovalidateMode.onUserInteraction,
-                            hintText: 'Enter OTP',
-                            controller: otpController,
-                            textInputAction: TextInputAction.done,
-                            borderColor: AppColors.secondaryTextColor,
-                            inputType: CustomTextInputType.number,
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.035),
                           ValueListenableBuilder(

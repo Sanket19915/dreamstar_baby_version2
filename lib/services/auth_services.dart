@@ -79,6 +79,12 @@ class AuthService {
         return ApiResult.failure('Login failed. No access token received.');
       }
       await establishSession(token);
+      try {
+        final profileBody = await ApiClient.get(ApiConfig.profile, authenticated: true);
+        await ProfileCache.save(profileBody);
+      } catch (e) {
+        // Ignore profile fetch failure here, it can be retried later
+      }
       return ApiResult.success(UserModel(phoneNo: user.phoneNo, token: token));
     } on ApiException catch (e) {
       return ApiResult.failure(
@@ -137,11 +143,15 @@ class AuthService {
           'new_password_confirmation': confirmPassword,
         },
       );
-      final id = body['user_id'];
-      if (id == null) {
-        return ApiResult.failure('Password reset failed.');
+      // Backend returns {success: true, message: '...'} on success
+      final isSuccess = body['success'] == true ||
+          body['message']?.toString().contains('reset') == true;
+      if (isSuccess) {
+        return ApiResult.success(userId ?? 0);
       }
-      return ApiResult.success(id is int ? id : int.parse('$id'));
+      return ApiResult.failure(
+        body['message']?.toString() ?? 'Password reset failed.',
+      );
     } on ApiException catch (e) {
       return ApiResult.failure(
         e.message,
@@ -199,7 +209,7 @@ class AuthService {
             : null,
       );
     } catch (_) {
-      return ApiResult.failure('OTP verification failed. Please try again.');
+      return ApiResult.failure('Unable to verify OTP. Please try again.');
     }
   }
 

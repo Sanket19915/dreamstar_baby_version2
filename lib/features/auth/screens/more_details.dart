@@ -28,8 +28,6 @@ class MoreDetailsScreen extends StatefulWidget {
 }
 
 class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
-  final TextEditingController dobController = TextEditingController();
-
   final TextEditingController eddController = TextEditingController();
   ValueNotifier<String> buttonNotifier = ValueNotifier('');
   late DetailType selectType;
@@ -94,40 +92,26 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            CustomTextField(
-                              label: 'Date of Birth',
-                              controller: dobController,
-                              borderColor: AppColors.secondaryTextColor,
-                              hintText: 'Select date of birth',
-                              readOnly: true,
-                              onChanged: (_) =>
-                                  buttonNotifier.value = dobController.text,
-                              suffix: InkWell(
-                                onTap: () => _pickDob(context),
-                                child: const Icon(
-                                  Icons.calendar_today_outlined,
-                                  color: AppColors.mainColor,
+                            const SizedBox(height: 8),
+                            if (widget.journeyType != 'conception') ...[
+                              Text(
+                                'Which of these do you know?',
+                                style: CustomLabels.pbody1TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.greyTextColor,
+                                  fontWeight: CustomLabels.verySmallFontWeight,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            // Text(
-                            //   'Which of these do you know?',
-                            //   style: CustomLabels.pbody1TextStyle(
-                            //     fontSize: 14,
-                            //     color: AppColors.greyTextColor,
-                            //     fontWeight: CustomLabels.verySmallFontWeight,
-                            //   ),
-                            // ),
-                            // const SizedBox(height: 8),
-                            // _buildRadioOption(
-                            //   title: 'Estimated Date of Delivery (EDD)',
-                            //   value: DetailType.EDD,
-                            // ),
-                            // _buildRadioOption(
-                            //   title: 'Date of last Menstruation (LMP)',
-                            //   value: DetailType.LMP,
-                            // ),
+                              const SizedBox(height: 8),
+                              _buildRadioOption(
+                                title: 'Estimated Date of Delivery (EDD)',
+                                value: DetailType.EDD,
+                              ),
+                              _buildRadioOption(
+                                title: 'Date of last Menstruation (LMP)',
+                                value: DetailType.LMP,
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             CustomTextField(
                               label: selectType == DetailType.EDD
@@ -141,9 +125,12 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               readOnly: true,
                               suffix: InkWell(
                                 onTap: () => _pickEddOrLmp(context),
-                                child: const Icon(
-                                  Icons.calendar_today_outlined,
-                                  color: AppColors.mainColor,
+                                child: const Padding(
+                                  padding: EdgeInsets.only(right: 12.0),
+                                  child: Icon(
+                                    Icons.calendar_today_outlined,
+                                    color: AppColors.mainColor,
+                                  ),
                                 ),
                               ),
                             ),
@@ -207,9 +194,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             ValueListenableBuilder(
                               valueListenable: buttonNotifier,
                               builder: (context, value, child) {
-                                final canSubmit = dobController.text.isNotEmpty &&
-                                    eddController.text.isNotEmpty &&
-                                    isSelected;
+                                final canSubmit = eddController.text.isNotEmpty && isSelected;
                                 return CustomButton(
                                   text: 'Submit',
                                   borderColor: canSubmit
@@ -228,7 +213,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                   onPressed: canSubmit
                                       ? () {
                                           submitAdditionalDetails(
-                                            dob: dobController.text,
                                             userId: widget.userId ?? '',
                                             eed: selectType == DetailType.EDD
                                                 ? eddController.text
@@ -236,6 +220,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                             lmp: selectType == DetailType.LMP
                                                 ? eddController.text
                                                 : '',
+                                            journeyType: widget.journeyType,
                                           );
                                         }
                                       : null,
@@ -247,8 +232,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               ValueListenableBuilder(
                                 valueListenable: buttonNotifier,
                                 builder: (context, value, child) {
-                                  final canSkip = dobController.text.isEmpty &&
-                                      eddController.text.isEmpty;
+                                  final canSkip = eddController.text.isEmpty;
                                   return CustomButton(
                                     text: 'Skip',
                                     isEnabled: canSkip,
@@ -317,19 +301,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     );
   }
 
-  Future<void> _pickDob(BuildContext context) async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2000, 1, 1),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (pickedDate != null) {
-      dobController.text = _formatDate(pickedDate);
-      buttonNotifier.value = dobController.text;
-    }
-  }
-
   Future<void> _pickEddOrLmp(BuildContext context) async {
     final pickedDate = await showDatePicker(
       context: context,
@@ -358,9 +329,17 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     try {
       final data = await ApiClient.postForm(
         ApiConfig.registerSkip,
-        {'user_id': userId},
+        {
+          'user_id': userId,
+          if (widget.journeyType != null) 'journey_type': widget.journeyType!,
+        },
         authenticated: true,
       );
+      if (widget.journeyType != null) {
+        final profile = ProfileCache.read() ?? {};
+        profile['journey_type'] = widget.journeyType;
+        await ProfileCache.save(profile);
+      }
       Fluttertoast.showToast(msg: data['message']?.toString() ?? 'Skipped');
       if (mounted) context.go(Routes.acknowledgement);
     } catch (e) {
@@ -369,7 +348,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   }
 
   Future<void> submitAdditionalDetails({
-    required String dob,
     required String userId,
     required String lmp,
     required String eed,
@@ -382,7 +360,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       await ApiClient.postForm(
         ApiConfig.completeRegistration,
         {
-          'dob': dob,
           'user_id': userId,
           'lmp': lmp,
           'eed': eed,
@@ -392,7 +369,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       );
       await ProfileCache.save({
         'user_id': userId,
-        'dob': dob,
         'lmp': lmp,
         'eed': eed,
         if (journeyType != null) 'journey_type': journeyType,

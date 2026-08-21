@@ -37,7 +37,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
         ),
       ),
       body: SizedBox(
-        height: MediaQuery.of(context).size.height - 50,
+        height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -47,7 +47,7 @@ class _PDFViewerScreenState extends State<PDFViewerScreen> {
                   child: PDFView(
                     pageFling: true,
                     fitEachPage: false,
-                    fitPolicy: FitPolicy.BOTH,
+                    fitPolicy: FitPolicy.WIDTH,
                     filePath: widget.pdfPath,
                     autoSpacing: false,
                     enableSwipe: true,

@@ -34,6 +34,8 @@ class CustomTextField extends StatefulWidget {
   final AutovalidateMode autoValidate;
   final bool readOnly;
   final Widget? suffix;
+  final Widget? prefix;
+  final String? prefixText;
   final ValueChanged<bool>? onValidChanged;
 
   const CustomTextField({
@@ -54,6 +56,8 @@ class CustomTextField extends StatefulWidget {
     this.scrollPadding = EdgeInsets.zero,
     this.enabled = true,
     this.suffix,
+    this.prefix,
+    this.prefixText,
     this.autoFocus = false,
     this.readOnly = false,
     this.autoValidate = AutovalidateMode.disabled,
@@ -169,6 +173,12 @@ class CustomTextFieldState extends State<CustomTextField> {
             autofocus: widget.autoFocus,
             textAlign: widget.textAlign,
             inputFormatters: widget.inputFormatters,
+            prefix: widget.prefix ?? (widget.prefixText != null 
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 14),
+                    child: Text(widget.prefixText!, style: TextStyle(color: AppColors.blackColor, fontSize: 15)),
+                  )
+                : null),
             suffix: _buildPasswordSuffix(context, eyeVisible),
           ),
         ),
@@ -229,6 +239,9 @@ class CustomTextFieldState extends State<CustomTextField> {
           borderRadius: radius,
           borderSide: const BorderSide(color: errorBorder, width: 1.5),
         ),
+        prefixIcon: widget.prefix,
+        prefixText: widget.prefixText,
+        prefixStyle: const TextStyle(color: Colors.black87, fontSize: 15),
         suffixIcon: _buildPasswordSuffix(context, eyeVisible),
       ),
       keyboardType: _getMaterialKeyboardType(),

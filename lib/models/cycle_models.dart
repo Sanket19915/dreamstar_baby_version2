@@ -43,6 +43,8 @@ class CycleStatusModel {
   final String fertileWindowStart;
   final String fertileWindowEnd;
   final bool hasIrregularPattern;
+  final String? shuddhiJourneyStartDate;
+  final int? shuddhiDay;
 
   const CycleStatusModel({
     required this.currentCycleDay,
@@ -55,6 +57,8 @@ class CycleStatusModel {
     required this.fertileWindowStart,
     required this.fertileWindowEnd,
     required this.hasIrregularPattern,
+    this.shuddhiJourneyStartDate,
+    this.shuddhiDay,
   });
 
   factory CycleStatusModel.fromJson(Map<String, dynamic> json) {
@@ -69,6 +73,8 @@ class CycleStatusModel {
       fertileWindowStart: json['fertile_window_start'] as String? ?? '',
       fertileWindowEnd: json['fertile_window_end'] as String? ?? '',
       hasIrregularPattern: json['has_irregular_pattern'] as bool? ?? false,
+      shuddhiJourneyStartDate: json['shuddhi_journey_start_date'] as String?,
+      shuddhiDay: json['shuddhi_day'] as int?,
     );
   }
 
@@ -101,6 +107,18 @@ class CycleStatusModel {
     }
   }
 
+  int get cycleLength {
+    try {
+      if (periodStartDate.isEmpty || expectedPeriodDate.isEmpty) return 28;
+      final start = DateTime.parse(periodStartDate);
+      final expected = DateTime.parse(expectedPeriodDate);
+      final days = expected.difference(start).inDays;
+      return days > 10 && days < 100 ? days : 28;
+    } catch (_) {
+      return 28;
+    }
+  }
+
   /// Returns the color for a given date in the calendar
   Color? getDayColor(DateTime date) {
     if (expectedPeriodDate.isEmpty ||
@@ -130,21 +148,22 @@ class CycleStatusModel {
       return const Color(0xFF2FBF71); // Green
     }
 
-    // 3. Period Days - Red
-    if (d.isAtSameMomentAs(periodStart) ||
-        d.isAtSameMomentAs(periodEnd) ||
-        (d.isAfter(periodStart) && d.isBefore(periodEnd))) {
+    // 3. Period Days - Red (include both start and end dates)
+    if (!d.isBefore(periodStart) && !d.isAfter(periodEnd)) {
       return const Color(0xFFE53935); // Red
     }
 
-    // 4. Fertile Window - Blue
-    if (d.isAtSameMomentAs(fertileStart) ||
-        d.isAtSameMomentAs(fertileEnd) ||
-        (d.isAfter(fertileStart) && d.isBefore(fertileEnd))) {
+    // 4. Fertile Window - Blue (include both start and end dates)
+    if (!d.isBefore(fertileStart) && !d.isAfter(fertileEnd)) {
       return const Color(0xFF42A5F5); // Blue
     }
 
-    // 5. Luteal Phase - Baby Pink (Between Ovulation and Expected Period)
+    // 5. Follicular Phase - Light Purple (between period end and fertile start)
+    if (d.isAfter(periodEnd) && d.isBefore(fertileStart)) {
+      return const Color(0xFFCE93D8); // Light Purple
+    }
+
+    // 6. Luteal Phase - Baby Pink (Between Ovulation and Expected Period)
     if (d.isAfter(ovulation) && d.isBefore(expected)) {
       return const Color(0xFFF48FB1); // Baby Pink
     }

@@ -9,7 +9,9 @@ import 'package:dream_baby/features/contact_us/contact_us_screen.dart';
 import 'package:dream_baby/features/home/screens/home_screen_content.dart';
 import 'package:dream_baby/features/setting/screens/faq_screen.dart';
 import 'package:dream_baby/features/testimonials_screen/testimonials_screen.dart';
+import 'package:dream_baby/services/popup_service.dart';
 import 'package:dream_baby/services/push_notification_service.dart';
+import 'package:dream_baby/shared/widgets/daily_popup_dialog.dart';
 import 'package:dream_baby/shared/helper/app_color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -44,6 +46,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
     getNotificationPermission();
     getActiveUser();
+    // Trigger daily popup after 1.5 second delay
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 1500), _checkAndShowDailyPopup);
+    });
   }
 
   @override
@@ -148,6 +154,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  Future<void> _checkAndShowDailyPopup() async {
+    try {
+      final popup = await PopupService.fetchTodayPopup();
+      if (popup != null && mounted) {
+        await showDailyPopup(context, popup);
+      }
+    } catch (_) {
+      // Silently ignore popup errors — non-critical
     }
   }
 

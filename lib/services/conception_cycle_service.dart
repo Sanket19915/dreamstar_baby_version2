@@ -48,6 +48,21 @@ class ConceptionCycleService {
     }
   }
 
+  static Future<ApiResult<bool>> startShuddhiJourney() async {
+    try {
+      await ApiClient.postForm(
+        ApiConfig.startShuddhiJourney,
+        {},
+        authenticated: true,
+      );
+      return ApiResult.success(true);
+    } on ApiException catch (e) {
+      return ApiResult.failure(e.message, statusCode: e.statusCode);
+    } catch (_) {
+      return ApiResult.failure('Failed to start Shuddhi journey.');
+    }
+  }
+
   /// Step 5A & 6A: Log period start date
   static Future<ApiResult<MenstrualCycleModel>> logPeriod({
     required String lmpDate,

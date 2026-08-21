@@ -106,13 +106,15 @@ class _ConceptionCalendarScreenState extends State<ConceptionCalendarScreen> {
       );
     }
 
-    return Column(
-      children: [
-        _buildMonthSelector(),
-        _buildDaysOfWeek(),
-        Expanded(child: _buildCalendarGrid()),
-        _buildLegend(),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildMonthSelector(),
+          _buildDaysOfWeek(),
+          _buildCalendarGrid(),
+          _buildLegend(),
+        ],
+      ),
     );
   }
 
@@ -180,10 +182,15 @@ class _ConceptionCalendarScreenState extends State<ConceptionCalendarScreen> {
 
     final today = DateTime.now();
 
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      physics: const NeverScrollableScrollPhysics(), // Since we want it contained
-      itemCount: totalCells,
+    final totalRows = ((daysInMonth + startWeekday) / 7).ceil();
+    final gridHeight = totalRows * 62.0;
+
+    return SizedBox(
+      height: gridHeight,
+      child: GridView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: totalCells,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
         childAspectRatio: 1.0,
@@ -229,6 +236,7 @@ class _ConceptionCalendarScreenState extends State<ConceptionCalendarScreen> {
           ),
         );
       },
+      ),
     );
   }
 
@@ -258,8 +266,9 @@ class _ConceptionCalendarScreenState extends State<ConceptionCalendarScreen> {
           ),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              _buildLegendItem(const Color(0xFFCE93D8), 'Follicular'),
               _buildLegendItem(const Color(0xFFF48FB1), 'Luteal Phase'),
               _buildLegendItem(const Color(0xFFE67700), 'Expected Next'),
             ],

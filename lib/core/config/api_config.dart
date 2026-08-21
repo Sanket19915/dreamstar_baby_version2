@@ -1,6 +1,7 @@
 class ApiConfig {
   ApiConfig._();
 
+  //static const String baseUrl = 'https://dream-baby.on-forge.com';
   static const String baseUrl = 'http://127.0.0.1:8000';
   static const String apiBase = '$baseUrl/api';
   static const String storageBase = '$baseUrl/storage';
@@ -28,6 +29,8 @@ class ApiConfig {
   static const String profile = '$apiBase/profile';
   static const String updateProfile = '$apiBase/update-profile';
   static const String babyData = '$apiBase/baby_data';
+  static const String conceptionData = '$apiBase/conception-data';
+  static const String startShuddhiJourney = '$apiBase/conception/cycle/shuddhi-journey/start';
   static const String activeUser = '$apiBase/active_user';
 
   // Questions & activities
@@ -63,4 +66,9 @@ class ApiConfig {
   static const String conceptionCyclePregnancyTest = '$apiBase/conception/cycle/pregnancy-test';
   static const String conceptionCycleHistory = '$apiBase/conception/cycle/history';
   static const String conceptionCycleStep9 = '$apiBase/conception/cycle/step-9-questions';
+
+  // Daily Popup Engagement
+  static const String popupToday = '$apiBase/popup/today';
+  static const String popupRespond = '$apiBase/popup/respond';
+  static const String popupStreak = '$apiBase/popup/streak';
 }

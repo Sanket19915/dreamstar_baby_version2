@@ -69,4 +69,6 @@ class AppImages {
   static const sharirConception = "assets/images/nutrition_icon.png";
   static const bhavConception = "assets/images/heart_icon.png";
   static const mannConception = "assets/images/brain_icon.png";
+
+  static const mcPhases = "assets/images/mc_phases.png";
 }

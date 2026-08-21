@@ -262,6 +262,29 @@ class _ConceptionIrregularInsightsScreenState
                     height: 1.5,
                   ),
                 ),
+                const SizedBox(height: 12),
+                RichText(
+                  text: TextSpan(
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: AppColors.secondaryTextColor,
+                      height: 1.5,
+                    ),
+                    children: [
+                      const TextSpan(text: 'Additionally, you can also follow our '),
+                      TextSpan(
+                        text: 'Shuddhi Framework',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.w600,
+                          height: 1.5,
+                        ),
+                      ),
+                      const TextSpan(text: ' to help regulate your cycle naturally.'),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
