@@ -112,12 +112,11 @@ class _KnowEntryState extends State<KnowEntry> {
                                             await _loadPdfFromNetwork(
                                           knowEntry[index].filePath,
                                         );
-                                        if (!mounted) return;
+                                        if (!context.mounted) return;
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (ctx) =>
-                                                PDFViewerScreen(
+                                            builder: (ctx) => PDFViewerScreen(
                                               pdfPath: pdfPath,
                                               week: week,
                                             ),
@@ -143,13 +142,17 @@ class _KnowEntryState extends State<KnowEntry> {
                                       height: isTablet ? 250 : height * 0.13,
                                       width: width,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (errContext, error, stackTrace) {
+                                      errorBuilder:
+                                          (errContext, error, stackTrace) {
                                         return Container(
-                                          height: isTablet ? 250 : height * 0.13,
+                                          height:
+                                              isTablet ? 250 : height * 0.13,
                                           width: width,
                                           color: Colors.grey.shade300,
                                           child: const Center(
-                                            child: Icon(Icons.image_not_supported, color: Colors.grey),
+                                            child: Icon(
+                                                Icons.image_not_supported,
+                                                color: Colors.grey),
                                           ),
                                         );
                                       },
@@ -256,8 +259,7 @@ class _KnowEntryState extends State<KnowEntry> {
       Fluttertoast.showToast(msg: 'File is Empty');
     }
     try {
-      var data =
-          await http.get(Uri.parse(ApiConfig.storageUrl(filePath)));
+      var data = await http.get(Uri.parse(ApiConfig.storageUrl(filePath)));
       if (data.statusCode != 200) {
         throw Exception("Failed to load PDF (HTTP ${data.statusCode})");
       }
@@ -287,7 +289,8 @@ class _KnowEntryState extends State<KnowEntry> {
 
     try {
       setState(() => isLoading = true);
-      final body = await ApiClient.get(ApiConfig.staticData, authenticated: true);
+      final body =
+          await ApiClient.get(ApiConfig.staticData, authenticated: true);
       final rawList = body['data'] is List
           ? body['data'] as List
           : (body.values.whereType<List>().isNotEmpty

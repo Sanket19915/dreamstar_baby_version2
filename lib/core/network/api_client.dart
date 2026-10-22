@@ -71,6 +71,24 @@ class ApiClient {
     return body;
   }
 
+  static Future<Map<String, dynamic>> postJson(
+    String url,
+    Map<String, dynamic> bodyData, {
+    bool authenticated = false,
+  }) async {
+    final headers =
+        authenticated ? await _authHeaders() : Map<String, String>.from(_defaultHeaders);
+    headers['Content-Type'] = 'application/json';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(bodyData),
+    ).timeout(const Duration(seconds: 15));
+    final body = _decodeBody(response.body);
+    _throwIfFailed(response.statusCode, body);
+    return body;
+  }
+
   static Future<Map<String, dynamic>> postMultipart(
     String url,
     Map<String, String> fields, {

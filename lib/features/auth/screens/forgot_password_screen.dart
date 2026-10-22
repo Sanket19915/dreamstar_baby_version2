@@ -74,7 +74,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   physics: const ClampingScrollPhysics(),
                   child: BlocProvider(
-                    create: (_) => IsFormValidBloc(),
+                    create: (_) => IsFormValidBloc()..setFormValid(txtPhone.text.isNotEmpty),
                     child: BlocBuilder<IsFormValidBloc, bool>(
                       builder: (context, isValid) {
                         return Container(

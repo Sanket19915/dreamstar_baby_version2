@@ -2,7 +2,7 @@ class ApiConfig {
   ApiConfig._();
 
   //static const String baseUrl = 'https://dream-baby.on-forge.com';
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = 'http://192.168.1.18:8000';
   static const String apiBase = '$baseUrl/api';
   static const String storageBase = '$baseUrl/storage';
 
@@ -71,4 +71,12 @@ class ApiConfig {
   static const String popupToday = '$apiBase/popup/today';
   static const String popupRespond = '$apiBase/popup/respond';
   static const String popupStreak = '$apiBase/popup/streak';
+
+  // Darpan Self-Assessment
+  static const String darpanApplyPromo = '$apiBase/v2/darpan/apply-promo';
+  static const String darpanStatus = '$apiBase/v2/darpan/status';
+  static const String darpanQuestions = '$apiBase/v2/darpan/questions';
+  static const String darpanAssessments = '$apiBase/v2/darpan/assessments';
+  static const String darpanRestart = '$apiBase/v2/darpan/restart';
+  static String darpanScore(int cycleNumber) => '$apiBase/v2/darpan/score?cycle_number=$cycleNumber';
 }

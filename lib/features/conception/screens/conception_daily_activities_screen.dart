@@ -29,7 +29,7 @@ class ConceptionDailyActivitiesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     bool allCompleted = false;
     bool hasNoActivities = false;
-    
+
     if (quotientStatuses.isNotEmpty) {
       allCompleted = [
         'Atma Conception',
@@ -38,7 +38,7 @@ class ConceptionDailyActivitiesScreen extends StatelessWidget {
         'Mann Conception'
       ].every((title) => quotientStatuses[title] == true);
     }
-    
+
     if (quotientTotals != null && quotientTotals!.isNotEmpty) {
       hasNoActivities = [
         'Atma Conception',
@@ -62,230 +62,273 @@ class ConceptionDailyActivitiesScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.blackColor),
-          onPressed: () {
-            notifyWidget();
-            context.pop();
-          },
-        ),
-        title: Text(
-          'Shuddhi Framework',
-          style: GoogleFonts.poppins(
-            color: AppColors.blackColor,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.blackColor),
+            onPressed: () {
+              notifyWidget();
+              context.pop();
+            },
           ),
+          title: Text(
+            'Shuddhi Framework',
+            style: GoogleFonts.poppins(
+              color: AppColors.blackColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - 96, // Minus the vertical padding
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight:
+                      constraints.maxHeight - 96, // Minus the vertical padding
+                ),
+                child: Center(
+                  child: Builder(
+                    builder: (context) {
+                      if (quotientStatuses.isEmpty) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            height: 390,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        );
+                      } else if (effectiveDay > 90) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.mainColor.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:
+                                    AppColors.mainColor.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                const Icon(Icons.info_outline_rounded,
+                                    size: 60, color: AppColors.mainColor),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Cycle Delayed',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.mainColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Your cycle has been delayed for more than 90 days. Please restart your Shuddhi Framework once your cycle restarts or consult a doctor.',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    color: AppColors.primaryTextColor,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            // Header section
+                            Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF5B4182),
+                                        Color(0xFFC26D68)
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Text(
+                                    'Day $effectiveDay Activities',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            if (hasNoActivities)
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 32),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.mainColor,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'No questions are available for today.',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            else if (allCompleted)
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 32),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.mainColor,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'All activities are completed for the day',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+
+                            // Overlapping quad layout (scaled down slightly to fit edges)
+                            Transform.scale(
+                              scale:
+                                  1.05, // Reduced from 1.15 so it doesn't bleed out of edges
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      // Top row
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _quadCard(
+                                              context: context,
+                                              originalTitle: 'Atma Conception',
+                                              index: 0,
+                                              imagePath:
+                                                  'assets/images/s_u.png',
+                                              isCompleted: quotientStatuses[
+                                                          'Atma Conception'] ==
+                                                      true &&
+                                                  (quotientTotals?[
+                                                              'Atma Conception'] ??
+                                                          0) >
+                                                      0,
+                                              effectiveDay: effectiveDay,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: _quadCard(
+                                              context: context,
+                                              originalTitle:
+                                                  'Sharir Conception',
+                                              index: 1,
+                                              imagePath:
+                                                  'assets/images/p_d.png',
+                                              isCompleted: quotientStatuses[
+                                                          'Sharir Conception'] ==
+                                                      true &&
+                                                  (quotientTotals?[
+                                                              'Sharir Conception'] ??
+                                                          0) >
+                                                      0,
+                                              effectiveDay: effectiveDay,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Bottom row
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _quadCard(
+                                              context: context,
+                                              originalTitle: 'Bhav Conception',
+                                              index: 2,
+                                              imagePath:
+                                                  'assets/images/e_c.png',
+                                              isCompleted: quotientStatuses[
+                                                          'Bhav Conception'] ==
+                                                      true &&
+                                                  (quotientTotals?[
+                                                              'Bhav Conception'] ??
+                                                          0) >
+                                                      0,
+                                              effectiveDay: effectiveDay,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: _quadCard(
+                                              context: context,
+                                              originalTitle: 'Mann Conception',
+                                              index: 3,
+                                              imagePath:
+                                                  'assets/images/m_p.png',
+                                              isCompleted: quotientStatuses[
+                                                          'Mann Conception'] ==
+                                                      true &&
+                                                  (quotientTotals?[
+                                                              'Mann Conception'] ??
+                                                          0) >
+                                                      0,
+                                              effectiveDay: effectiveDay,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ),
               ),
-              child: Center(
-                child: Builder(
-                  builder: (context) {
-            if (quotientStatuses.isEmpty) {
-              return Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  height: 390,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              );
-            } else if (effectiveDay > 90) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppColors.mainColor.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.mainColor.withValues(alpha: 0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.info_outline_rounded, size: 60, color: AppColors.mainColor),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Cycle Delayed',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.mainColor,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Your cycle has been delayed for more than 90 days. Please restart your Shuddhi Framework once your cycle restarts or consult a doctor.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          color: AppColors.primaryTextColor,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } else {
-              return Column(
-                children: [
-                  // Header section
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF5B4182), Color(0xFFC26D68)],
-                          ),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          'Day $effectiveDay Activities',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  if (hasNoActivities)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 32),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: const BoxDecoration(
-                        color: AppColors.mainColor,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'No questions are available for today.',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
-                  else if (allCompleted)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 32),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: const BoxDecoration(
-                        color: AppColors.mainColor,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'All activities are completed for the day',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-
-                  // Overlapping quad layout (scaled down slightly to fit edges)
-                  Transform.scale(
-                    scale: 1.05, // Reduced from 1.15 so it doesn't bleed out of edges
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                      Column(
-                        children: [
-                          // Top row
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _quadCard(
-                                  context: context,
-                                  originalTitle: 'Atma Conception',
-                                  index: 0,
-                                  imagePath: 'assets/images/s_u.png',
-                                  isCompleted: quotientStatuses['Atma Conception'] == true && (quotientTotals?['Atma Conception'] ?? 0) > 0,
-                                  effectiveDay: effectiveDay,
-                                ),
-                              ),
-                              Expanded(
-                                child: _quadCard(
-                                  context: context,
-                                  originalTitle: 'Sharir Conception',
-                                  index: 1,
-                                  imagePath: 'assets/images/p_d.png',
-                                  isCompleted: quotientStatuses['Sharir Conception'] == true && (quotientTotals?['Sharir Conception'] ?? 0) > 0,
-                                  effectiveDay: effectiveDay,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Bottom row
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _quadCard(
-                                  context: context,
-                                  originalTitle: 'Bhav Conception',
-                                  index: 2,
-                                  imagePath: 'assets/images/e_c.png',
-                                  isCompleted: quotientStatuses['Bhav Conception'] == true && (quotientTotals?['Bhav Conception'] ?? 0) > 0,
-                                  effectiveDay: effectiveDay,
-                                ),
-                              ),
-                              Expanded(
-                                child: _quadCard(
-                                  context: context,
-                                  originalTitle: 'Mann Conception',
-                                  index: 3,
-                                  imagePath: 'assets/images/m_p.png',
-                                  isCompleted: quotientStatuses['Mann Conception'] == true && (quotientTotals?['Mann Conception'] ?? 0) > 0,
-                                  effectiveDay: effectiveDay,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              );
-            }
+            );
           },
         ),
-              ),
-            ),
-          );
-        },
       ),
-    ),
     );
   }
 
@@ -333,7 +376,8 @@ class AnimatedQuadCard extends StatefulWidget {
   State<AnimatedQuadCard> createState() => _AnimatedQuadCardState();
 }
 
-class _AnimatedQuadCardState extends State<AnimatedQuadCard> with SingleTickerProviderStateMixin {
+class _AnimatedQuadCardState extends State<AnimatedQuadCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _glowAnimation;
   bool _isPressed = false;
@@ -371,18 +415,20 @@ class _AnimatedQuadCardState extends State<AnimatedQuadCard> with SingleTickerPr
         setState(() => _isPressed = false);
         await _controller.reverse();
         HapticFeedback.lightImpact(); // Add native vibration
-        if (!mounted) return;
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (ctx) => ExistentialScreen(
-              from: widget.originalTitle,
-              quotientStatuses: widget.quotientStatuses,
-              index: widget.index,
-              cycleDay: widget.effectiveDay,
-              onExit: widget.notifyWidget,
-            ),
-          ),
-        ).then((_) => widget.notifyWidget());
+        if (!context.mounted) return;
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (ctx) => ExistentialScreen(
+                  from: widget.originalTitle,
+                  quotientStatuses: widget.quotientStatuses,
+                  index: widget.index,
+                  cycleDay: widget.effectiveDay,
+                  onExit: widget.notifyWidget,
+                ),
+              ),
+            )
+            .then((_) => widget.notifyWidget());
       },
       child: AnimatedScale(
         scale: _isPressed ? 0.95 : 1.0,
@@ -410,7 +456,7 @@ class _AnimatedQuadCardState extends State<AnimatedQuadCard> with SingleTickerPr
                 );
               },
             ),
-            
+
             // Completion checkmark badge (inset to prevent edge clipping)
             if (widget.isCompleted)
               Positioned(

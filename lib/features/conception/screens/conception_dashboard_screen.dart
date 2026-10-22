@@ -21,6 +21,10 @@ import 'package:dream_baby/features/home/screens/four_quotients.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:dream_baby/features/rough.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:dream_baby/services/darpan_service.dart';
+import 'package:dream_baby/features/conception/screens/darpan_assessment_screen.dart';
+import 'package:dream_baby/features/conception/screens/darpan_result_screen.dart';
+import 'package:dream_baby/features/conception/screens/darpan_history_screen.dart';
 
 /// The main Conception Dashboard — beautiful fertility-style home screen
 class ConceptionDashboardScreen extends StatefulWidget {
@@ -41,6 +45,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
   Map<String, bool> quotientStatuses = {};
   Map<String, int> quotientTotals = {};
   Map<String, dynamic>? _conceptionData;
+  Map<String, dynamic>? _darpanStatus;
   bool _isCycleExpanded = false;
   bool _isShuddhiIntroExpanded = false;
 
@@ -79,6 +84,16 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
     await _fetchTodayQuestionStatus();
     await _fetchQuotientStatuses();
     await _fetchConceptionData();
+    await _fetchDarpanStatus();
+  }
+
+  Future<void> _fetchDarpanStatus() async {
+    final result = await DarpanService.getStatus();
+    if (mounted && result.isSuccess) {
+      setState(() {
+        _darpanStatus = result.data;
+      });
+    }
   }
 
   Future<void> _fetchConceptionData() async {
@@ -90,7 +105,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
         });
         return;
       }
-      
+
       final body = await ApiClient.get(
         '${ApiConfig.conceptionData}?cycle_day=$shuddhiDay',
         authenticated: true,
@@ -116,7 +131,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
 
   Future<void> _fetchQuotientStatuses() async {
     try {
-      final cycleDay = _status?.currentCycleDay;
+      final cycleDay = _status?.shuddhiDay ?? _status?.currentCycleDay;
       final queryStr = cycleDay != null ? '?day=$cycleDay' : '';
       final data = await ApiClient.get(
         '${ApiConfig.userQuestionStatus}$queryStr',
@@ -130,8 +145,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
           quotientStatuses =
               statuses.map((key, value) => MapEntry(key, value as bool));
           if (totals != null) {
-            quotientTotals =
-                totals.map((key, value) => MapEntry(key, (value as num).toInt()));
+            quotientTotals = totals
+                .map((key, value) => MapEntry(key, (value as num).toInt()));
           }
         });
       }
@@ -219,8 +234,6 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
     return _phaseMessage;
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -248,7 +261,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                         text:
                             'Experience the Best Online Garbhasanskar Community in India!',
                         sharePositionOrigin: Rect.fromCenter(
-                            center: Offset.zero, width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height)));
+                            center: Offset.zero,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height)));
                   },
                   child: Image.asset(
                     AppImages.share,
@@ -289,8 +304,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                             backgroundColor: Colors.red,
                             child: Text(
                               "$_notificationCount",
-                              style:
-                                  const TextStyle(color: Colors.white, fontSize: 8),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 8),
                             ),
                           ),
                       ],
@@ -299,22 +314,22 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
             ),
           ),
 
-            // ── Content ──────────────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: _isLoading
-                  ? const Padding(
-                      padding: EdgeInsets.only(top: 80),
-                      child: Center(
-                          child: CircularProgressIndicator(
-                              color: AppColors.mainColor)),
-                    )
-                  : _hasError
-                      ? _buildSetupState()
-                      : _buildMainContent(),
-            ),
-          ],
-        ),
-      );
+          // ── Content ──────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: _isLoading
+                ? const Padding(
+                    padding: EdgeInsets.only(top: 80),
+                    child: Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.mainColor)),
+                  )
+                : _hasError
+                    ? _buildSetupState()
+                    : _buildMainContent(),
+          ),
+        ],
+      ),
+    );
 
     if (widget.isEmbedded) {
       return Stack(
@@ -323,7 +338,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
             child: Image.asset(
               AppImages.bg,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => const _BlobBackground(),
+              errorBuilder: (context, error, stackTrace) =>
+                  const _BlobBackground(),
             ),
           ),
           scrollView,
@@ -339,7 +355,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
             child: Image.asset(
               AppImages.bg,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => const _BlobBackground(),
+              errorBuilder: (context, error, stackTrace) =>
+                  const _BlobBackground(),
             ),
           ),
           scrollView,
@@ -469,11 +486,13 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                 ),
                 const SizedBox(width: 10),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.55),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.7), width: 1),
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.7), width: 1),
                   ),
                   child: Text(
                     'Conception Journey',
@@ -487,13 +506,13 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
               ],
             ),
           ),
-          
+
           if (s.hasIrregularPattern || ProfileCache.hasIrregularCycle())
             FadeAndSlide(
               delay: const Duration(milliseconds: 50),
               child: _buildIrregularCycleBanner(),
             ),
-            
+
           const SizedBox(height: 12),
 
           // ── Hero Cycle Card (Expandable) ──
@@ -507,11 +526,13 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.mainColor.withOpacity(0.2)),
+                  border:
+                      Border.all(color: AppColors.mainColor.withOpacity(0.2)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.04),
@@ -556,7 +577,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
               ),
             ),
           ),
-          
+
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
@@ -573,7 +594,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                               filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
                               child: Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 24, horizontal: 16),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     begin: Alignment.topLeft,
@@ -584,7 +606,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                                  border: Border.all(
+                                      color: Colors.white.withOpacity(0.8),
+                                      width: 1.5),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.04),
@@ -596,14 +620,17 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Image.asset(AppImages.mcPhases, height: 260, fit: BoxFit.contain),
+                                    Image.asset(AppImages.mcPhases,
+                                        height: 260, fit: BoxFit.contain),
                                     const SizedBox(height: 8),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Icon(
                                           Icons.flip,
-                                          color: const Color(0xFF5B4182).withOpacity(0.8),
+                                          color: const Color(0xFF5B4182)
+                                              .withOpacity(0.8),
                                           size: 16,
                                         ),
                                         const SizedBox(width: 4),
@@ -612,7 +639,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                                           style: GoogleFonts.poppins(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w600,
-                                            color: const Color(0xFF5B4182).withOpacity(0.8),
+                                            color: const Color(0xFF5B4182)
+                                                .withOpacity(0.8),
                                           ),
                                         ),
                                       ],
@@ -623,7 +651,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w400,
-                                        color: const Color(0xFF5B4182).withOpacity(0.6),
+                                        color: const Color(0xFF5B4182)
+                                            .withOpacity(0.6),
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -659,12 +688,13 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              if (_status?.isDelayed != true)
-                _buildQuestionsSection(),
+                if (_status?.isDelayed != true) _buildQuestionsSection(),
               ],
             ),
           ),
           const SizedBox(height: 16),
+          if (_darpanStatus != null) _buildDarpanCard(),
+          if (_darpanStatus != null) const SizedBox(height: 16),
 
           // ── Knowledge Hub & Amazon Link ──
           FadeAndSlide(
@@ -765,7 +795,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                 color: Colors.red.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.play_arrow_rounded, color: Colors.red, size: 28),
+              child: const Icon(Icons.play_arrow_rounded,
+                  color: Colors.red, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -822,7 +853,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
               ],
             ),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+            border:
+                Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
@@ -846,7 +878,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                       left: 30,
                       child: TwinkleAnimation(
                         delay: const Duration(milliseconds: 300),
-                        child: Icon(Icons.auto_awesome, color: const Color(0xFFD4A96A).withOpacity(0.6), size: 20),
+                        child: Icon(Icons.auto_awesome,
+                            color: const Color(0xFFD4A96A).withOpacity(0.6),
+                            size: 20),
                       ),
                     ),
                     Positioned(
@@ -854,7 +888,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                       right: 20,
                       child: TwinkleAnimation(
                         delay: const Duration(milliseconds: 800),
-                        child: Icon(Icons.auto_awesome, color: const Color(0xFF917BB3).withOpacity(0.5), size: 16),
+                        child: Icon(Icons.auto_awesome,
+                            color: const Color(0xFF917BB3).withOpacity(0.5),
+                            size: 16),
                       ),
                     ),
                     Positioned(
@@ -862,11 +898,16 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                       right: 40,
                       child: TwinkleAnimation(
                         delay: const Duration(milliseconds: 100),
-                        child: Icon(Icons.star_rounded, color: const Color(0xFF6EC6C1).withOpacity(0.4), size: 12),
+                        child: Icon(Icons.star_rounded,
+                            color: const Color(0xFF6EC6C1).withOpacity(0.4),
+                            size: 12),
                       ),
                     ),
                     TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0.0, end: math.min((day / status.cycleLength).clamp(0.0, 1.0), 1.0)),
+                      tween: Tween<double>(
+                          begin: 0.0,
+                          end: math.min(
+                              (day / status.cycleLength).clamp(0.0, 1.0), 1.0)),
                       duration: const Duration(milliseconds: 1500),
                       curve: Curves.easeOutCubic,
                       builder: (context, value, child) {
@@ -942,7 +983,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                                 style: GoogleFonts.poppins(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF5B4182).withOpacity(0.8),
+                                  color:
+                                      const Color(0xFF5B4182).withOpacity(0.8),
                                 ),
                               ),
                             ],
@@ -999,7 +1041,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.35),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.7), width: 1.2),
+              border:
+                  Border.all(color: Colors.white.withOpacity(0.7), width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.02),
@@ -1109,7 +1152,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.35),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.7), width: 1.2),
+                border: Border.all(
+                    color: Colors.white.withOpacity(0.7), width: 1.2),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.02),
@@ -1151,9 +1195,11 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
   }
 
   Widget _buildWellnessCard() {
-    final activeQuotients = quotients.where((q) => (quotientTotals[q] ?? 0) > 0).toList();
+    final activeQuotients =
+        quotients.where((q) => (quotientTotals[q] ?? 0) > 0).toList();
     final total = activeQuotients.length;
-    final completed = activeQuotients.where((q) => quotientStatuses[q] == true).length;
+    final completed =
+        activeQuotients.where((q) => quotientStatuses[q] == true).length;
     final progress = total > 0 ? completed / total : 0.0;
 
     return ClipRRect(
@@ -1165,114 +1211,125 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.4),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
+            border:
+                Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
           ),
           child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Shuddhi Framework',
-            style: GoogleFonts.poppins(
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF2D1B69),
-            )),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Progress bar
-                    Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.centerLeft,
+              Text('Shuddhi Framework',
+                  style: GoogleFonts.poppins(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2D1B69),
+                  )),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE8E0FF),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        AnimatedFractionallySizedBox(
-                          duration: const Duration(milliseconds: 800),
-                          curve: Curves.easeOut,
-                          widthFactor: progress,
-                          child: Container(
-                            height: 8,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF5B4182), Color(0xFFB8A8E8)],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                        // Star indicator
-                        AnimatedPositioned(
-                          duration: const Duration(milliseconds: 800),
-                          curve: Curves.easeOut,
-                          left: 0,
-                          right: 0,
-                          child: FractionallySizedBox(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: progress,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Transform.translate(
-                                offset: const Offset(6, 0),
-                                child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22,
-                                  shadows: [Shadow(color: Color(0xFF7C3AED), blurRadius: 12)]),
+                        // Progress bar
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8E0FF),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                          ),
+                            AnimatedFractionallySizedBox(
+                              duration: const Duration(milliseconds: 800),
+                              curve: Curves.easeOut,
+                              widthFactor: progress,
+                              child: Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF5B4182),
+                                      Color(0xFFB8A8E8)
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                            // Star indicator
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 800),
+                              curve: Curves.easeOut,
+                              left: 0,
+                              right: 0,
+                              child: FractionallySizedBox(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: progress,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Transform.translate(
+                                    offset: const Offset(6, 0),
+                                    child: const Icon(Icons.auto_awesome,
+                                        color: Colors.white,
+                                        size: 22,
+                                        shadows: [
+                                          Shadow(
+                                              color: Color(0xFF7C3AED),
+                                              blurRadius: 12)
+                                        ]),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 6),
+                        Text('$completed/$total Completed',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: const Color(0xFF5B4182),
+                            )),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    Text('$completed/$total Completed',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: const Color(0xFF5B4182),
-                      )),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              GestureDetector(
-                onTap: _startDailyActivity,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF917BB3), Color(0xFF7A62A3)],
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF7A62A3).withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                  ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: _startDailyActivity,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF917BB3), Color(0xFF7A62A3)],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7A62A3).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    "Start Today's Activity",
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      child: Text(
+                        "Start Today's Activity",
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-      ),
+        ),
       ),
     );
   }
@@ -1281,13 +1338,16 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
   Widget _buildCalendarStrip(CycleStatusModel s) {
     final today = DateTime.now();
     // Show 61 days: 30 before today, today, 30 after
-    final days = List.generate(61, (i) => today.subtract(Duration(days: 30 - i)));
+    final days =
+        List.generate(61, (i) => today.subtract(Duration(days: 30 - i)));
     final dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     // We can estimate the initial scroll offset so 'today' is somewhat centered.
     // Each item is about 52 pixels wide. (padding 8*2 + container 36 = 52)
-    final initialOffset = (30 * 52.0) - (MediaQuery.of(context).size.width / 2) + 26.0;
-    final ScrollController scrollController = ScrollController(initialScrollOffset: initialOffset > 0 ? initialOffset : 0);
+    final initialOffset =
+        (30 * 52.0) - (MediaQuery.of(context).size.width / 2) + 26.0;
+    final ScrollController scrollController = ScrollController(
+        initialScrollOffset: initialOffset > 0 ? initialOffset : 0);
 
     return GestureDetector(
       onTap: () => context.push(Routes.conceptionCalendar),
@@ -1319,10 +1379,10 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                     style: GoogleFonts.poppins(
                       color: isToday
                           ? AppColors.mainColor
-                          : AppColors.primaryTextColor, // Make day names darker to ensure visibility
+                          : AppColors
+                              .primaryTextColor, // Make day names darker to ensure visibility
                       fontSize: 12,
-                      fontWeight:
-                          isToday ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -1334,11 +1394,12 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                       shape: BoxShape.circle,
                       color: hasColor
                           ? dayColor
-                          : (isToday ? AppColors.mainColor : Colors.transparent),
+                          : (isToday
+                              ? AppColors.mainColor
+                              : Colors.transparent),
                       border: (isToday || hasColor)
                           ? null
-                          : Border.all(
-                              color: Colors.transparent, width: 1.5),
+                          : Border.all(color: Colors.transparent, width: 1.5),
                     ),
                     child: Center(
                       child: Text(
@@ -1634,7 +1695,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFFE67700)),
+              const Icon(Icons.arrow_forward_ios,
+                  size: 14, color: Color(0xFFE67700)),
             ],
           ),
         ),
@@ -1740,8 +1802,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right,
-                        color: AppColors.warningColor),
+                    Icon(Icons.chevron_right, color: AppColors.warningColor),
                   ],
                 ),
               ),
@@ -1815,7 +1876,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.85),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.mainColor.withOpacity(0.3), width: 1.5),
+          border: Border.all(
+              color: AppColors.mainColor.withOpacity(0.3), width: 1.5),
           boxShadow: [
             BoxShadow(
               color: AppColors.mainColor.withOpacity(0.08),
@@ -1885,14 +1947,17 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                           child: ElevatedButton(
                             onPressed: () async {
                               setState(() => _isLoading = true);
-                              final result = await ConceptionCycleService.startShuddhiJourney();
+                              final result = await ConceptionCycleService
+                                  .startShuddhiJourney();
                               if (result.isSuccess) {
                                 await _fetchAll();
                               } else {
                                 setState(() => _isLoading = false);
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(result.errorMessage ?? 'Failed to start journey.')),
+                                    SnackBar(
+                                        content: Text(result.errorMessage ??
+                                            'Failed to start journey.')),
                                   );
                                 }
                               }
@@ -1929,7 +1994,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
     if (_status?.shuddhiJourneyStartDate == null) {
       return _buildShuddhiIntro();
     }
-    
+
     final int effectiveDay = _status?.shuddhiDay ?? 1;
 
     return Padding(
@@ -1955,7 +2020,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF5B4182), Color(0xFFC26D68)],
@@ -1989,7 +2055,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                             originalTitle: 'Atma Conception',
                             index: 0,
                             imagePath: 'assets/images/s_u.png',
-                            isCompleted: quotientStatuses['Atma Conception'] == true && (quotientTotals['Atma Conception'] ?? 0) > 0,
+                            isCompleted: quotientStatuses['Atma Conception'] ==
+                                    true &&
+                                (quotientTotals['Atma Conception'] ?? 0) > 0,
                             effectiveDay: effectiveDay,
                           ),
                         ),
@@ -1999,7 +2067,10 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                             originalTitle: 'Sharir Conception',
                             index: 1,
                             imagePath: 'assets/images/p_d.png',
-                            isCompleted: quotientStatuses['Sharir Conception'] == true && (quotientTotals['Sharir Conception'] ?? 0) > 0,
+                            isCompleted:
+                                quotientStatuses['Sharir Conception'] == true &&
+                                    (quotientTotals['Sharir Conception'] ?? 0) >
+                                        0,
                             effectiveDay: effectiveDay,
                           ),
                         ),
@@ -2013,7 +2084,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                             originalTitle: 'Bhav Conception',
                             index: 2,
                             imagePath: 'assets/images/e_c.png',
-                            isCompleted: quotientStatuses['Bhav Conception'] == true && (quotientTotals['Bhav Conception'] ?? 0) > 0,
+                            isCompleted: quotientStatuses['Bhav Conception'] ==
+                                    true &&
+                                (quotientTotals['Bhav Conception'] ?? 0) > 0,
                             effectiveDay: effectiveDay,
                           ),
                         ),
@@ -2023,7 +2096,9 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                             originalTitle: 'Mann Conception',
                             index: 3,
                             imagePath: 'assets/images/m_p.png',
-                            isCompleted: quotientStatuses['Mann Conception'] == true && (quotientTotals['Mann Conception'] ?? 0) > 0,
+                            isCompleted: quotientStatuses['Mann Conception'] ==
+                                    true &&
+                                (quotientTotals['Mann Conception'] ?? 0) > 0,
                             effectiveDay: effectiveDay,
                           ),
                         ),
@@ -2113,8 +2188,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                   if (d != null) setInner(() => pickedDate = d);
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.backgroundColor,
                     borderRadius: BorderRadius.circular(12),
@@ -2151,8 +2226,7 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                     : () async {
                         Navigator.pop(ctx);
                         final r = await ConceptionCycleService.logPeriod(
-                          lmpDate: DateFormat('yyyy-MM-dd')
-                              .format(pickedDate!),
+                          lmpDate: DateFormat('yyyy-MM-dd').format(pickedDate!),
                         );
                         if (!mounted) return;
                         if (r.isSuccess) {
@@ -2168,10 +2242,8 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
                     gradient: pickedDate != null
-                        ? const LinearGradient(colors: [
-                            Color(0xFFE71C65),
-                            Color(0xFF861088)
-                          ])
+                        ? const LinearGradient(
+                            colors: [Color(0xFFE71C65), Color(0xFF861088)])
                         : null,
                     color: pickedDate == null
                         ? AppColors.secondaryTextColor.withValues(alpha: 0.3)
@@ -2229,6 +2301,344 @@ class _ConceptionDashboardScreenState extends State<ConceptionDashboardScreen> {
       ),
     );
   }
+
+  Widget _buildDarpanCard() {
+    if (_darpanStatus == null) return const SizedBox.shrink();
+
+    final bool hasAccess = _darpanStatus!['has_access'] ?? false;
+    final bool hasStartedJourney =
+        _darpanStatus!['has_started_journey'] ?? false;
+    final int cycleNumber =
+        (_darpanStatus!['current_cycle'] as num?)?.toInt() ?? 1;
+    final List<dynamic> completedCyclesRaw =
+        _darpanStatus!['completed_cycles'] ?? [];
+    final List<int> completedCycles =
+        completedCyclesRaw.map((e) => (e as num).toInt()).toList();
+    final bool isDue = _darpanStatus!['is_due'] ?? false;
+    final bool isLocked = _darpanStatus!['is_locked'] ?? false;
+    final int daysUntilUnlock =
+        (_darpanStatus!['days_until_unlock'] as num?)?.toInt() ?? 0;
+    final int effectiveDay = _status?.shuddhiDay ?? 1;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.mainColor.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mainColor.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.psychology, color: AppColors.mainColor, size: 28),
+              const SizedBox(width: 8),
+              Text(
+                'Shuddhi Darpan',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.blackColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (!hasAccess) ...[
+            Text(
+              'Unlock the Shuddhi Darpan assessment framework with a promo code.',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: AppColors.primaryTextColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _showPromoCodeDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mainColor,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Unlock Shuddhi Darpan',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ] else if (!hasStartedJourney)
+            Text(
+                'Please start your Shuddhi Framework journey to unlock the Darpan reflection.',
+                style: GoogleFonts.poppins(
+                    fontSize: 13, color: AppColors.primaryTextColor))
+          else ...[
+            if (cycleNumber <= 5)
+              Text(
+                isLocked
+                    ? 'Your Cycle $cycleNumber assessment will unlock in $daysUntilUnlock days.'
+                    : 'Cycle $cycleNumber Self-Assessment is ready!',
+                style: GoogleFonts.poppins(
+                    fontSize: 13, color: AppColors.primaryTextColor),
+              ),
+            if (cycleNumber > 5)
+              Text(
+                  'You have completed all 5 assessments in this Shuddhi Framework journey.',
+                  style: GoogleFonts.poppins(
+                      fontSize: 13, color: AppColors.primaryTextColor)),
+
+            const SizedBox(height: 16),
+
+            // Render a single "View Assessment Results" button if any cycles are completed
+            if (completedCycles.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DarpanHistoryScreen(
+                              completedCycles: completedCycles),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.mainColor,
+                      side: BorderSide(color: AppColors.mainColor),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text('View Assessment Results',
+                        style: GoogleFonts.poppins(
+                            fontSize: 14, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ),
+
+            // Next Cycle Button
+            if (cycleNumber <= 5)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isLocked
+                      ? () {
+                          AppMessenger.showSuccess(
+                              'Assessment $cycleNumber will unlock in $daysUntilUnlock days.');
+                        }
+                      : () async {
+                          final shouldRefresh = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DarpanAssessmentScreen(
+                                  cycleNumber: cycleNumber),
+                            ),
+                          );
+                          if (shouldRefresh == true) {
+                            _fetchDarpanStatus();
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isLocked ? Colors.grey : AppColors.mainColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text('Start Assessment $cycleNumber',
+                      style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white)),
+                ),
+              ),
+
+            // Restart Button (only if all 5 done)
+            if (cycleNumber > 5)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _showRestartDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text('Restart Shuddhi Journey',
+                      style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white)),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showRestartDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            'Restart Shuddhi Journey',
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18),
+          ),
+          content: Text(
+            'Are you sure you want to restart your 108-day journey? This will let you track your progress again from Cycle 1.',
+            style: GoogleFonts.poppins(fontSize: 13),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel',
+                  style: GoogleFonts.poppins(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                final result = await DarpanService.restartJourney();
+                if (result.isSuccess) {
+                  AppMessenger.showSuccess(
+                      'Your journey has been restarted successfully!');
+                  _fetchDarpanStatus();
+                } else {
+                  AppMessenger.showError(
+                    result.errorMessage ??
+                        'Failed to restart journey. Please try again.',
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text('Restart',
+                  style: GoogleFonts.poppins(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPromoCodeDialog() {
+    final TextEditingController promoController = TextEditingController();
+    bool isSubmitting = false;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Text(
+                'Unlock Shuddhi Darpan',
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600, fontSize: 18),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Enter your promo code to unlock the assessment.',
+                    style: GoogleFonts.poppins(fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: promoController,
+                    decoration: InputDecoration(
+                      hintText: 'Promo Code',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppColors.mainColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancel',
+                      style: GoogleFonts.poppins(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () async {
+                          if (promoController.text.trim().isEmpty) return;
+                          setDialogState(() => isSubmitting = true);
+                          final result = await DarpanService.applyPromoCode(
+                              promoController.text.trim());
+                          if (context.mounted) {
+                            setDialogState(() => isSubmitting = false);
+                            if (result.isSuccess) {
+                              Navigator.pop(context);
+                              AppMessenger.showSuccess(
+                                  'Shuddhi Darpan unlocked successfully!');
+                              _fetchDarpanStatus();
+                            } else {
+                              AppMessenger.showError(
+                                result.errorMessage ??
+                                    'Invalid promo code. Please try again.',
+                              );
+                            }
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: isSubmitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text('Unlock',
+                          style: GoogleFonts.poppins(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
 class _BlobBackground extends StatefulWidget {
@@ -2238,7 +2648,8 @@ class _BlobBackground extends StatefulWidget {
   State<_BlobBackground> createState() => _BlobBackgroundState();
 }
 
-class _BlobBackgroundState extends State<_BlobBackground> with SingleTickerProviderStateMixin {
+class _BlobBackgroundState extends State<_BlobBackground>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<Offset> _anim1;
   late Animation<Offset> _anim2;
@@ -2246,9 +2657,13 @@ class _BlobBackgroundState extends State<_BlobBackground> with SingleTickerProvi
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(seconds: 10))..repeat(reverse: true);
-    _anim1 = Tween<Offset>(begin: Offset.zero, end: const Offset(0.03, 0.04)).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
-    _anim2 = Tween<Offset>(begin: Offset.zero, end: const Offset(-0.04, -0.02)).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
+    _ctrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 10))
+          ..repeat(reverse: true);
+    _anim1 = Tween<Offset>(begin: Offset.zero, end: const Offset(0.03, 0.04))
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
+    _anim2 = Tween<Offset>(begin: Offset.zero, end: const Offset(-0.04, -0.02))
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
   }
 
   @override
@@ -2357,7 +2772,8 @@ class _GlowRingPainter extends CustomPainter {
     );
 
     final glowPaint = Paint()
-      ..shader = sweepGradient.createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = sweepGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 24
       ..strokeCap = StrokeCap.round
@@ -2372,7 +2788,8 @@ class _GlowRingPainter extends CustomPainter {
 
     // Main arc
     final arcPaint = Paint()
-      ..shader = sweepGradient.createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = sweepGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14
       ..strokeCap = StrokeCap.round;
@@ -2393,13 +2810,15 @@ class _GlowRingPainter extends CustomPainter {
 class FadeAndSlide extends StatefulWidget {
   final Widget child;
   final Duration delay;
-  const FadeAndSlide({Key? key, required this.child, required this.delay}) : super(key: key);
+  const FadeAndSlide({Key? key, required this.child, required this.delay})
+      : super(key: key);
 
   @override
   State<FadeAndSlide> createState() => _FadeAndSlideState();
 }
 
-class _FadeAndSlideState extends State<FadeAndSlide> with SingleTickerProviderStateMixin {
+class _FadeAndSlideState extends State<FadeAndSlide>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _fade;
   late Animation<Offset> _slide;
@@ -2408,11 +2827,15 @@ class _FadeAndSlideState extends State<FadeAndSlide> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
-    _slide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
-    _scale = Tween<double>(begin: 0.95, end: 1.0).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
-    
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 900));
+    _fade = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+    _slide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _scale = Tween<double>(begin: 0.95, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
+
     Future.delayed(widget.delay, () {
       if (mounted) _ctrl.forward();
     });
@@ -2451,15 +2874,20 @@ class FloatingAnimation extends StatefulWidget {
   State<FloatingAnimation> createState() => _FloatingAnimationState();
 }
 
-class _FloatingAnimationState extends State<FloatingAnimation> with SingleTickerProviderStateMixin {
+class _FloatingAnimationState extends State<FloatingAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<Offset> _anim;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat(reverse: true);
-    _anim = Tween<Offset>(begin: const Offset(0, -0.015), end: const Offset(0, 0.015)).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
+    _ctrl =
+        AnimationController(vsync: this, duration: const Duration(seconds: 4))
+          ..repeat(reverse: true);
+    _anim = Tween<Offset>(
+            begin: const Offset(0, -0.015), end: const Offset(0, 0.015))
+        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine));
   }
 
   @override
@@ -2480,19 +2908,23 @@ class _FloatingAnimationState extends State<FloatingAnimation> with SingleTicker
 class TwinkleAnimation extends StatefulWidget {
   final Widget child;
   final Duration delay;
-  const TwinkleAnimation({Key? key, required this.child, this.delay = Duration.zero}) : super(key: key);
+  const TwinkleAnimation(
+      {Key? key, required this.child, this.delay = Duration.zero})
+      : super(key: key);
 
   @override
   State<TwinkleAnimation> createState() => _TwinkleAnimationState();
 }
 
-class _TwinkleAnimationState extends State<TwinkleAnimation> with SingleTickerProviderStateMixin {
+class _TwinkleAnimationState extends State<TwinkleAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1500));
     Future.delayed(widget.delay, () {
       if (mounted) _ctrl.repeat(reverse: true);
     });
@@ -2507,11 +2939,14 @@ class _TwinkleAnimationState extends State<TwinkleAnimation> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: Tween<double>(begin: 0.3, end: 1.0).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut)),
+      opacity: Tween<double>(begin: 0.3, end: 1.0)
+          .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut)),
       child: ScaleTransition(
-        scale: Tween<double>(begin: 0.8, end: 1.2).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut)),
+        scale: Tween<double>(begin: 0.8, end: 1.2)
+            .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut)),
         child: RotationTransition(
-          turns: Tween<double>(begin: -0.02, end: 0.02).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine)),
+          turns: Tween<double>(begin: -0.02, end: 0.02).animate(
+              CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutSine)),
           child: widget.child,
         ),
       ),
@@ -2529,10 +2964,12 @@ class _FlippableCycleHeroCard extends StatefulWidget {
   });
 
   @override
-  State<_FlippableCycleHeroCard> createState() => _FlippableCycleHeroCardState();
+  State<_FlippableCycleHeroCard> createState() =>
+      _FlippableCycleHeroCardState();
 }
 
-class _FlippableCycleHeroCardState extends State<_FlippableCycleHeroCard> with SingleTickerProviderStateMixin {
+class _FlippableCycleHeroCardState extends State<_FlippableCycleHeroCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isFront = true;
@@ -2540,7 +2977,8 @@ class _FlippableCycleHeroCardState extends State<_FlippableCycleHeroCard> with S
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 600));
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -2614,7 +3052,8 @@ class AnimatedQuadCard extends StatefulWidget {
   State<AnimatedQuadCard> createState() => _AnimatedQuadCardState();
 }
 
-class _AnimatedQuadCardState extends State<AnimatedQuadCard> with SingleTickerProviderStateMixin {
+class _AnimatedQuadCardState extends State<AnimatedQuadCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _glowAnimation;
 
@@ -2644,64 +3083,73 @@ class _AnimatedQuadCardState extends State<AnimatedQuadCard> with SingleTickerPr
       onTapUp: (_) async {
         await _controller.reverse();
         HapticFeedback.lightImpact(); // Add native vibration
-        if (!mounted) return;
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (ctx) => ExistentialScreen(
-              from: widget.originalTitle,
-              quotientStatuses: widget.quotientStatuses,
-              index: widget.index,
-              cycleDay: widget.effectiveDay,
-              onExit: widget.notifyWidget,
-            ),
-          ),
-        ).then((_) => widget.notifyWidget());
+        if (!context.mounted) return;
+
+        if (widget.quotientStatuses[widget.originalTitle] == true) {
+          AppMessenger.showError(
+              "You have already completed this activity for today.");
+          return;
+        }
+
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (ctx) => ExistentialScreen(
+                  from: widget.originalTitle,
+                  quotientStatuses: widget.quotientStatuses,
+                  index: widget.index,
+                  cycleDay: widget.effectiveDay,
+                  onExit: widget.notifyWidget,
+                ),
+              ),
+            )
+            .then((_) => widget.notifyWidget());
       },
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-            Image.asset(
-              widget.imagePath,
-              fit: BoxFit.fitWidth,
-            ),
-            AnimatedBuilder(
-              animation: _glowAnimation,
-              builder: (context, child) {
-                return Opacity(
-                  opacity: _glowAnimation.value * 0.4,
-                  child: Image.asset(
-                    widget.imagePath,
-                    fit: BoxFit.fitWidth,
-                    color: Colors.white,
-                    colorBlendMode: BlendMode.srcATop,
-                  ),
-                );
-              },
-            ),
-            
-            // Completion checkmark badge (inset to prevent edge clipping)
-            if (widget.isCompleted)
-              Positioned(
-                top: (widget.index == 0 || widget.index == 1) ? 12 : null,
-                bottom: (widget.index == 2 || widget.index == 3) ? 12 : null,
-                right: (widget.index == 1 || widget.index == 3) ? 12 : null,
-                left: (widget.index == 0 || widget.index == 2) ? 12 : null,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2FBF71),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 14,
-                  ),
+          Image.asset(
+            widget.imagePath,
+            fit: BoxFit.fitWidth,
+          ),
+          AnimatedBuilder(
+            animation: _glowAnimation,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _glowAnimation.value * 0.4,
+                child: Image.asset(
+                  widget.imagePath,
+                  fit: BoxFit.fitWidth,
+                  color: Colors.white,
+                  colorBlendMode: BlendMode.srcATop,
+                ),
+              );
+            },
+          ),
+
+          // Completion checkmark badge (inset to prevent edge clipping)
+          if (widget.isCompleted)
+            Positioned(
+              top: (widget.index == 0 || widget.index == 1) ? 12 : null,
+              bottom: (widget.index == 2 || widget.index == 3) ? 12 : null,
+              right: (widget.index == 1 || widget.index == 3) ? 12 : null,
+              left: (widget.index == 0 || widget.index == 2) ? 12 : null,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF2FBF71),
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 14,
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
+      ),
     );
   }
 }

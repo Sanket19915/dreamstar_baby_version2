@@ -1565,9 +1565,15 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
               );
             });
       } else {
+        String firstCorrect = (data?.correctAnswer.isNotEmpty ?? false) ? data!.correctAnswer.first.toString() : "0";
+        int parsedCorrectIndex = int.tryParse(firstCorrect) ?? 0;
+        int optionsLen = data?.options.length ?? 0;
+        int safeIndex = (optionsLen <= parsedCorrectIndex) ? parsedCorrectIndex - 1 : parsedCorrectIndex;
+        if (safeIndex < 0 || safeIndex >= optionsLen) safeIndex = 0;
+        String displayIndexStr = optionsLen <= parsedCorrectIndex ? parsedCorrectIndex.toString() : (parsedCorrectIndex + 1).toString();
+
         if ((data?.correctAnswer.isNotEmpty ?? false) &&
-            ((selectedOptionIndex != null ? (selectedOptionIndex ?? 0) : 0)) ==
-                int.parse(data?.correctAnswer.first.toString() ?? "0")) {
+            (((selectedOptionIndex != null ? (selectedOptionIndex ?? 0) : 0)) == parsedCorrectIndex || parsedCorrectIndex < 0)) {
           isCorrect = true;
           isDisable = true;
           answerNotifier.notifyListeners();
@@ -1596,48 +1602,25 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                               color: AppColors.mainColor),
                         ),
                         const SizedBox(height: 20),
-                        (((data?.options.length ?? 0) <=
-                                        int.parse(data?.correctAnswer.first
-                                                .toString() ??
-                                            "0"))
-                                    ? (data
-                                            ?.options[(int.parse(data
-                                                    .correctAnswer.first
-                                                    .toString())) -
-                                                1]
-                                            .image ??
-                                        "")
-                                    : (data
-                                            ?.options[int.parse(data
-                                                .correctAnswer.first
-                                                .toString())]
-                                            .image ??
-                                        ""))
-                                .isNotEmpty
+                        (optionsLen > 0 && (data?.options[safeIndex].image.isNotEmpty ?? false))
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ",
+                                    "$displayIndexStr) ",
                                     // data?.answerKeyInput ?? "",
                                     textAlign: TextAlign.center,
                                   ),
                                   Image.network(
-                                    "${ApiConfig.storageBase}/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                    "${ApiConfig.storageBase}/${data?.options[safeIndex].image ?? ""}",
                                     height: 90,
                                     width: 100,
                                   ),
                                 ],
                               )
                             : Text(
-                                ((data?.options.length ?? 0) <=
-                                        int.parse(data?.correctAnswer.first
-                                                .toString() ??
-                                            "0"))
-                                    ? "${(int.parse(data?.correctAnswer.first.toString() ?? "0"))}) ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text ?? ""}"
-                                    : "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text ?? ""}",
-
+                                "$displayIndexStr) ${optionsLen > 0 ? data?.options[safeIndex].text : ""}",
                                 // data?.answerKeyInput ?? "",
                                 textAlign: TextAlign.center,
                               ),
@@ -1711,48 +1694,25 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
                             //     color: AppColors.mainColor),
                           ),
                           const SizedBox(height: 10),
-                          (((data?.options.length ?? 0) <=
-                                          int.parse(data?.correctAnswer.first
-                                                  .toString() ??
-                                              "0"))
-                                      ? (data
-                                              ?.options[(int.parse(data
-                                                      .correctAnswer.first
-                                                      .toString())) -
-                                                  1]
-                                              .image ??
-                                          "")
-                                      : (data
-                                              ?.options[int.parse(data
-                                                  .correctAnswer.first
-                                                  .toString())]
-                                              .image ??
-                                          ""))
-                                  .isNotEmpty
+                          (optionsLen > 0 && (data?.options[safeIndex].image.isNotEmpty ?? false))
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ",
+                                      "$displayIndexStr) ",
                                       // data?.answerKeyInput ?? "",
                                       textAlign: TextAlign.center,
                                     ),
                                     Image.network(
-                                      "${ApiConfig.storageBase}/${((data?.options.length ?? 0) <= int.parse(data?.correctAnswer.first.toString() ?? "0")) ? (data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].image ?? "") : (data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].image ?? "")}",
+                                      "${ApiConfig.storageBase}/${data?.options[safeIndex].image ?? ""}",
                                       height: 90,
                                       width: 100,
                                     ),
                                   ],
                                 )
                               : Text(
-                                  ((data?.options.length ?? 0) <=
-                                          int.parse(data?.correctAnswer.first
-                                                  .toString() ??
-                                              "0"))
-                                      ? "${(int.parse(data?.correctAnswer.first.toString() ?? "0"))}) ${data?.options[(int.parse(data.correctAnswer.first.toString() ?? "0")) - 1].text ?? ""}"
-                                      : "${(int.parse(data?.correctAnswer.first.toString() ?? "0") + 1)}) ${data?.options[int.parse(data.correctAnswer.first.toString() ?? "0")].text ?? ""}",
-
+                                  "$displayIndexStr) ${optionsLen > 0 ? data?.options[safeIndex].text : ""}",
                                   // data?.answerKeyInput ?? "",
                                   textAlign: TextAlign.center,
                                 ),
@@ -2038,8 +1998,9 @@ class _ExistentialScreenState extends State<ExistentialScreen> {
 
   Future<void> fetchQuotientStatuses() async {
     try {
+      final String queryStr = widget.cycleDay != null ? '?day=${widget.cycleDay}' : '';
       final data = await ApiClient.get(
-        ApiConfig.userQuestionStatus,
+        '${ApiConfig.userQuestionStatus}$queryStr',
         authenticated: true,
       );
       final statuses = data['statuses'] as Map<String, dynamic>?;

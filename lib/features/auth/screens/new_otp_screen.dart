@@ -73,6 +73,7 @@ class _NewOTPScreenState extends State<NewOTPScreen> {
       if (token != null && token.isNotEmpty) {
         await AuthService.establishSession(token);
       }
+      if (!mounted) return;
       context.go(
         Routes.journeySelection,
         extra: (data['user_id'] ?? result.data?['user_id']).toString(),
@@ -153,7 +154,8 @@ class _NewOTPScreenState extends State<NewOTPScreen> {
                                 return Stack(
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: List.generate(6, (index) {
                                         String digit = '';
                                         if (value.length > index) {
@@ -166,10 +168,14 @@ class _NewOTPScreenState extends State<NewOTPScreen> {
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                              color: isActive ? AppColors.primaryColor : AppColors.secondaryTextColor.withValues(alpha: 0.5),
+                                              color: isActive
+                                                  ? AppColors.primaryColor
+                                                  : AppColors.secondaryTextColor
+                                                      .withValues(alpha: 0.5),
                                               width: isActive ? 2 : 1,
                                             ),
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             color: AppColors.whiteColor,
                                           ),
                                           child: Text(

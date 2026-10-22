@@ -26,7 +26,7 @@ class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -35,7 +35,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController dobController = TextEditingController();
   LoginViewModel get viewModel =>
       Provider.of<LoginViewModel>(context, listen: false);
@@ -129,7 +130,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -206,7 +208,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 height: double.infinity,
                 child: Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                  padding:
+                      EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                   child: SafeArea(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.only(
@@ -226,7 +229,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   tag: 'Logo',
                                   child: Image.asset(
                                     AppImages.logoNew,
-                                    height: MediaQuery.of(context).size.height * .06,
+                                    height: MediaQuery.of(context).size.height *
+                                        .06,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -239,11 +243,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Create your account',
@@ -278,7 +285,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         hintText: 'Enter first name',
                                         controller: firstNameController,
                                         textInputAction: TextInputAction.next,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.text,
                                         validator: firstNameValidator,
                                         onValidChanged: (v) =>
@@ -293,7 +301,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         hintText: 'Enter last name',
                                         controller: lastNameController,
                                         textInputAction: TextInputAction.next,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.text,
                                         validator: lastNameValidator,
                                         onValidChanged: (v) =>
@@ -308,12 +317,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         hintText: 'Enter 10-digit number',
                                         controller: phoneController,
                                         textInputAction: TextInputAction.next,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.number,
                                         prefixText: '+91 ',
                                         inputFormatters: [
                                           LengthLimitingTextInputFormatter(10),
-                                          FilteringTextInputFormatter.digitsOnly,
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
                                         ],
                                         validator: phoneValidator,
                                         onValidChanged: (v) =>
@@ -328,7 +339,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         hintText: 'Enter email address',
                                         controller: emailController,
                                         textInputAction: TextInputAction.next,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.email,
                                         validator: emailValidator,
                                         onValidChanged: (v) =>
@@ -343,14 +355,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         hintText: 'Select date of birth',
                                         controller: dobController,
                                         readOnly: true,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         validator: dobValidator,
                                         onValidChanged: (v) =>
                                             setState(() => _dobValid = v),
                                         suffix: InkWell(
                                           onTap: _pickDob,
                                           child: const Padding(
-                                            padding: EdgeInsets.only(right: 12.0),
+                                            padding:
+                                                EdgeInsets.only(right: 12.0),
                                             child: Icon(
                                               Icons.calendar_today_outlined,
                                               color: AppColors.mainColor,
@@ -368,7 +382,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         controller: passwordController,
                                         textInputAction: TextInputAction.next,
                                         obscureText: true,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.password,
                                         validator: passwordValidator,
                                         onValidChanged: (v) =>
@@ -384,7 +399,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         controller: confirmPasswordController,
                                         textInputAction: TextInputAction.done,
                                         obscureText: true,
-                                        borderColor: AppColors.secondaryTextColor,
+                                        borderColor:
+                                            AppColors.secondaryTextColor,
                                         inputType: CustomTextInputType.password,
                                         validator: confirmPasswordValidator,
                                         onValidChanged: (v) => setState(
@@ -402,11 +418,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             ? AppColors.primaryColor
                                             : AppColors.secondaryTextColor
                                                 .withValues(alpha: .5),
-                                        textStyle: CustomLabels.body3GreyTextStyle(
+                                        textStyle:
+                                            CustomLabels.body3GreyTextStyle(
                                           fontSize: 16,
                                           color: AppColors.whiteColor,
                                         ),
-                                        onPressed: isFormValid ? _sendOTP : null,
+                                        onPressed:
+                                            isFormValid ? _sendOTP : null,
                                       ),
                                     ],
                                   ),
@@ -415,7 +433,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 RichText(
                                   text: TextSpan(
                                     text: "Already have an account? ",
-                                    style: const TextStyle(color: Colors.black45),
+                                    style:
+                                        const TextStyle(color: Colors.black45),
                                     children: <TextSpan>[
                                       TextSpan(
                                         text: 'Login here',

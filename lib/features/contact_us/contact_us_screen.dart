@@ -10,14 +10,8 @@ import '../../shared/helper/app_images.dart';
 class ContactUsScreen extends StatelessWidget {
   const ContactUsScreen({super.key});
 
-  Future<bool> launchUrl(Uri uri) async {
-    if (await canLaunch(uri.toString())) {
-      await launch(uri.toString());
-      return true;
-    } else {
-      return false;
-    }
-  }
+  Future<bool> _launchExternalUrl(Uri uri) =>
+      launchUrl(uri, mode: LaunchMode.externalApplication);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +24,8 @@ class ContactUsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Contact Us',
-          style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.mainColor),
+          style: TextStyle(
+              fontWeight: FontWeight.w600, color: AppColors.mainColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -80,12 +75,15 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.chat,
                           text: 'Chat with Us',
                           onTap: () async {
-                            final whatsappUrl = Uri.parse('https://wa.me/917030962300');
-                            if (await canLaunchUrl(whatsappUrl)) {
-                              await launchUrl(whatsappUrl);
-                            } else {
+                            final whatsappUrl =
+                                Uri.parse('https://wa.me/917030962300');
+                            final launched =
+                                await _launchExternalUrl(whatsappUrl);
+                            if (!context.mounted) return;
+                            if (!launched) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Could not open WhatsApp')),
+                                const SnackBar(
+                                    content: Text('Could not open WhatsApp')),
                               );
                             }
                           },
@@ -96,11 +94,12 @@ class ContactUsScreen extends StatelessWidget {
                           text: '+917030962300',
                           onTap: () async {
                             final phoneUrl = Uri.parse('tel:+917030962300');
-                            if (await launchUrl(phoneUrl)) {
-                              await launchUrl(phoneUrl);
-                            } else {
+                            final launched = await _launchExternalUrl(phoneUrl);
+                            if (!context.mounted) return;
+                            if (!launched) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Could not make the call')),
+                                const SnackBar(
+                                    content: Text('Could not make the call')),
                               );
                             }
                           },
@@ -110,12 +109,16 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.web,
                           text: 'https://garbhasanskar.sonaljainjayaswal.com/',
                           onTap: () async {
-                            final websiteUrl = Uri.parse('https://garbhasanskar.sonaljainjayaswal.com/');
-                            if (await canLaunchUrl(websiteUrl)) {
-                              await launchUrl(websiteUrl);
-                            } else {
+                            final websiteUrl = Uri.parse(
+                                'https://garbhasanskar.sonaljainjayaswal.com/');
+                            final launched =
+                                await _launchExternalUrl(websiteUrl);
+                            if (!context.mounted) return;
+                            if (!launched) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Could not open the website')),
+                                const SnackBar(
+                                    content:
+                                        Text('Could not open the website')),
                               );
                             }
                           },
@@ -125,12 +128,14 @@ class ContactUsScreen extends StatelessWidget {
                           icon: Icons.email,
                           text: 'contact@sonaljainjayaswal.com',
                           onTap: () async {
-                            final emailUrl = Uri.parse('mailto:contact@sonaljainjayaswal.com');
-                            if (await canLaunchUrl(emailUrl)) {
-                              await launchUrl(emailUrl);
-                            } else {
+                            final emailUrl = Uri.parse(
+                                'mailto:contact@sonaljainjayaswal.com');
+                            final launched = await _launchExternalUrl(emailUrl);
+                            if (!context.mounted) return;
+                            if (!launched) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Could not send the email')),
+                                const SnackBar(
+                                    content: Text('Could not send the email')),
                               );
                             }
                           },
